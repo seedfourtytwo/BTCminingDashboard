@@ -49,6 +49,12 @@ jobs:
           file: ./coverage/lcov.info
           flags: unittests
           name: codecov-umbrella
+          
+      - name: Claude Code Analysis
+        uses: anthropics/claude-code-action@beta
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          anthropic_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
   # Job 2: Build - Only runs if quality checks pass
   build:
