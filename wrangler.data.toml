@@ -74,9 +74,9 @@ crons = ["0 0 * * *"]    # Daily - Equipment database updates
 [[triggers]]
 crons = ["0 12 * * 1"]   # Weekly Monday noon - Weather data refresh
 
-# Standard CPU limits for API calls
-[limits]
-cpu_ms = 10000  # 10 seconds for external API operations
+# CPU limits disabled for free plan
+# [limits]
+# cpu_ms = 10000  # 10 seconds for external API operations
 
 [observability]
 enabled = true

@@ -73,9 +73,9 @@ API_VERSION = "v1"
 CORS_ORIGIN = "https://solar-mining-calculator.pages.dev"
 API_VERSION = "v1"
 
-# Optimized for fast API responses
-[limits]
-cpu_ms = 50
+# CPU limits disabled for free plan
+# [limits]
+# cpu_ms = 50
 
 [observability]
 enabled = true
