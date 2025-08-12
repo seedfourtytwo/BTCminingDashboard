@@ -33,33 +33,25 @@ export abstract class BaseRepository<T extends BaseEntity> {
    * Find entity by ID
    */
   async findById(id: string): Promise<T | null> {
-    return await this.connection.first<T>(
-      `SELECT * FROM ${this.tableName} WHERE id = ?`,
-      [id]
-    );
+    return await this.connection.first<T>(`SELECT * FROM ${this.tableName} WHERE id = ?`, [id]);
   }
 
   /**
    * Find multiple entities with pagination
    */
   async findMany(params: PaginationParams = {}): Promise<PaginatedResult<T>> {
-    const {
-      page = 1,
-      per_page = 20,
-      sort_by = 'created_at',
-      sort_order = 'desc'
-    } = params;
+    const { page = 1, per_page = 20, sort_by = 'created_at', sort_order = 'desc' } = params;
 
     const offset = (page - 1) * per_page;
     const limit = per_page;
 
     // Validate and sanitize sort parameters to prevent SQL injection
     const allowedSortColumns = new Set(['id', 'created_at', 'updated_at', 'name']);
-    const allowedSortOrder: Record<string, 'ASC' | 'DESC'> = { 
-      asc: 'ASC', 
-      desc: 'DESC' 
+    const allowedSortOrder: Record<string, 'ASC' | 'DESC'> = {
+      asc: 'ASC',
+      desc: 'DESC',
     };
-    
+
     const sortColumn = allowedSortColumns.has(sort_by || '') ? sort_by! : 'created_at';
     const sortDirection = allowedSortOrder[(sort_order || 'desc').toLowerCase()] ?? 'DESC';
 
@@ -87,8 +79,8 @@ export abstract class BaseRepository<T extends BaseEntity> {
         total,
         total_pages,
         has_next: page < total_pages,
-        has_prev: page > 1
-      }
+        has_prev: page > 1,
+      },
     };
   }
 
@@ -98,12 +90,12 @@ export abstract class BaseRepository<T extends BaseEntity> {
   async create(data: Omit<T, 'id' | 'created_at' | 'updated_at'>): Promise<T> {
     const id = this.generateId();
     const now = new Date().toISOString();
-    
+
     const entityData = {
       ...data,
       id,
       created_at: now,
-      updated_at: now
+      updated_at: now,
     };
 
     const columns = Object.keys(entityData);
@@ -129,7 +121,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
   async update(id: string, data: Partial<Omit<T, 'id' | 'created_at'>>): Promise<T> {
     const updateData = {
       ...data,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     const columns = Object.keys(updateData);
@@ -157,10 +149,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
    * Delete an entity by ID
    */
   async delete(id: string): Promise<boolean> {
-    const result = await this.connection.run(
-      `DELETE FROM ${this.tableName} WHERE id = ?`,
-      [id]
-    );
+    const result = await this.connection.run(`DELETE FROM ${this.tableName} WHERE id = ?`, [id]);
 
     return result.changes !== undefined && result.changes > 0;
   }
@@ -191,10 +180,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
   /**
    * Execute a custom query for this table
    */
-  protected async query<R = T>(
-    sql: string,
-    params: unknown[] = []
-  ): Promise<R[]> {
+  protected async query<R = T>(sql: string, params: unknown[] = []): Promise<R[]> {
     const result = await this.connection.execute<R>(sql, params);
     return result.results || [];
   }
@@ -202,10 +188,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
   /**
    * Execute a custom query and return first result
    */
-  protected async queryFirst<R = T>(
-    sql: string,
-    params: unknown[] = []
-  ): Promise<R | null> {
+  protected async queryFirst<R = T>(sql: string, params: unknown[] = []): Promise<R | null> {
     return await this.connection.first<R>(sql, params);
   }
 
@@ -244,9 +227,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
       }
     }
 
-    const whereClause = conditions.length > 0 
-      ? `WHERE ${conditions.join(' AND ')}`
-      : '';
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     return { whereClause, params };
   }
@@ -254,10 +235,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
   /**
    * Build ORDER BY clause
    */
-  protected buildOrderClause(
-    sortBy?: string,
-    sortOrder: 'asc' | 'desc' = 'desc'
-  ): string {
+  protected buildOrderClause(sortBy?: string, sortOrder: 'asc' | 'desc' = 'desc'): string {
     if (!sortBy) {
       return 'ORDER BY created_at DESC';
     }
@@ -268,7 +246,10 @@ export abstract class BaseRepository<T extends BaseEntity> {
   /**
    * Build LIMIT and OFFSET clause
    */
-  protected buildLimitClause(page: number = 1, perPage: number = 20): {
+  protected buildLimitClause(
+    page: number = 1,
+    perPage: number = 20
+  ): {
     limitClause: string;
     offset: number;
     limit: number;

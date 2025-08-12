@@ -1,7 +1,7 @@
 /**
  * API Worker - Main application server
  * Port: 8787
- * 
+ *
  * Responsibilities:
  * - HTTP routing and request handling
  * - Database CRUD operations (D1)
@@ -18,7 +18,7 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const method = request.method;
-    
+
     // CORS headers for development
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
@@ -34,11 +34,14 @@ export default {
     try {
       // Health check endpoint
       if (url.pathname === '/health') {
-        return Response.json({ 
-          status: 'healthy', 
-          worker: 'api',
-          timestamp: new Date().toISOString() 
-        }, { headers: corsHeaders });
+        return Response.json(
+          {
+            status: 'healthy',
+            worker: 'api',
+            timestamp: new Date().toISOString(),
+          },
+          { headers: corsHeaders }
+        );
       }
 
       // API versioning - all API routes start with /api/v1
@@ -47,27 +50,29 @@ export default {
       }
 
       // Default response for unmatched routes
-      return new Response('Not Found', { 
-        status: 404, 
-        headers: corsHeaders 
+      return new Response('Not Found', {
+        status: 404,
+        headers: corsHeaders,
       });
-
     } catch (error) {
       console.error('API Worker Error:', error);
-      return Response.json({
-        error: 'Internal Server Error',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      }, { 
-        status: 500, 
-        headers: corsHeaders 
-      });
+      return Response.json(
+        {
+          error: 'Internal Server Error',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
+        {
+          status: 500,
+          headers: corsHeaders,
+        }
+      );
     }
   },
 } satisfies ExportedHandler<Env>;
 
 async function handleAPIRoutes(
-  request: Request, 
-  env: Env, 
+  request: Request,
+  env: Env,
   _ctx: ExecutionContext,
   corsHeaders: Record<string, string>
 ): Promise<Response> {
@@ -90,7 +95,10 @@ async function handleAPIRoutes(
   // System configuration routes
   if (path.startsWith('/system-configs')) {
     // TODO: Import and use system config handlers
-    return Response.json({ message: 'System config endpoints coming soon' }, { headers: corsHeaders });
+    return Response.json(
+      { message: 'System config endpoints coming soon' },
+      { headers: corsHeaders }
+    );
   }
 
   // Bitcoin network data routes
@@ -100,14 +108,14 @@ async function handleAPIRoutes(
     const upstream = new Request(new URL(`/bitcoin${url.search}`, 'http://internal'), {
       method,
       headers: request.headers,
-      ...(body && { body })
+      ...(body && { body }),
     });
     const response = await env.DATA_SERVICE.fetch(upstream);
-    
+
     const data = await response.json();
-    return Response.json(data, { 
-      status: response.status, 
-      headers: corsHeaders 
+    return Response.json(data, {
+      status: response.status,
+      headers: corsHeaders,
     });
   }
 
@@ -118,19 +126,19 @@ async function handleAPIRoutes(
     const weatherUpstream = new Request(new URL(`/weather${url.search}`, 'http://internal'), {
       method,
       headers: request.headers,
-      ...(weatherBody && { body: weatherBody })
+      ...(weatherBody && { body: weatherBody }),
     });
     const response = await env.DATA_SERVICE.fetch(weatherUpstream);
-    
+
     const data = await response.json();
-    return Response.json(data, { 
-      status: response.status, 
-      headers: corsHeaders 
+    return Response.json(data, {
+      status: response.status,
+      headers: corsHeaders,
     });
   }
 
-  return new Response('API endpoint not found', { 
-    status: 404, 
-    headers: corsHeaders 
+  return new Response('API endpoint not found', {
+    status: 404,
+    headers: corsHeaders,
   });
 }

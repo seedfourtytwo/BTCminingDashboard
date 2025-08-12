@@ -10,12 +10,15 @@ export class CalculationEngine {
 
   async fetch(_request: Request): Promise<Response> {
     // TODO: Implement stateful calculation engine
-    return new Response(JSON.stringify({
-      message: 'Calculation Engine - Not implemented yet',
-      timestamp: new Date().toISOString()
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        message: 'Calculation Engine - Not implemented yet',
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -26,11 +29,14 @@ export class MonteCarloEngine {
 
   async fetch(_request: Request): Promise<Response> {
     // TODO: Implement Monte Carlo simulation engine
-    return new Response(JSON.stringify({
-      message: 'Monte Carlo Engine - Not implemented yet',
-      timestamp: new Date().toISOString()
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        message: 'Monte Carlo Engine - Not implemented yet',
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }

@@ -27,7 +27,7 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "lint:ci": "eslint src --ext .ts,.tsx --format=junit --output-file=eslint-report.xml",
+    "lint:ci": "eslint src --ext .ts,.tsx --format=junit --output-file=eslint-report.xml --max-warnings 100",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "db:migrate": "wrangler d1 execute solar-mining-db-dev --file=src/server/shared/database/migrations/0001_initial_schema.sql --config wrangler.api.toml",

@@ -5,14 +5,14 @@
 export abstract class AppError extends Error {
   abstract readonly code: string;
   abstract readonly statusCode: number;
-  
+
   constructor(
     message: string,
     public readonly context?: Record<string, unknown>
   ) {
     super(message);
     this.name = this.constructor.name;
-    
+
     // Maintains proper stack trace for where our error was thrown
     if (typeof Error.captureStackTrace === 'function') {
       Error.captureStackTrace(this, this.constructor);
@@ -26,7 +26,7 @@ export abstract class AppError extends Error {
       code: this.code,
       statusCode: this.statusCode,
       context: this.context,
-      stack: this.stack
+      stack: this.stack,
     };
   }
 }
@@ -34,7 +34,7 @@ export abstract class AppError extends Error {
 export class ValidationError extends AppError {
   readonly code = 'VALIDATION_ERROR';
   readonly statusCode = 400;
-  
+
   constructor(
     message: string,
     public readonly field?: string,
@@ -48,11 +48,8 @@ export class ValidationError extends AppError {
 export class DatabaseError extends AppError {
   readonly code = 'DATABASE_ERROR';
   readonly statusCode = 500;
-  
-  constructor(
-    message: string,
-    context?: Record<string, unknown>
-  ) {
+
+  constructor(message: string, context?: Record<string, unknown>) {
     super(message, context);
   }
 }
@@ -60,7 +57,7 @@ export class DatabaseError extends AppError {
 export class CalculationError extends AppError {
   readonly code = 'CALCULATION_ERROR';
   readonly statusCode = 422;
-  
+
   constructor(
     message: string,
     public readonly calculationType?: string,
@@ -73,7 +70,7 @@ export class CalculationError extends AppError {
 export class ExternalAPIError extends AppError {
   readonly code = 'EXTERNAL_API_ERROR';
   readonly statusCode = 502;
-  
+
   constructor(
     message: string,
     public readonly apiProvider?: string,
@@ -87,13 +84,9 @@ export class ExternalAPIError extends AppError {
 export class NotFoundError extends AppError {
   readonly code = 'NOT_FOUND';
   readonly statusCode = 404;
-  
-  constructor(
-    resource: string,
-    identifier?: string,
-    context?: Record<string, unknown>
-  ) {
-    const message = identifier 
+
+  constructor(resource: string, identifier?: string, context?: Record<string, unknown>) {
+    const message = identifier
       ? `${resource} with identifier '${identifier}' not found`
       : `${resource} not found`;
     super(message, context);
@@ -103,11 +96,8 @@ export class NotFoundError extends AppError {
 export class AuthenticationError extends AppError {
   readonly code = 'AUTHENTICATION_ERROR';
   readonly statusCode = 401;
-  
-  constructor(
-    message: string = 'Authentication required',
-    context?: Record<string, unknown>
-  ) {
+
+  constructor(message: string = 'Authentication required', context?: Record<string, unknown>) {
     super(message, context);
   }
 }
@@ -115,7 +105,7 @@ export class AuthenticationError extends AppError {
 export class AuthorizationError extends AppError {
   readonly code = 'AUTHORIZATION_ERROR';
   readonly statusCode = 403;
-  
+
   constructor(
     message: string = 'Insufficient permissions',
     public readonly requiredPermission?: string,
@@ -128,7 +118,7 @@ export class AuthorizationError extends AppError {
 export class RateLimitError extends AppError {
   readonly code = 'RATE_LIMIT_ERROR';
   readonly statusCode = 429;
-  
+
   constructor(
     message: string = 'Rate limit exceeded',
     public readonly retryAfter?: number,
@@ -141,7 +131,7 @@ export class RateLimitError extends AppError {
 export class ConfigurationError extends AppError {
   readonly code = 'CONFIGURATION_ERROR';
   readonly statusCode = 500;
-  
+
   constructor(
     message: string,
     public readonly configKey?: string,
@@ -154,12 +144,8 @@ export class ConfigurationError extends AppError {
 export class TimeoutError extends AppError {
   readonly code = 'TIMEOUT_ERROR';
   readonly statusCode = 408;
-  
-  constructor(
-    operation: string,
-    timeoutMs: number,
-    context?: Record<string, unknown>
-  ) {
+
+  constructor(operation: string, timeoutMs: number, context?: Record<string, unknown>) {
     super(`Operation '${operation}' timed out after ${timeoutMs}ms`, context);
   }
 }
@@ -170,51 +156,63 @@ export function handleError(error: unknown): Response {
 
   // Handle known application errors
   if (error instanceof AppError) {
-    return Response.json({
-      success: false,
-      error: {
-        code: error.code,
-        message: error.message,
-        context: error.context
+    return Response.json(
+      {
+        success: false,
+        error: {
+          code: error.code,
+          message: error.message,
+          context: error.context,
+        },
+      },
+      {
+        status: error.statusCode,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
-    }, { 
-      status: error.statusCode,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    );
   }
 
   // Handle standard JavaScript errors
   if (error instanceof Error) {
-    return Response.json({
-      success: false,
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: 'An internal error occurred',
-        details: typeof process !== 'undefined' && process.env?.NODE_ENV === 'development' ? error.message : undefined
+    return Response.json(
+      {
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'An internal error occurred',
+          details:
+            typeof process !== 'undefined' && process.env?.NODE_ENV === 'development'
+              ? error.message
+              : undefined,
+        },
+      },
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
-    }, { 
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    );
   }
 
   // Handle unknown errors
-  return Response.json({
-    success: false,
-    error: {
-      code: 'UNKNOWN_ERROR',
-      message: 'An unknown error occurred'
+  return Response.json(
+    {
+      success: false,
+      error: {
+        code: 'UNKNOWN_ERROR',
+        message: 'An unknown error occurred',
+      },
+    },
+    {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     }
-  }, { 
-    status: 500,
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
+  );
 }
 
 // Utility functions for error handling
@@ -253,7 +251,7 @@ export interface ErrorLogContext {
 }
 
 export function logError(
-  error: unknown, 
+  error: unknown,
   context: ErrorLogContext,
   additionalContext?: Record<string, unknown>
 ): void {
@@ -265,19 +263,19 @@ export function logError(
       message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
       code: error instanceof AppError ? error.code : undefined,
-      statusCode: error instanceof AppError ? error.statusCode : undefined
+      statusCode: error instanceof AppError ? error.statusCode : undefined,
     },
     request: {
       id: context.requestId,
       endpoint: context.endpoint,
       userAgent: context.userAgent,
       ipAddress: context.ipAddress,
-      userId: context.userId
+      userId: context.userId,
     },
     context: {
       ...additionalContext,
-      ...(error instanceof AppError ? error.context : {})
-    }
+      ...(error instanceof AppError ? error.context : {}),
+    },
   };
 
   console.error('Application Error:', JSON.stringify(logData, null, 2));

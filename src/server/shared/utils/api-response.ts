@@ -21,8 +21,8 @@ export function createSuccessResponse<T>(
     data,
     meta: {
       timestamp: new Date().toISOString(),
-      ...meta
-    }
+      ...meta,
+    },
   };
 }
 
@@ -42,8 +42,8 @@ export function createErrorResponse(
     error,
     meta: {
       timestamp: new Date().toISOString(),
-      ...meta
-    }
+      ...meta,
+    },
   };
 
   if (message !== undefined) {
@@ -70,8 +70,8 @@ export function createPaginatedResponse<T>(
     meta: {
       timestamp: new Date().toISOString(),
       pagination,
-      ...meta
-    }
+      ...meta,
+    },
   };
 }
 
@@ -88,7 +88,7 @@ export function jsonResponse<T>(
   }
 ): Response {
   const { status = 200, headers = {}, pagination, request_id } = options || {};
-  
+
   const metaData: any = { request_id };
   if (pagination) {
     metaData.pagination = pagination;
@@ -97,12 +97,12 @@ export function jsonResponse<T>(
 
   const responseHeaders = {
     'Content-Type': 'application/json',
-    ...headers
+    ...headers,
   };
 
   return new Response(JSON.stringify(responseData), {
     status,
-    headers: responseHeaders
+    headers: responseHeaders,
   });
 }
 
@@ -119,7 +119,7 @@ export function errorResponse(
   }
 ): Response {
   const { status = 500, headers = {}, message, request_id } = options || {};
-  
+
   const metaData: any = {};
   if (request_id) {
     metaData.request_id = request_id;
@@ -128,12 +128,12 @@ export function errorResponse(
 
   const responseHeaders = {
     'Content-Type': 'application/json',
-    ...headers
+    ...headers,
   };
 
   return new Response(JSON.stringify(responseData), {
     status,
-    headers: responseHeaders
+    headers: responseHeaders,
   });
 }
 
@@ -148,7 +148,7 @@ export function validationErrorResponse(
   }
 ): Response {
   const { headers = {}, request_id } = options || {};
-  
+
   const responseData: APIResponse<never> = {
     success: false,
     error: 'Validation Error',
@@ -156,18 +156,18 @@ export function validationErrorResponse(
     meta: {
       timestamp: new Date().toISOString(),
       ...(request_id && { request_id }),
-      validation_errors: errors
-    } as any
+      validation_errors: errors,
+    } as any,
   };
 
   const responseHeaders = {
     'Content-Type': 'application/json',
-    ...headers
+    ...headers,
   };
 
   return new Response(JSON.stringify(responseData), {
     status: 400,
-    headers: responseHeaders
+    headers: responseHeaders,
   });
 }
 
@@ -182,24 +182,23 @@ export function notFoundResponse(
   }
 ): Response {
   const { headers = {}, request_id } = options || {};
-  
-  return errorResponse(
-    'Not Found',
-    {
-      status: 404,
-      headers,
-      message: `${resource} not found`,
-      ...(request_id && { request_id })
-    }
-  );
+
+  return errorResponse('Not Found', {
+    status: 404,
+    headers,
+    message: `${resource} not found`,
+    ...(request_id && { request_id }),
+  });
 }
 
 /**
  * Extract request ID from request headers for consistent tracking
  */
 export function getRequestId(request: Request): string {
-  return request.headers.get('x-request-id') || 
-         `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return (
+    request.headers.get('x-request-id') ||
+    `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  );
 }
 
 /**
@@ -207,15 +206,15 @@ export function getRequestId(request: Request): string {
  */
 export function withCORS(response: Response, allowedOrigins: string[] = ['*']): Response {
   const headers = new Headers(response.headers);
-  
+
   headers.set('Access-Control-Allow-Origin', allowedOrigins.join(', '));
   headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Request-ID');
   headers.set('Access-Control-Max-Age', '86400');
-  
+
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
-    headers
+    headers,
   });
 }

@@ -21,16 +21,11 @@ export class DatabaseConnection {
   /**
    * Execute a prepared statement with error handling
    */
-  async execute<T = unknown>(
-    query: string, 
-    params: unknown[] = []
-  ): Promise<D1Result<T>> {
+  async execute<T = unknown>(query: string, params: unknown[] = []): Promise<D1Result<T>> {
     try {
       const stmt = this.db.prepare(query);
-      const result = params.length > 0 
-        ? await stmt.bind(...params).all()
-        : await stmt.all();
-      
+      const result = params.length > 0 ? await stmt.bind(...params).all() : await stmt.all();
+
       return result as D1Result<T>;
     } catch (error) {
       console.error('Database query error:', { query, params, error });
@@ -44,16 +39,11 @@ export class DatabaseConnection {
   /**
    * Execute a prepared statement and return first result
    */
-  async first<T = unknown>(
-    query: string, 
-    params: unknown[] = []
-  ): Promise<T | null> {
+  async first<T = unknown>(query: string, params: unknown[] = []): Promise<T | null> {
     try {
       const stmt = this.db.prepare(query);
-      const result = params.length > 0 
-        ? await stmt.bind(...params).first()
-        : await stmt.first();
-      
+      const result = params.length > 0 ? await stmt.bind(...params).first() : await stmt.first();
+
       return result as T | null;
     } catch (error) {
       console.error('Database query error:', { query, params, error });
@@ -67,16 +57,11 @@ export class DatabaseConnection {
   /**
    * Execute a mutation query (INSERT, UPDATE, DELETE)
    */
-  async run(
-    query: string, 
-    params: unknown[] = []
-  ): Promise<D1Result> {
+  async run(query: string, params: unknown[] = []): Promise<D1Result> {
     try {
       const stmt = this.db.prepare(query);
-      const result = params.length > 0 
-        ? await stmt.bind(...params).run()
-        : await stmt.run();
-      
+      const result = params.length > 0 ? await stmt.bind(...params).run() : await stmt.run();
+
       return result;
     } catch (error) {
       console.error('Database mutation error:', { query, params, error });
@@ -90,19 +75,17 @@ export class DatabaseConnection {
   /**
    * Execute multiple statements in a transaction
    */
-  async transaction<T>(
-    operations: ((db: D1Database) => Promise<T>)[]
-  ): Promise<T[]> {
+  async transaction<T>(operations: ((db: D1Database) => Promise<T>)[]): Promise<T[]> {
     try {
       // Note: D1 doesn't support explicit transactions yet
       // This is a sequential execution pattern
       const results: T[] = [];
-      
+
       for (const operation of operations) {
         const result = await operation(this.db);
         results.push(result);
       }
-      
+
       return results;
     } catch (error) {
       console.error('Transaction error:', error);
@@ -134,15 +117,15 @@ export class DatabaseConnection {
       const result = await this.first<{ test: number; timestamp: string }>(
         'SELECT 1 as test, datetime("now") as timestamp'
       );
-      
+
       return {
         connected: result?.test === 1,
-        timestamp: result?.timestamp || 'unknown'
+        timestamp: result?.timestamp || 'unknown',
       };
     } catch (error) {
       return {
         connected: false,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -193,14 +176,14 @@ export class MigrationManager {
     for (const migration of migrations) {
       if (migration.version > currentVersion) {
         console.log(`Running migration ${migration.version}: ${migration.name}`);
-        
+
         try {
           await db.exec(migration.sql);
-          await this.connection.run(
-            'INSERT INTO migrations (version, name) VALUES (?, ?)',
-            [migration.version, migration.name]
-          );
-          
+          await this.connection.run('INSERT INTO migrations (version, name) VALUES (?, ?)', [
+            migration.version,
+            migration.name,
+          ]);
+
           console.log(`Migration ${migration.version} completed successfully`);
         } catch (error) {
           console.error(`Migration ${migration.version} failed:`, error);
@@ -217,10 +200,12 @@ export class MigrationManager {
    * Get migration status
    */
   async getMigrationStatus(): Promise<{ version: number; name: string; executed_at: string }[]> {
-    const result = await this.connection.execute<{ version: number; name: string; executed_at: string }>(
-      'SELECT version, name, executed_at FROM migrations ORDER BY version'
-    );
-    
+    const result = await this.connection.execute<{
+      version: number;
+      name: string;
+      executed_at: string;
+    }>('SELECT version, name, executed_at FROM migrations ORDER BY version');
+
     return result.results || [];
   }
 }

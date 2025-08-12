@@ -248,10 +248,13 @@ export interface MonteCarloRequest {
 
 export interface MonteCarloResponse {
   scenarios_analyzed: number;
-  confidence_intervals: Record<string, {
-    metric: string;
-    percentiles: Record<string, number>;
-  }>;
+  confidence_intervals: Record<
+    string,
+    {
+      metric: string;
+      percentiles: Record<string, number>;
+    }
+  >;
   risk_metrics: {
     probability_of_loss: number;
     expected_value: number;

@@ -1,5 +1,5 @@
-import React from 'react'
-import './App.css'
+import React from 'react';
+import './App.css';
 
 function App(): React.JSX.Element {
   return (
@@ -10,7 +10,7 @@ function App(): React.JSX.Element {
         <p>🚀 CI/CD Pipeline is working!</p>
       </header>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

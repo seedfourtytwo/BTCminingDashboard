@@ -8,9 +8,9 @@ import { ValidationError } from '../errors';
  * Generate a UUID v4
  */
 export function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
@@ -109,13 +109,13 @@ export function percentageChange(oldValue: number, newValue: number): number {
  * Format number as currency (USD)
  */
 export function formatCurrency(
-  amount: number, 
+  amount: number,
   currency: string = 'USD',
   locale: string = 'en-US'
 ): string {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency
+    currency,
   }).format(amount);
 }
 
@@ -137,7 +137,7 @@ export function deepClone<T>(obj: T): T {
   if (obj === null || typeof obj !== 'object') {
     return obj;
   }
-  
+
   return JSON.parse(JSON.stringify(obj)) as T;
 }
 
@@ -171,28 +171,31 @@ function isObject(item: unknown): item is Record<string, any> {
  */
 export function removeUndefined<T extends Record<string, any>>(obj: T): Partial<T> {
   const result: any = {};
-  
+
   for (const [key, value] of Object.entries(obj)) {
     if (value !== undefined) {
       result[key] = value;
     }
   }
-  
+
   return result as Partial<T>;
 }
 
 /**
  * Pick specific keys from object
  */
-export function pick<T extends Record<string, any>, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
+export function pick<T extends Record<string, any>, K extends keyof T>(
+  obj: T,
+  keys: K[]
+): Pick<T, K> {
   const result = {} as Pick<T, K>;
-  
+
   for (const key of keys) {
     if (key in obj) {
       result[key] = obj[key];
     }
   }
-  
+
   return result;
 }
 
@@ -201,11 +204,11 @@ export function pick<T extends Record<string, any>, K extends keyof T>(obj: T, k
  */
 export function omit<T, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
   const result = { ...obj };
-  
+
   for (const key of keys) {
     delete result[key];
   }
-  
+
   return result;
 }
 
@@ -228,12 +231,7 @@ export async function retry<T>(
     backoffFactor?: number;
   } = {}
 ): Promise<T> {
-  const {
-    maxAttempts = 3,
-    baseDelay = 1000,
-    maxDelay = 10000,
-    backoffFactor = 2
-  } = options;
+  const { maxAttempts = 3, baseDelay = 1000, maxDelay = 10000, backoffFactor = 2 } = options;
 
   let lastError: Error;
 
@@ -242,7 +240,7 @@ export async function retry<T>(
       return await fn();
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      
+
       if (attempt === maxAttempts) {
         throw lastError;
       }
@@ -263,12 +261,12 @@ export function debounce<T extends (...args: any[]) => any>(
   wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: any = null;
-  
+
   return (...args: Parameters<T>) => {
     if (timeout) {
       clearTimeout(timeout);
     }
-    
+
     timeout = setTimeout(() => {
       func(...args);
     }, wait);
@@ -283,12 +281,12 @@ export function throttle<T extends (...args: any[]) => any>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean = false;
-  
+
   return (...args: Parameters<T>) => {
     if (!inThrottle) {
       func(...args);
       inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      setTimeout(() => (inThrottle = false), limit);
     }
   };
 }
@@ -310,12 +308,7 @@ export function validateRequired<T extends Record<string, any>>(
 /**
  * Validate numeric range
  */
-export function validateRange(
-  value: number,
-  min: number,
-  max: number,
-  fieldName: string
-): void {
+export function validateRange(value: number, min: number, max: number, fieldName: string): void {
   if (value < min || value > max) {
     throw new ValidationError(
       `Field '${fieldName}' must be between ${min} and ${max}`,
@@ -330,11 +323,11 @@ export function validateRange(
  */
 export function parseQueryParams(url: URL): Record<string, string> {
   const params: Record<string, string> = {};
-  
+
   for (const [key, value] of url.searchParams.entries()) {
     params[key] = value;
   }
-  
+
   return params;
 }
 
@@ -348,8 +341,9 @@ export function getRequestContext(request: Request): {
   timestamp: Date;
 } {
   const userAgent = request.headers.get('user-agent');
-  const ipAddress = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for');
-  
+  const ipAddress =
+    request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for');
+
   const result: {
     requestId: string;
     userAgent?: string;
@@ -357,7 +351,7 @@ export function getRequestContext(request: Request): {
     timestamp: Date;
   } = {
     requestId: request.headers.get('x-request-id') || generateShortId('req'),
-    timestamp: new Date()
+    timestamp: new Date(),
   };
 
   if (userAgent) {
@@ -367,7 +361,7 @@ export function getRequestContext(request: Request): {
   if (ipAddress) {
     result.ipAddress = ipAddress;
   }
-  
+
   return result;
 }
 
@@ -376,16 +370,16 @@ export function getRequestContext(request: Request): {
  */
 export function addCORSHeaders(response: Response, allowedOrigins: string[] = ['*']): Response {
   const headers = new Headers(response.headers);
-  
+
   headers.set('Access-Control-Allow-Origin', allowedOrigins.join(', '));
   headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Request-ID');
   headers.set('Access-Control-Max-Age', '86400');
-  
+
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
-    headers
+    headers,
   });
 }
 
@@ -396,7 +390,7 @@ export function simpleHash(str: string): string {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32-bit integer
   }
   return Math.abs(hash).toString(36);
@@ -408,13 +402,16 @@ export function simpleHash(str: string): string {
 export function createCacheKey(prefix: string, params: Record<string, any>): string {
   const sortedParams = Object.keys(params)
     .sort()
-    .reduce((result, key) => {
-      result[key] = params[key];
-      return result;
-    }, {} as Record<string, any>);
-  
+    .reduce(
+      (result, key) => {
+        result[key] = params[key];
+        return result;
+      },
+      {} as Record<string, any>
+    );
+
   const paramsString = JSON.stringify(sortedParams);
   const hash = simpleHash(paramsString);
-  
+
   return `${prefix}:${hash}`;
 }

@@ -73,7 +73,11 @@ declare global {
   // KV Namespace Types
   interface KVNamespace {
     get(key: string, options?: { type: 'text' | 'json' | 'arrayBuffer' | 'stream' }): Promise<any>;
-    put(key: string, value: string | ArrayBuffer | ArrayBufferView | ReadableStream, options?: KVNamespacePutOptions): Promise<void>;
+    put(
+      key: string,
+      value: string | ArrayBuffer | ArrayBufferView | ReadableStream,
+      options?: KVNamespacePutOptions
+    ): Promise<void>;
     delete(key: string): Promise<void>;
     list(options?: KVNamespaceListOptions): Promise<KVNamespaceListResult<any>>;
   }
