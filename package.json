@@ -23,7 +23,7 @@
     "test:unit": "vitest run src/**/*.test.ts",
     "test:integration": "vitest run tests/integration/**/*.test.ts",
     "test:smoke": "vitest run tests/smoke/**/*.test.ts",
-    "test:smoke:staging": "VITE_API_BASE_URL=https://solar-mining-api-dev.workers.dev npm run test:smoke",
+    "test:smoke:staging": "VITE_API_BASE_URL=https://solar-mining-api-dev.christopher-k.workers.dev npm run test:smoke",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",

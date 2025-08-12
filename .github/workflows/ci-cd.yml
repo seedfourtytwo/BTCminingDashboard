@@ -42,6 +42,8 @@ jobs:
         
       - name: Run tests with coverage
         run: npm run test:ci
+        env:
+          VITE_API_BASE_URL: https://solar-mining-api-dev.christopher-k.workers.dev
         
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
@@ -100,7 +102,7 @@ jobs:
     
     environment:
       name: staging
-      url: https://solar-mining-api-dev.workers.dev
+      url: https://solar-mining-api-dev.christopher-k.workers.dev
       
     steps:
       - name: Checkout code
@@ -170,6 +172,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          VITE_API_BASE_URL: https://solar-mining-api.christopher-k.workers.dev
           
       - name: Deploy Calculations Worker to production
         run: npm run deploy:calculations
@@ -213,4 +216,4 @@ jobs:
       - name: Run smoke tests
         run: npm run test:smoke
         env:
-          VITE_API_BASE_URL: ${{ needs.deploy-production.result == 'success' && 'https://solar-mining-api.workers.dev' || 'https://solar-mining-api-dev.workers.dev' }}
+          VITE_API_BASE_URL: ${{ needs.deploy-production.result == 'success' && 'https://solar-mining-api.christopher-k.workers.dev' || 'https://solar-mining-api-dev.christopher-k.workers.dev' }}
