@@ -54,10 +54,10 @@ binding = "CALC_CACHE"
 id = "calculation-cache-namespace-id"
 preview_id = "calculation-cache-preview-id"
 
-# Analytics for calculation performance
-[[env.production.analytics_engine_datasets]]
-binding = "CALC_ANALYTICS"
-dataset = "solar_mining_calc_analytics"
+# Analytics for calculation performance (disabled for initial deployment)
+# [[env.production.analytics_engine_datasets]]
+# binding = "CALC_ANALYTICS"
+# dataset = "solar_mining_calc_analytics"
 
 # High CPU limits for intensive calculations
 [limits]

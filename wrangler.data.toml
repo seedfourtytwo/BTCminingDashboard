@@ -46,10 +46,10 @@ binding = "RATE_LIMITS"
 id = "rate-limits-namespace-id"
 preview_id = "rate-limits-preview-id"
 
-# Analytics for external API usage
-[[env.production.analytics_engine_datasets]]
-binding = "DATA_ANALYTICS"
-dataset = "solar_mining_data_analytics"
+# Analytics for external API usage (disabled for initial deployment)
+# [[env.production.analytics_engine_datasets]]
+# binding = "DATA_ANALYTICS"
+# dataset = "solar_mining_data_analytics"
 
 # External API configuration
 [env.development.vars]

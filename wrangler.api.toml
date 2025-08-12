@@ -59,10 +59,10 @@ service = "solar-mining-calculations"
 binding = "DATA_SERVICE"
 service = "solar-mining-data"
 
-# Analytics for monitoring API usage
-[[env.production.analytics_engine_datasets]]
-binding = "ANALYTICS"
-dataset = "solar_mining_api_analytics"
+# Analytics for monitoring API usage (disabled for initial deployment)
+# [[env.production.analytics_engine_datasets]]
+# binding = "ANALYTICS"
+# dataset = "solar_mining_api_analytics"
 
 # API Worker environment variables
 [env.development.vars]

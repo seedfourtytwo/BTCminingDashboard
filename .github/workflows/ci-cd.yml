@@ -53,10 +53,11 @@ jobs:
           name: codecov-umbrella
           
       - name: Claude Code Analysis
+        if: github.event_name == 'pull_request'
         uses: anthropics/claude-code-action@beta
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          anthropic_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
         continue-on-error: true
 
   # Job 2: Build - Only runs if quality checks pass
