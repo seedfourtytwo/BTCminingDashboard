@@ -10,7 +10,6 @@ on:
 # Environment variables available to all jobs
 env:
   NODE_VERSION: '20'
-  NPM_CACHE_KEY: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
 jobs:
   # Job 1: Quality Checks - Runs first and must pass
@@ -27,6 +26,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
           
       - name: Install dependencies
         run: npm ci
@@ -65,6 +65,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
           
       - name: Install dependencies
         run: npm ci
@@ -104,6 +105,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
           
       - name: Install dependencies
         run: npm ci
@@ -152,6 +154,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
           
       - name: Install dependencies
         run: npm ci
@@ -196,6 +199,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
           
       - name: Install dependencies
         run: npm ci
