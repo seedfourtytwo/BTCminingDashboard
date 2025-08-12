@@ -28,31 +28,31 @@ name = "solar-mining-calculations-dev"
 [env.production]
 name = "solar-mining-calculations"
 
-# Durable Objects for stateful calculations
-[[durable_objects.bindings]]
-name = "CALCULATION_ENGINE"
-class_name = "CalculationEngine"
+# Durable Objects for stateful calculations (disabled for initial deployment)
+# [[durable_objects.bindings]]
+# name = "CALCULATION_ENGINE"
+# class_name = "CalculationEngine"
 
-[[durable_objects.bindings]]
-name = "MONTE_CARLO_ENGINE"
-class_name = "MonteCarloEngine"
+# [[durable_objects.bindings]]
+# name = "MONTE_CARLO_ENGINE"
+# class_name = "MonteCarloEngine"
 
-# Queue bindings for background processing
-[[env.production.queues.producers]]
-binding = "CALCULATION_QUEUE"
-queue = "calculation-requests"
+# Queue bindings for background processing (disabled for initial deployment)
+# [[env.production.queues.producers]]
+# binding = "CALCULATION_QUEUE"
+# queue = "calculation-requests"
 
-[[env.production.queues.consumers]]
-queue = "calculation-requests"
-max_batch_size = 5
-max_batch_timeout = 30
-max_retries = 3
+# [[env.production.queues.consumers]]
+# queue = "calculation-requests"
+# max_batch_size = 5
+# max_batch_timeout = 30
+# max_retries = 3
 
-# KV for caching calculation results
-[[env.production.kv_namespaces]]
-binding = "CALC_CACHE"
-id = "calculation-cache-namespace-id"
-preview_id = "calculation-cache-preview-id"
+# KV for caching calculation results (disabled for initial deployment)
+# [[env.production.kv_namespaces]]
+# binding = "CALC_CACHE"
+# id = "calculation-cache-namespace-id"
+# preview_id = "calculation-cache-preview-id"
 
 # Analytics for calculation performance (disabled for initial deployment)
 # [[env.production.analytics_engine_datasets]]
