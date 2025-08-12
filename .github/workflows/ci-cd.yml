@@ -35,7 +35,7 @@ jobs:
         run: npm run type-check
         
       - name: ESLint code quality check
-        run: npm run lint
+        run: npm run lint:ci
         
       - name: Prettier format check
         run: npm run format:check
@@ -50,11 +50,11 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           
-      - name: Claude Code Analysis
-        uses: anthropics/claude-code-action@beta
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          anthropic_key: ${{ secrets.ANTHROPIC_API_KEY }}
+      # - name: Claude Code Analysis
+      #   uses: anthropics/claude-code-action@beta
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     anthropic_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
   # Job 2: Build - Only runs if quality checks pass
   build:

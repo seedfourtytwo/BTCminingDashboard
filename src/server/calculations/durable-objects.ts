@@ -4,12 +4,8 @@
  */
 
 export class CalculationEngine {
-  private _state: any; // DurableObjectState not available in types
-  private _env: any;
-
-  constructor(state: any, env: any) {
-    this._state = state;
-    this._env = env;
+  constructor() {
+    // TODO: Add state and env parameters when implementing
   }
 
   async fetch(_request: Request): Promise<Response> {
@@ -24,12 +20,8 @@ export class CalculationEngine {
 }
 
 export class MonteCarloEngine {
-  private _state: any; // DurableObjectState not available in types
-  private _env: any;
-
-  constructor(state: any, env: any) {
-    this._state = state;
-    this._env = env;
+  constructor() {
+    // TODO: Add state and env parameters when implementing
   }
 
   async fetch(_request: Request): Promise<Response> {

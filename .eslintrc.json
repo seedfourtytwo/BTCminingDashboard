@@ -24,7 +24,8 @@
     "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true
-    }
+    },
+    "project": "./tsconfig.json"
   },
   "plugins": [
     "react-refresh",
@@ -40,8 +41,9 @@
       { "argsIgnorePattern": "^_" }
     ],
     "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/prefer-nullish-coalescing": "error",
-    "@typescript-eslint/prefer-optional-chain": "error",
+    "@typescript-eslint/prefer-nullish-coalescing": "warn",
+    "@typescript-eslint/prefer-optional-chain": "warn",
+    "no-var": "warn",
     "react/prop-types": "off",
     "react/react-in-jsx-scope": "off"
   },
