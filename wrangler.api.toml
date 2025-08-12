@@ -35,12 +35,12 @@ name = "solar-mining-api"
 [[env.development.d1_databases]]
 binding = "DB"
 database_name = "solar-mining-db-dev"
-database_id = "REPLACE_WITH_YOUR_DEV_DATABASE_ID"
+database_id = "435d8973-cd30-4d83-bb9f-a37c09190695"
 
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "solar-mining-db"
-database_id = "REPLACE_WITH_YOUR_PROD_DATABASE_ID"
+database_id = "6967c156-01e7-4469-b331-69a33240c796"
 
 # Service bindings - Connect to other Workers
 [[env.development.services]]
