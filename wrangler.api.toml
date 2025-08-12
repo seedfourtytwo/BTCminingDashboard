@@ -26,21 +26,10 @@ compatibility_flags = ["nodejs_compat"]
 # Development environment
 [env.development]
 name = "solar-mining-api-dev"
-vars = { 
-  ENVIRONMENT = "development",
-  LOG_LEVEL = "debug",
-  ENABLE_DEBUG_MODE = "true"
-}
 
 # Production environment  
 [env.production]
 name = "solar-mining-api"
-vars = { 
-  ENVIRONMENT = "production",
-  LOG_LEVEL = "warn",
-  ENABLE_DEBUG_MODE = "false",
-  ENABLE_ANALYTICS = "true"
-}
 
 # Database bindings - Main API Worker handles all database operations
 [[env.development.d1_databases]]

@@ -24,24 +24,10 @@ compatibility_flags = ["nodejs_compat"]
 # Development environment
 [env.development]
 name = "solar-mining-data-dev"
-vars = { 
-  ENVIRONMENT = "development",
-  LOG_LEVEL = "debug",
-  ENABLE_DEBUG_MODE = "true",
-  CACHE_TTL_SECONDS = "300",
-  RATE_LIMIT_ENABLED = "false"
-}
 
 # Production environment
 [env.production]
 name = "solar-mining-data"
-vars = { 
-  ENVIRONMENT = "production",
-  LOG_LEVEL = "info",
-  ENABLE_DEBUG_MODE = "false",
-  CACHE_TTL_SECONDS = "3600",
-  RATE_LIMIT_ENABLED = "true"
-}
 
 # KV namespaces for aggressive data caching
 [[env.development.kv_namespaces]]
