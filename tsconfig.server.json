@@ -1,0 +1,38 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Server-specific configuration for Cloudflare Workers
+    "target": "ES2022",
+    "lib": ["ES2022", "WebWorker"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    
+    // No JSX for server
+    "jsx": "preserve",
+    "types": ["@cloudflare/workers-types"],
+    
+    // Server build output
+    "outDir": "./dist/server",
+    "rootDir": "./src/server",
+    
+    // Worker-specific settings
+    "allowJs": false,
+    "checkJs": false,
+    "noEmit": true,
+    
+    // Relaxed settings for server code
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "include": [
+    "src/server/**/*",
+    "src/shared/**/*"
+  ],
+  "exclude": [
+    "src/client/**/*",
+    "node_modules",
+    "dist",
+    "build",
+    ".wrangler"
+  ]
+}

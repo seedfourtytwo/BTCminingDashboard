@@ -1,0 +1,96 @@
+# ==============================================================================
+# DATA WORKER - External API calls and data management
+# ==============================================================================
+#
+# Handles all external data operations:
+# - Bitcoin price and network data (CoinGecko, blockchain APIs)
+# - Weather and solar irradiance data (OpenWeatherMap, NREL)
+# - Equipment specifications updates
+# - Data caching and rate limiting
+# - API key management and rotation
+#
+# Optimized for:
+# - External API calls with proper rate limiting
+# - Aggressive caching to minimize API costs
+# - Resilient error handling and fallbacks
+# - Scheduled data updates via Cron Triggers
+# ==============================================================================
+
+name = "solar-mining-data"
+main = "src/server/data/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Development environment
+[env.development]
+name = "solar-mining-data-dev"
+vars = { 
+  ENVIRONMENT = "development",
+  LOG_LEVEL = "debug",
+  ENABLE_DEBUG_MODE = "true",
+  CACHE_TTL_SECONDS = "300",
+  RATE_LIMIT_ENABLED = "false"
+}
+
+# Production environment
+[env.production]
+name = "solar-mining-data"
+vars = { 
+  ENVIRONMENT = "production",
+  LOG_LEVEL = "info",
+  ENABLE_DEBUG_MODE = "false",
+  CACHE_TTL_SECONDS = "3600",
+  RATE_LIMIT_ENABLED = "true"
+}
+
+# KV namespaces for aggressive data caching
+[[env.development.kv_namespaces]]
+binding = "DATA_CACHE"
+id = "data-cache-dev-namespace-id"
+preview_id = "data-cache-dev-preview-id"
+
+[[env.production.kv_namespaces]]
+binding = "DATA_CACHE"
+id = "data-cache-namespace-id"
+preview_id = "data-cache-preview-id"
+
+# Rate limiting KV store
+[[env.production.kv_namespaces]]
+binding = "RATE_LIMITS"
+id = "rate-limits-namespace-id"
+preview_id = "rate-limits-preview-id"
+
+# Analytics for external API usage
+[[env.production.analytics_engine_datasets]]
+binding = "DATA_ANALYTICS"
+dataset = "solar_mining_data_analytics"
+
+# External API configuration
+[env.development.vars]
+BITCOIN_API_BASE_URL = "https://api.coingecko.com/api/v3"
+WEATHER_API_BASE_URL = "https://api.openweathermap.org/data/2.5"
+SOLAR_API_BASE_URL = "https://developer.nrel.gov/api/solar"
+BLOCKCHAIN_API_BASE_URL = "https://blockstream.info/api"
+
+[env.production.vars]
+BITCOIN_API_BASE_URL = "https://api.coingecko.com/api/v3"
+WEATHER_API_BASE_URL = "https://api.openweathermap.org/data/2.5"
+SOLAR_API_BASE_URL = "https://developer.nrel.gov/api/solar"
+BLOCKCHAIN_API_BASE_URL = "https://blockstream.info/api"
+
+# Scheduled triggers for data updates
+[[triggers]]
+crons = ["0 */6 * * *"]  # Every 6 hours - Bitcoin price updates
+
+[[triggers]]
+crons = ["0 0 * * *"]    # Daily - Equipment database updates
+
+[[triggers]]
+crons = ["0 12 * * 1"]   # Weekly Monday noon - Weather data refresh
+
+# Standard CPU limits for API calls
+[limits]
+cpu_ms = 10000  # 10 seconds for external API operations
+
+[observability]
+enabled = true

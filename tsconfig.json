@@ -1,0 +1,74 @@
+{
+  "compilerOptions": {
+    // Language and Environment
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "useDefineForClassFields": true,
+    
+    // Module Resolution
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    
+    // Type Checking - Strict Mode (Required)
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    
+    // Emit - Disabled for base config since we use project references
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "removeComments": false,
+    "importHelpers": true,
+    "downlevelIteration": true,
+    
+    // Interop Constraints
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    // Skip Library Checking
+    "skipLibCheck": true,
+    
+    // Path Mapping
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/client/*": ["src/client/*"],
+      "@/server/*": ["src/server/*"],
+      "@/shared/*": ["src/shared/*"],
+      "@/components/*": ["src/client/components/*"],
+      "@/hooks/*": ["src/client/hooks/*"],
+      "@/services/*": ["src/client/services/*"],
+      "@/utils/*": ["src/client/utils/*"],
+      "@/types/*": ["src/shared/types/*"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "tests/**/*",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    ".wrangler"
+  ],
+  // Project references removed to simplify configuration
+  // Use individual tsconfig files directly instead
+}

@@ -1,0 +1,30 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Client-specific configuration
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+    
+    // Client build output
+    "outDir": "./dist/client",
+    "rootDir": "./src/client",
+    
+    // DOM-specific settings
+    "allowJs": false,
+    "checkJs": false
+  },
+  "include": [
+    "src/client/**/*",
+    "src/shared/**/*",
+    "tests/**/*"
+  ],
+  "exclude": [
+    "src/server/**/*",
+    "node_modules",
+    "dist",
+    "build",
+    ".wrangler"
+  ]
+}

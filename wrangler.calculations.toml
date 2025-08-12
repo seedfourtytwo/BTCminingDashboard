@@ -1,0 +1,79 @@
+# ==============================================================================
+# CALCULATION WORKER - Heavy computational tasks
+# ==============================================================================
+#
+# Handles all calculation-intensive operations:
+# - Solar energy production calculations
+# - Bitcoin mining projections
+# - Monte Carlo simulations  
+# - Financial analysis (NPV, IRR, payback period)
+# - Equipment degradation modeling
+#
+# Optimized for:
+# - High CPU limits for complex calculations
+# - Durable Objects for stateful long-running calculations
+# - Queue processing for batch calculations
+# ==============================================================================
+
+name = "solar-mining-calculations"
+main = "src/server/calculations/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Development environment
+[env.development]
+name = "solar-mining-calculations-dev"
+vars = { 
+  ENVIRONMENT = "development",
+  LOG_LEVEL = "debug",
+  ENABLE_DEBUG_MODE = "true",
+  CALCULATION_TIMEOUT_MS = "30000"
+}
+
+# Production environment
+[env.production]
+name = "solar-mining-calculations"
+vars = { 
+  ENVIRONMENT = "production",
+  LOG_LEVEL = "info",
+  ENABLE_DEBUG_MODE = "false",
+  CALCULATION_TIMEOUT_MS = "60000"
+}
+
+# Durable Objects for stateful calculations
+[[durable_objects.bindings]]
+name = "CALCULATION_ENGINE"
+class_name = "CalculationEngine"
+
+[[durable_objects.bindings]]
+name = "MONTE_CARLO_ENGINE"
+class_name = "MonteCarloEngine"
+
+# Queue bindings for background processing
+[[env.production.queues.producers]]
+binding = "CALCULATION_QUEUE"
+queue = "calculation-requests"
+
+[[env.production.queues.consumers]]
+queue = "calculation-requests"
+max_batch_size = 5
+max_batch_timeout = 30
+max_retries = 3
+
+# KV for caching calculation results
+[[env.production.kv_namespaces]]
+binding = "CALC_CACHE"
+id = "calculation-cache-namespace-id"
+preview_id = "calculation-cache-preview-id"
+
+# Analytics for calculation performance
+[[env.production.analytics_engine_datasets]]
+binding = "CALC_ANALYTICS"
+dataset = "solar_mining_calc_analytics"
+
+# High CPU limits for intensive calculations
+[limits]
+cpu_ms = 30000  # 30 seconds for complex projections
+
+[observability]
+enabled = true

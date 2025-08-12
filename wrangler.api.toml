@@ -1,0 +1,92 @@
+# ==============================================================================
+# SOLAR MINING CALCULATOR - MODULAR WORKER ARCHITECTURE
+# ==============================================================================
+# 
+# This configuration defines a modular Worker architecture with clear separation
+# of concerns for maintainability and scalability:
+#
+# 1. Main API Worker (this file) - UI interactions, CRUD operations, routing
+# 2. Calculation Worker - Heavy computational tasks, projections, simulations  
+# 3. Data Worker - External API calls, data fetching, caching
+# 4. Frontend - React app deployed to Cloudflare Pages
+#
+# Benefits:
+# - Independent scaling and resource allocation
+# - Isolated failure domains (API failures don't affect calculations)
+# - Optimized performance per service type
+# - Easier maintenance and deployment
+# ==============================================================================
+
+# MAIN API WORKER - Primary application server
+name = "solar-mining-api"
+main = "src/server/api/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Development environment
+[env.development]
+name = "solar-mining-api-dev"
+vars = { 
+  ENVIRONMENT = "development",
+  LOG_LEVEL = "debug",
+  ENABLE_DEBUG_MODE = "true"
+}
+
+# Production environment  
+[env.production]
+name = "solar-mining-api"
+vars = { 
+  ENVIRONMENT = "production",
+  LOG_LEVEL = "warn",
+  ENABLE_DEBUG_MODE = "false",
+  ENABLE_ANALYTICS = "true"
+}
+
+# Database bindings - Main API Worker handles all database operations
+[[env.development.d1_databases]]
+binding = "DB"
+database_name = "solar-mining-db-dev"
+database_id = "REPLACE_WITH_YOUR_DEV_DATABASE_ID"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "solar-mining-db"
+database_id = "REPLACE_WITH_YOUR_PROD_DATABASE_ID"
+
+# Service bindings - Connect to other Workers
+[[env.development.services]]
+binding = "CALCULATIONS"
+service = "solar-mining-calculations-dev"
+
+[[env.development.services]]
+binding = "DATA_SERVICE"
+service = "solar-mining-data-dev"
+
+[[env.production.services]]
+binding = "CALCULATIONS"
+service = "solar-mining-calculations"
+
+[[env.production.services]]
+binding = "DATA_SERVICE"
+service = "solar-mining-data"
+
+# Analytics for monitoring API usage
+[[env.production.analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "solar_mining_api_analytics"
+
+# API Worker environment variables
+[env.development.vars]
+CORS_ORIGIN = "http://localhost:3000"
+API_VERSION = "v1"
+
+[env.production.vars]
+CORS_ORIGIN = "https://solar-mining-calculator.pages.dev"
+API_VERSION = "v1"
+
+# Optimized for fast API responses
+[limits]
+cpu_ms = 50
+
+[observability]
+enabled = true
