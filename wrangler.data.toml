@@ -29,22 +29,22 @@ name = "solar-mining-data-dev"
 [env.production]
 name = "solar-mining-data"
 
-# KV namespaces for aggressive data caching
-[[env.development.kv_namespaces]]
-binding = "DATA_CACHE"
-id = "data-cache-dev-namespace-id"
-preview_id = "data-cache-dev-preview-id"
+# KV namespaces for aggressive data caching (disabled for initial deployment)
+# [[env.development.kv_namespaces]]
+# binding = "DATA_CACHE"
+# id = "data-cache-dev-namespace-id"
+# preview_id = "data-cache-dev-preview-id"
 
-[[env.production.kv_namespaces]]
-binding = "DATA_CACHE"
-id = "data-cache-namespace-id"
-preview_id = "data-cache-preview-id"
+# [[env.production.kv_namespaces]]
+# binding = "DATA_CACHE"
+# id = "data-cache-namespace-id"
+# preview_id = "data-cache-preview-id"
 
-# Rate limiting KV store
-[[env.production.kv_namespaces]]
-binding = "RATE_LIMITS"
-id = "rate-limits-namespace-id"
-preview_id = "rate-limits-preview-id"
+# Rate limiting KV store (disabled for initial deployment)
+# [[env.production.kv_namespaces]]
+# binding = "RATE_LIMITS"
+# id = "rate-limits-namespace-id"
+# preview_id = "rate-limits-preview-id"
 
 # Analytics for external API usage (disabled for initial deployment)
 # [[env.production.analytics_engine_datasets]]
