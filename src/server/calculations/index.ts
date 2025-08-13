@@ -14,7 +14,7 @@ import type { CalculationWorkerEnv } from '../types/environment';
 interface Env extends CalculationWorkerEnv {}
 
 export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, _env: Env, _ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const method = request.method;
 
@@ -45,7 +45,7 @@ export default {
 
       // Calculation endpoints
       if (url.pathname.startsWith('/calculate')) {
-        return handleCalculationRoutes(request, env, ctx, corsHeaders);
+        return handleCalculationRoutes(request, corsHeaders);
       }
 
       // Default response for unmatched routes
@@ -71,12 +71,12 @@ export default {
 
 async function handleCalculationRoutes(
   request: Request,
-  env: Env,
-  _ctx: ExecutionContext,
+  // env: Env, // TODO: Will be used when implementing calculation engines
+  // ctx: ExecutionContext, // TODO: Will be used for background calculations
   corsHeaders: Record<string, string>
 ): Promise<Response> {
   const url = new URL(request.url);
-  const method = request.method;
+  // const method = request.method; // TODO: Will be used for different HTTP methods
   const path = url.pathname.replace('/calculate', '');
 
   // Solar calculations

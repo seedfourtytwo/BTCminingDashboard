@@ -15,7 +15,7 @@ import type { APIWorkerEnv } from '../types/environment';
 interface Env extends APIWorkerEnv {}
 
 export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, _env: Env, _ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const method = request.method;
 
@@ -46,7 +46,7 @@ export default {
 
       // API versioning - all API routes start with /api/v1
       if (url.pathname.startsWith('/api/v1')) {
-        return handleAPIRoutes(request, env, ctx, corsHeaders);
+        return handleAPIRoutes(request, corsHeaders);
       }
 
       // Default response for unmatched routes
@@ -72,12 +72,12 @@ export default {
 
 async function handleAPIRoutes(
   request: Request,
-  env: Env,
-  _ctx: ExecutionContext,
+  // env: Env, // TODO: Will be used when implementing database operations
+  // ctx: ExecutionContext, // TODO: Will be used for background tasks
   corsHeaders: Record<string, string>
 ): Promise<Response> {
   const url = new URL(request.url);
-  const method = request.method;
+  // const method = request.method; // TODO: Will be used for different HTTP methods
   const path = url.pathname.replace('/api/v1', '');
 
   // Equipment routes

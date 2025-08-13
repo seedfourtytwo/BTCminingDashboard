@@ -14,7 +14,7 @@ import type { DataWorkerEnv } from '../types/environment';
 interface Env extends DataWorkerEnv {}
 
 export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, _env: Env, _ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const method = request.method;
 
@@ -45,7 +45,7 @@ export default {
 
       // Data collection endpoints
       if (url.pathname.startsWith('/data')) {
-        return handleDataRoutes(request, env, ctx, corsHeaders);
+        return handleDataRoutes(request, corsHeaders);
       }
 
       // Default response for unmatched routes
@@ -71,12 +71,12 @@ export default {
 
 async function handleDataRoutes(
   request: Request,
-  env: Env,
-  _ctx: ExecutionContext,
+  // env: Env, // TODO: Will be used when implementing data collection
+  // ctx: ExecutionContext, // TODO: Will be used for background data fetching
   corsHeaders: Record<string, string>
 ): Promise<Response> {
   const url = new URL(request.url);
-  const method = request.method;
+  // const method = request.method; // TODO: Will be used for different HTTP methods
   const path = url.pathname.replace('/data', '');
 
   // Bitcoin data
