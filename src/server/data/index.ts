@@ -81,17 +81,26 @@ async function handleDataRoutes(
 
   // Bitcoin data
   if (path.startsWith('/bitcoin')) {
-    return Response.json({ message: 'Bitcoin data collection coming soon' }, { headers: corsHeaders });
+    return Response.json(
+      { message: 'Bitcoin data collection coming soon' },
+      { headers: corsHeaders }
+    );
   }
 
   // Environmental data
   if (path.startsWith('/environmental')) {
-    return Response.json({ message: 'Environmental data collection coming soon' }, { headers: corsHeaders });
+    return Response.json(
+      { message: 'Environmental data collection coming soon' },
+      { headers: corsHeaders }
+    );
   }
 
   // Equipment data
   if (path.startsWith('/equipment')) {
-    return Response.json({ message: 'Equipment data management coming soon' }, { headers: corsHeaders });
+    return Response.json(
+      { message: 'Equipment data management coming soon' },
+      { headers: corsHeaders }
+    );
   }
 
   // Cache management

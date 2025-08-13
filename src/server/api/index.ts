@@ -105,12 +105,18 @@ async function handleAPIRoutes(
 
   // Bitcoin data routes
   if (path.startsWith('/bitcoin')) {
-    return Response.json({ message: 'Bitcoin data endpoints coming soon' }, { headers: corsHeaders });
+    return Response.json(
+      { message: 'Bitcoin data endpoints coming soon' },
+      { headers: corsHeaders }
+    );
   }
 
   // Environmental data routes
   if (path.startsWith('/environmental')) {
-    return Response.json({ message: 'Environmental data endpoints coming soon' }, { headers: corsHeaders });
+    return Response.json(
+      { message: 'Environmental data endpoints coming soon' },
+      { headers: corsHeaders }
+    );
   }
 
   // Default API response

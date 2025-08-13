@@ -91,12 +91,18 @@ async function handleCalculationRoutes(
 
   // Financial calculations
   if (path.startsWith('/financial')) {
-    return Response.json({ message: 'Financial calculations coming soon' }, { headers: corsHeaders });
+    return Response.json(
+      { message: 'Financial calculations coming soon' },
+      { headers: corsHeaders }
+    );
   }
 
   // Projection calculations
   if (path.startsWith('/projection')) {
-    return Response.json({ message: 'Projection calculations coming soon' }, { headers: corsHeaders });
+    return Response.json(
+      { message: 'Projection calculations coming soon' },
+      { headers: corsHeaders }
+    );
   }
 
   // Default calculation response

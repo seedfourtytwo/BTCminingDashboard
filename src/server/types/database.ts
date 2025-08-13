@@ -82,7 +82,7 @@ export interface SolarPanelModel {
   angle_of_incidence_modifier?: string; // JSON data for AOI performance
   shading_tolerance_factor: number; // Performance under partial shading (0-1)
   soiling_sensitivity: number; // Performance degradation from soiling (%/mm dust)
-  
+
   // Advanced durability factors
   thermal_cycling_rating?: number; // Thermal cycling test cycles passed
   humidity_freeze_rating?: number; // Humidity-freeze cycles passed
@@ -283,7 +283,7 @@ export interface WeatherData {
 
   // Solar irradiance (W/m²)
   ghi?: number; // Global Horizontal Irradiance
-  dni?: number; // Direct Normal Irradiance  
+  dni?: number; // Direct Normal Irradiance
   dhi?: number; // Diffuse Horizontal Irradiance
   poa_irradiance?: number; // Plane of Array irradiance for tilted surfaces
   clearsky_ghi?: number; // Clear sky GHI for comparison
@@ -303,7 +303,7 @@ export interface WeatherData {
   wind_direction_deg?: number;
   pressure_hpa?: number;
   cloud_cover_percent?: number;
-  
+
   // Enhanced weather parameters
   dewpoint_c?: number; // Dew point temperature
   visibility_km?: number; // Atmospheric visibility
@@ -321,7 +321,7 @@ export interface WeatherData {
   is_forecast: boolean; // True if forecast data, false if historical
   forecast_horizon_hours?: number; // How many hours ahead this forecast is
   forecast_confidence?: number; // Forecast confidence level (0-1)
-  
+
   // Data quality and validation
   data_source: string;
   data_quality: 'excellent' | 'good' | 'fair' | 'poor' | 'estimated' | 'interpolated';
@@ -348,7 +348,7 @@ export interface BitcoinNetworkData {
   block_height: number;
   block_reward: number;
   transaction_fees_btc: number;
-  
+
   // Enhanced network metrics
   hashprice_usd_per_th?: number; // Revenue per TH/s per day in USD
   next_difficulty_estimate?: number; // Estimated next difficulty adjustment
@@ -357,31 +357,31 @@ export interface BitcoinNetworkData {
   estimated_adjustment_time?: string; // ISO date string for next adjustment
   mempool_size_mb?: number; // Current mempool size
   avg_block_time_minutes?: number; // Recent average block time
-  
+
   // Transaction and fee data
   transactions_per_block?: number; // Average transactions per block
   avg_transaction_fee_usd?: number; // Average transaction fee in USD
   fee_rate_sat_vb?: number; // Fee rate in satoshis per vByte
   high_priority_fee_sat_vb?: number; // High priority fee rate
-  
+
   // Market microstructure
   bid_ask_spread_percent?: number; // Current bid-ask spread
   order_book_depth_btc?: number; // Order book depth at 1% from mid
-  
+
   // Mining pool data
   largest_pool_percentage?: number; // Largest pool's network share
   pool_concentration_hhi?: number; // Herfindahl-Hirschman Index for pools
-  
+
   // Network health metrics
   node_count?: number; // Estimated number of full nodes
   lightning_capacity_btc?: number; // Lightning Network capacity
-  
+
   // Mining economics (enhanced)
   revenue_per_th_usd?: number;
   profit_per_th_usd?: number; // Assumes $0.05/kWh electricity
   break_even_electricity_cost?: number; // $/kWh for break-even
   mining_revenue_7d_ma?: number; // 7-day moving average of mining revenue
-  
+
   // Long-term indicators
   stock_to_flow_ratio?: number; // Current stock-to-flow ratio
   days_until_halving?: number; // Days remaining until next halving
@@ -411,28 +411,28 @@ export interface MiningPoolConfiguration {
   id: string;
   pool_name: string;
   pool_url: string;
-  
+
   // Pool characteristics
   fee_percentage: number;
   payout_method: 'pps' | 'pplns' | 'fpps' | 'solo'; // Pay Per Share, Pay Per Last N Shares, etc.
   minimum_payout_btc: number;
   payout_frequency: 'immediate' | 'daily' | 'weekly' | 'manual';
-  
+
   // Pool performance metrics
   pool_hashrate_percentage?: number; // Percentage of total network hashrate
   pool_uptime_percentage?: number; // Historical uptime
   block_finding_variance?: number; // Variance in block finding (luck factor)
   stale_share_rate?: number; // Percentage of stale shares
-  
+
   // Geographic and latency
   server_locations?: string; // JSON array of server locations
   avg_latency_ms?: number; // Average latency for connections
-  
+
   // Features and compatibility
   supported_mining_software?: string; // JSON array of compatible mining software
   supports_merged_mining?: boolean; // Whether pool supports merged mining
   supports_ssl?: boolean; // SSL/TLS support
-  
+
   // Metadata
   data_source?: string;
   verified: boolean;
@@ -444,32 +444,32 @@ export interface HardwareComparisonTemplate {
   id: string;
   template_name: string;
   template_category: 'beginner' | 'intermediate' | 'advanced' | 'commercial' | 'industrial';
-  
+
   // Template configuration
   recommended_miners?: string; // JSON array of miner IDs
   recommended_solar_panels?: string; // JSON array of solar panel IDs
   recommended_inverters?: string; // JSON array of inverter specifications
-  
+
   // Use case parameters
   target_hashrate_th?: number; // Target total hashrate
   target_power_generation_kw?: number; // Target solar generation
   budget_range_usd?: string; // JSON object with min/max budget
   space_requirements_m2?: number; // Required installation space
-  
+
   // Geographic suitability
   suitable_climate_zones?: string; // JSON array of Köppen climate codes
   min_solar_irradiance_kwh_m2?: number; // Minimum required annual irradiance
-  
+
   // Performance expectations
   expected_roi_months?: number; // Expected payback period
   expected_capacity_factor?: number; // Expected renewable energy capacity factor
   risk_level: 'low' | 'medium' | 'high';
-  
+
   // Documentation
   description?: string;
   setup_instructions?: string; // Markdown text with setup guide
   maintenance_schedule?: string; // JSON object with maintenance requirements
-  
+
   // Metadata
   created_by?: string;
   usage_count?: number; // How many times this template has been used
@@ -484,29 +484,29 @@ export interface RiskAnalysisScenario {
   system_config_id: string;
   scenario_name: string;
   scenario_type: 'monte_carlo' | 'sensitivity' | 'stress_test' | 'what_if';
-  
+
   // Scenario parameters (JSON)
   variable_ranges: string; // JSON object defining parameter ranges
   correlation_matrix?: string; // JSON matrix of variable correlations
   simulation_runs?: number; // Number of Monte Carlo runs
   confidence_intervals?: string; // JSON array of confidence levels to calculate
-  
+
   // Results summary (JSON)
   risk_metrics: string; // JSON object with VaR, CVaR, etc.
   probability_distributions?: string; // JSON object with result distributions
-  
+
   // Key outcomes
   probability_of_loss?: number; // Probability of negative ROI
   expected_roi_percent?: number; // Expected return on investment
   roi_standard_deviation?: number; // Volatility of returns
   worst_case_loss_percent?: number; // Maximum loss in worst-case scenario
   best_case_gain_percent?: number; // Maximum gain in best-case scenario
-  
+
   // Breakeven analysis
   breakeven_btc_price?: number; // BTC price needed to break even
   breakeven_electricity_cost?: number; // Max electricity cost for profitability
   breakeven_hashrate?: number; // Minimum required hashrate
-  
+
   // Metadata
   calculation_time_ms?: number;
   created_at: string;
@@ -517,35 +517,35 @@ export interface RealTimeDataStream {
   id: string;
   data_type: 'bitcoin_price' | 'network_hashrate' | 'weather' | 'electricity_price';
   source_api: string;
-  
+
   // Data stream configuration
   update_frequency_seconds: number;
   data_retention_days: number;
   quality_threshold: number; // Minimum acceptable data quality (0-1)
-  
+
   // Current status
   is_active: boolean;
   last_update: string; // ISO date string
   consecutive_failures: number;
   total_requests: number;
   successful_requests: number;
-  
+
   // Rate limiting
   requests_per_hour_limit?: number;
   current_hour_requests?: number;
   rate_limit_reset_time?: string;
-  
+
   // Data validation
   validation_rules?: string; // JSON object with validation criteria
   outlier_detection_enabled: boolean;
   data_smoothing_enabled: boolean;
-  
+
   // API configuration
   api_endpoint: string;
   api_key_required: boolean;
   request_headers?: string; // JSON object with custom headers
   timeout_seconds?: number;
-  
+
   // Metadata
   created_at: string;
   updated_at: string;
@@ -555,31 +555,31 @@ export interface OptimizationResult {
   id: string;
   system_config_id: string;
   optimization_type: 'equipment_mix' | 'sizing' | 'placement' | 'operational' | 'financial';
-  
+
   // Optimization parameters
   objective_function: 'maximize_roi' | 'minimize_payback' | 'maximize_hashrate' | 'minimize_risk';
   constraints?: string; // JSON object with optimization constraints
   optimization_algorithm: 'genetic' | 'simulated_annealing' | 'gradient_descent' | 'brute_force';
-  
+
   // Results
   optimal_configuration: string; // JSON object with optimal parameter values
   objective_value: number; // Value of the objective function at optimum
   improvement_percentage?: number; // Improvement over baseline configuration
-  
+
   // Solution quality
   convergence_iterations?: number; // Number of iterations to converge
   solution_confidence?: number; // Confidence in solution quality (0-1)
   local_optimum_risk?: number; // Risk that solution is only locally optimal
-  
+
   // Alternative solutions
   pareto_frontier?: string; // JSON array of Pareto-optimal solutions
   sensitivity_to_changes?: string; // JSON object showing sensitivity analysis
-  
+
   // Computational details
   computation_time_ms: number;
   memory_usage_mb?: number;
   cpu_cores_used?: number;
-  
+
   // Metadata
   created_at: string;
 }

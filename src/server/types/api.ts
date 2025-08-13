@@ -467,11 +467,14 @@ export interface RiskAnalysisResponse {
     roi_percent: number;
     break_even_months: number;
   }>;
-  sensitivity_analysis?: Record<string, {
-    variable_name: string;
-    impact_on_roi: number;
-    correlation_coefficient: number;
-  }>;
+  sensitivity_analysis?: Record<
+    string,
+    {
+      variable_name: string;
+      impact_on_roi: number;
+      correlation_coefficient: number;
+    }
+  >;
 }
 
 // Optimization and recommendation types
