@@ -98,7 +98,7 @@ Environmental:
 Equipment:
 ├── Manufacturer APIs: Live pricing, availability
 ├── Performance Databases: Real-world efficiency data
-├── Market Analysis: Technology trends, roadmaps
+├── Technology Analysis: Equipment trends, roadmaps
 └── User Contributions: Community-driven specifications
 ```
 
@@ -135,7 +135,7 @@ Equipment:
 - **Decision Support**: Measurable improvement in investment decisions
 - **Cost Optimization**: Average 10-15% improvement in operational efficiency
 - **Risk Reduction**: Better scenario planning and contingency preparation
-- **Market Adoption**: 1000+ active users within first year
+- **User Adoption**: 1000+ active users within first year
 
 ## Technical Architecture Overview
 

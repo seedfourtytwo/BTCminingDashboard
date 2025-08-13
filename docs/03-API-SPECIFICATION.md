@@ -503,7 +503,7 @@ POST /api/v1/scenarios
 Content-Type: application/json
 
 {
-  "scenario_name": "Optimistic Bull Market",
+  "scenario_name": "Optimistic Growth Scenario",
   "description": "High Bitcoin price growth scenario",
   "system_config_id": 5,
   "btc_price_model": {
@@ -623,9 +623,9 @@ GET /api/v1/projections/15/results?start_date=2024-08-11&end_date=2024-12-11&gra
 }
 ```
 
-### 6. MARKET DATA
+### 6. BITCOIN DATA
 
-**GET /api/v1/market/bitcoin**
+**GET /api/v1/bitcoin/current**
 Get current Bitcoin network data
 
 ```http
@@ -650,11 +650,11 @@ GET /api/v1/market/bitcoin
 }
 ```
 
-**GET /api/v1/market/bitcoin/history**
+**GET /api/v1/bitcoin/history**
 Get historical Bitcoin data
 
 ```http
-GET /api/v1/market/bitcoin/history?start_date=2024-01-01&end_date=2024-08-11&metrics=price,difficulty
+GET /api/v1/bitcoin/history?start_date=2024-01-01&end_date=2024-08-11&metrics=price,difficulty
 ```
 
 ### 7. ENVIRONMENTAL DATA
@@ -738,7 +738,7 @@ The API supports webhooks for real-time notifications:
 
 ### Available Events
 - `projection.completed`: Projection calculation finished
-- `market.significant_change`: Major Bitcoin price/difficulty change
+- `bitcoin.significant_change`: Major Bitcoin price/difficulty change
 - `equipment.degradation_alert`: Equipment performance below threshold
 
 ### Webhook Configuration

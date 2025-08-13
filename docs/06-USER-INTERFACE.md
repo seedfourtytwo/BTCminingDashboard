@@ -323,7 +323,7 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
       </div>
       
       <div class="scenario-card">
-        <h4>Optimistic Bull Market</h4>
+        <h4>Optimistic Growth Scenario</h4>
         <div class="scenario-summary">
           <span>15x S19 XP + 75kW Solar</span>
           <span class="roi">ROI: 892%</span>
@@ -479,15 +479,15 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
         <label>Scenario A</label>
         <select id="scenario-a">
           <option value="15">Conservative 5-Year</option>
-          <option value="16">Optimistic Bull Market</option>
+          <option value="16">Optimistic Growth Scenario</option>
         </select>
       </div>
       
       <div class="selector-group">
         <label>Scenario B</label>
         <select id="scenario-b">
-          <option value="16" selected>Optimistic Bull Market</option>
-          <option value="17">Bear Market Survival</option>
+          <option value="16" selected>Optimistic Growth Scenario</option>
+<option value="17">Conservative Survival</option>
         </select>
       </div>
       
@@ -742,7 +742,7 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
 2. **Initial Investment**: Equipment costs, installation
 3. **Operating Costs**: Maintenance, insurance, etc.
 
-#### Phase 3: Market Assumptions
+#### Phase 3: Bitcoin Assumptions
 1. **Bitcoin Price Model**: Growth scenarios, volatility
 2. **Network Difficulty**: Growth projections
 3. **Equipment Degradation**: Performance decline rates

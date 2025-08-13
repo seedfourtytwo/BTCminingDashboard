@@ -120,7 +120,7 @@ Manages all external data sources and provides clean APIs for internal consumpti
 - **Bitcoin Data**: CoinGecko API, blockchain.info
 - **Weather Data**: OpenWeatherMap, NREL Solar API
 - **Equipment Data**: Manufacturer APIs, manual updates
-- **Market Data**: Mining pool statistics, electricity rates
+- **Bitcoin Data**: Mining pool statistics, electricity rates
 
 #### Caching Strategy:
 - **Bitcoin Prices**: 5-minute cache (high volatility)

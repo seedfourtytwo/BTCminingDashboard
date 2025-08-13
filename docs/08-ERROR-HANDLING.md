@@ -206,7 +206,7 @@ const CALCULATION_ERRORS = {
   CALC_005: {
     message: "Economic calculation negative result",
     severity: ErrorSeverity.LOW,
-    suggestedAction: "Review investment assumptions and market conditions"
+    suggestedAction: "Review investment assumptions and Bitcoin conditions"
   }
 } as const;
 ```
@@ -509,7 +509,7 @@ export class ExternalAPIManager {
   async fetchBitcoinPrice(): Promise<number> {
     const apis = [
       { name: 'CoinGecko', url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd' },
-      { name: 'CoinMarketCap', url: 'https://api.coinmarketcap.com/v1/ticker/bitcoin/' }
+      { name: 'CoinGecko', url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd' }
     ];
     
     let lastError: ExternalAPIError | null = null;

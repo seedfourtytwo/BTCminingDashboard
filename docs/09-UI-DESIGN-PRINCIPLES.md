@@ -73,7 +73,7 @@ Visual hierarchy is the principle of arranging elements according to importance,
 1. **Size**: Larger elements naturally draw more attention
 2. **Weight**: Bold text creates emphasis and importance
 3. **Color**: High contrast colors stand out more
-4. **Positioning**: Top-left elements are typically seen first
+4. **Layout**: Top-left elements are typically seen first
 5. **Spacing**: More whitespace around an element increases its prominence
 
 ### Application to Mining Calculator

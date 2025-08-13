@@ -1,5 +1,7 @@
 /**
  * API request/response type definitions
+ * Enhanced with real-time data pipeline and advanced mining calculator features
+ * Based on research of leading Bitcoin mining profitability calculators
  */
 
 // Common API response wrapper
@@ -347,6 +349,263 @@ export interface WeatherDataResponse {
   }>;
   data_source: string;
   last_updated: string;
+}
+
+// Enhanced API types for advanced features (documentation for future implementation)
+
+// Real-time data pipeline types
+export interface RealtimeDataSubscription {
+  data_types: ('bitcoin_price' | 'network_stats' | 'weather' | 'mining_pools')[];
+  update_frequency: 'immediate' | 'minute' | '5minute' | 'hour';
+  location_filters?: {
+    latitude: number;
+    longitude: number;
+    radius_km?: number;
+  };
+}
+
+export interface RealtimeDataEvent {
+  event_type: string;
+  timestamp: string;
+  data: Record<string, unknown>;
+  data_source: string;
+  quality_score: number;
+}
+
+// Hardware comparison and template types
+export interface HardwareComparisonRequest {
+  miner_ids?: string[];
+  panel_ids?: string[];
+  comparison_metrics: ('efficiency' | 'roi' | 'payback' | 'hashrate_per_dollar')[];
+  location?: {
+    latitude: number;
+    longitude: number;
+  };
+  electricity_cost?: number;
+  btc_price_assumption?: number;
+}
+
+export interface HardwareComparisonResponse {
+  comparison_matrix: Record<string, Record<string, number>>;
+  rankings: Array<{
+    equipment_id: string;
+    equipment_name: string;
+    rank: number;
+    score: number;
+    strengths: string[];
+    weaknesses: string[];
+  }>;
+  recommendation: {
+    best_overall: string;
+    best_efficiency: string;
+    best_value: string;
+    best_beginner: string;
+  };
+}
+
+// Template and configuration wizard types
+export interface ConfigurationWizardStep {
+  step_id: string;
+  step_name: string;
+  step_description: string;
+  input_fields: Array<{
+    field_name: string;
+    field_type: 'text' | 'number' | 'select' | 'multiselect' | 'location' | 'slider';
+    required: boolean;
+    validation_rules?: Record<string, unknown>;
+    options?: Array<{ value: string; label: string }>;
+    help_text?: string;
+  }>;
+  next_step_logic?: Record<string, string>; // conditional navigation
+}
+
+export interface ConfigurationTemplateRequest {
+  template_category: 'beginner' | 'intermediate' | 'advanced' | 'commercial';
+  budget_range?: {
+    min_usd: number;
+    max_usd: number;
+  };
+  target_hashrate?: number;
+  location?: {
+    latitude: number;
+    longitude: number;
+  };
+  risk_tolerance: 'low' | 'medium' | 'high';
+}
+
+// Risk analysis and Monte Carlo simulation types
+export interface RiskAnalysisRequest {
+  system_config_id: string;
+  analysis_type: 'monte_carlo' | 'sensitivity' | 'scenario' | 'stress_test';
+  parameters: {
+    simulation_runs?: number;
+    confidence_levels?: number[];
+    variable_correlations?: Record<string, Record<string, number>>;
+    stress_scenarios?: Array<{
+      name: string;
+      btc_price_change: number;
+      difficulty_change: number;
+      electricity_cost_change: number;
+    }>;
+  };
+}
+
+export interface RiskAnalysisResponse {
+  analysis_type: string;
+  total_scenarios: number;
+  risk_metrics: {
+    probability_of_loss: number;
+    value_at_risk_95: number;
+    expected_return: number;
+    return_volatility: number;
+    sharpe_ratio?: number;
+  };
+  scenario_results: Array<{
+    scenario_name: string;
+    probability: number;
+    total_profit_usd: number;
+    roi_percent: number;
+    break_even_months: number;
+  }>;
+  sensitivity_analysis?: Record<string, {
+    variable_name: string;
+    impact_on_roi: number;
+    correlation_coefficient: number;
+  }>;
+}
+
+// Optimization and recommendation types
+export interface OptimizationRequest {
+  objective: 'maximize_roi' | 'minimize_payback' | 'maximize_hashrate' | 'minimize_risk';
+  constraints: {
+    max_budget_usd?: number;
+    max_power_consumption_kw?: number;
+    max_space_m2?: number;
+    min_roi_percent?: number;
+    max_payback_years?: number;
+  };
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  preferences?: {
+    prefer_newer_equipment?: boolean;
+    prefer_established_manufacturers?: boolean;
+    include_experimental_tech?: boolean;
+  };
+}
+
+export interface OptimizationResponse {
+  optimal_configuration: {
+    miners: Array<{
+      miner_id: string;
+      quantity: number;
+      total_cost_usd: number;
+      total_hashrate_th: number;
+    }>;
+    solar_panels: Array<{
+      panel_id: string;
+      quantity: number;
+      total_cost_usd: number;
+      total_power_kw: number;
+    }>;
+    total_investment_usd: number;
+    expected_roi_percent: number;
+    payback_period_years: number;
+  };
+  alternative_configurations: Array<{
+    configuration_name: string;
+    trade_offs: string;
+    performance_comparison: Record<string, number>;
+  }>;
+  optimization_metadata: {
+    algorithm_used: string;
+    computation_time_ms: number;
+    confidence_score: number;
+    iterations_performed: number;
+  };
+}
+
+// Export and reporting types
+export interface ReportGenerationRequest {
+  system_config_id: string;
+  projection_id?: string;
+  report_type: 'financial_summary' | 'technical_specs' | 'risk_analysis' | 'comprehensive';
+  format: 'pdf' | 'xlsx' | 'csv' | 'json';
+  include_charts: boolean;
+  custom_branding?: {
+    logo_url?: string;
+    company_name?: string;
+    contact_info?: string;
+  };
+}
+
+export interface ReportGenerationResponse {
+  report_id: string;
+  download_url: string;
+  expires_at: string;
+  file_size_bytes: number;
+  generation_time_ms: number;
+}
+
+// Mining pool integration types
+export interface MiningPoolAnalysisRequest {
+  hashrate_th: number;
+  location?: {
+    latitude: number;
+    longitude: number;
+  };
+  preferences?: {
+    payout_frequency?: 'immediate' | 'daily' | 'weekly';
+    min_payout_btc?: number;
+    prefer_low_variance?: boolean;
+  };
+}
+
+export interface MiningPoolAnalysisResponse {
+  recommended_pools: Array<{
+    pool_name: string;
+    pool_url: string;
+    fee_percentage: number;
+    expected_payout_variance: number;
+    estimated_latency_ms: number;
+    payout_frequency: string;
+    pros: string[];
+    cons: string[];
+    suitability_score: number;
+  }>;
+  pool_comparison_matrix: Record<string, Record<string, number | string>>;
+}
+
+// Enhanced weather and environmental data types
+export interface EnvironmentalImpactRequest {
+  system_config_id: string;
+  analysis_scope: 'solar_performance' | 'mining_efficiency' | 'combined';
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  time_horizon_years: number;
+}
+
+export interface EnvironmentalImpactResponse {
+  solar_impact_factors: {
+    soiling_losses_percent: number;
+    temperature_derating_percent: number;
+    weather_variability_impact: number;
+    seasonal_performance_variation: Record<string, number>;
+  };
+  mining_impact_factors: {
+    temperature_efficiency_impact: number;
+    cooling_cost_increase_percent: number;
+    equipment_lifespan_impact_years: number;
+  };
+  mitigation_recommendations: Array<{
+    issue: string;
+    solution: string;
+    estimated_cost_usd: number;
+    expected_benefit: string;
+  }>;
 }
 
 // Error types

@@ -82,63 +82,52 @@ async function handleAPIRoutes(
 
   // Equipment routes
   if (path.startsWith('/equipment')) {
-    // TODO: Import and use equipment handlers
     return Response.json({ message: 'Equipment endpoints coming soon' }, { headers: corsHeaders });
   }
 
   // Projection routes
   if (path.startsWith('/projections')) {
-    // TODO: Import and use projection handlers
     return Response.json({ message: 'Projection endpoints coming soon' }, { headers: corsHeaders });
   }
 
   // System configuration routes
   if (path.startsWith('/system-configs')) {
-    // TODO: Import and use system config handlers
     return Response.json(
       { message: 'System config endpoints coming soon' },
       { headers: corsHeaders }
     );
   }
 
-  // Bitcoin network data routes
+  // Location routes
+  if (path.startsWith('/locations')) {
+    return Response.json({ message: 'Location endpoints coming soon' }, { headers: corsHeaders });
+  }
+
+  // Bitcoin data routes
   if (path.startsWith('/bitcoin')) {
-    // Delegate to Data Worker for external API calls
-    const body = method !== 'GET' ? await request.text() : undefined;
-    const upstream = new Request(new URL(`/bitcoin${url.search}`, 'http://internal'), {
-      method,
-      headers: request.headers,
-      ...(body && { body }),
-    });
-    const response = await env.DATA_SERVICE.fetch(upstream);
-
-    const data = await response.json();
-    return Response.json(data, {
-      status: response.status,
-      headers: corsHeaders,
-    });
+    return Response.json({ message: 'Bitcoin data endpoints coming soon' }, { headers: corsHeaders });
   }
 
-  // Weather data routes
-  if (path.startsWith('/weather')) {
-    // Delegate to Data Worker for external API calls
-    const weatherBody = method !== 'GET' ? await request.text() : undefined;
-    const weatherUpstream = new Request(new URL(`/weather${url.search}`, 'http://internal'), {
-      method,
-      headers: request.headers,
-      ...(weatherBody && { body: weatherBody }),
-    });
-    const response = await env.DATA_SERVICE.fetch(weatherUpstream);
-
-    const data = await response.json();
-    return Response.json(data, {
-      status: response.status,
-      headers: corsHeaders,
-    });
+  // Environmental data routes
+  if (path.startsWith('/environmental')) {
+    return Response.json({ message: 'Environmental data endpoints coming soon' }, { headers: corsHeaders });
   }
 
-  return new Response('API endpoint not found', {
-    status: 404,
-    headers: corsHeaders,
-  });
+  // Default API response
+  return Response.json(
+    {
+      message: 'Solar Bitcoin Mining Calculator API',
+      version: '1.0.0',
+      status: 'development',
+      endpoints: {
+        equipment: '/api/v1/equipment',
+        projections: '/api/v1/projections',
+        'system-configs': '/api/v1/system-configs',
+        locations: '/api/v1/locations',
+        bitcoin: '/api/v1/bitcoin',
+        environmental: '/api/v1/environmental',
+      },
+    },
+    { headers: corsHeaders }
+  );
 }

@@ -208,7 +208,7 @@ The system includes comprehensive specifications for current and historical sola
     "noise_level_db": 38,
     "turbulence_tolerance": "High"
   },
-  "advantages": [
+  "features": [
     "Low noise operation",
     "Handles turbulent wind well",
     "Compact installation footprint",
@@ -363,7 +363,7 @@ The system includes comprehensive specifications for current and historical sola
 {
   "cooling_technology": "Immersion Cooling",
   "cooling_fluid": "Dielectric Fluid (3M Novec or equivalent)",
-  "advantages": [
+  "features": [
     "Higher power density (up to 50kW/rack)",
     "Improved efficiency (+3-5%)",
     "Reduced noise (<40dB)",
@@ -488,7 +488,7 @@ The system includes comprehensive specifications for current and historical sola
       "degradation_doubling_temp": 10
     }
   },
-  "advantages": [
+  "features": [
     "Longer cycle life than Li-ion",
     "Better thermal stability",
     "Lower fire risk",
@@ -741,7 +741,7 @@ The system includes comprehensive specifications for current and historical sola
     },
     "obsolete": {
       "efficiency_j_th": ">50",
-      "recommendation": "Not economically viable in most markets"
+      "recommendation": "Not economically viable in most locations"
     }
   }
 }

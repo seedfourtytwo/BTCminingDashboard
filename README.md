@@ -1,98 +1,123 @@
 # Solar Bitcoin Mining Calculator
 
-A comprehensive planning and projection tool for solar-powered Bitcoin mining operations with support for multiple renewable energy sources.
+A comprehensive planning and projection tool for solar-powered Bitcoin mining operations.
 
 ## Project Overview
 
-This application enables Bitcoin miners to plan and optimize solar-powered mining operations by providing detailed projections, equipment management, and economic analysis tools. The system supports multiple power sources including solar panels, wind turbines, grid connections, and custom renewable sources.
+This application enables Bitcoin miners to plan and optimize solar-powered mining operations by providing detailed projections, equipment management, and economic analysis tools. The system supports solar power modeling with location-specific environmental data.
 
-## Key Features
+## Current Status
 
-### 🔋 Multi-Source Power Management
-- **Solar Power**: Comprehensive PV system modeling with irradiance data
-- **Wind Power**: Wind turbine integration with speed-based power curves
-- **Grid Integration**: Time-of-use rates and net metering support
-- **Custom Sources**: Flexible system for any renewable power source
-- **Battery Storage**: Advanced energy storage modeling with degradation
+🚧 **Development in Progress** - This is a personal project in early development.
+
+### What's Implemented
+- ✅ Basic project structure and architecture
+- ✅ Simplified database schema
+- ✅ API worker placeholders
+- ✅ Calculation worker placeholders
+- ✅ Data worker placeholders
+- ✅ Landing page with feature overview
+
+### What's Coming Next
+- 🔄 Equipment selection interface
+- 🔄 Solar power modeling calculations
+- 🔄 Mining profitability projections
+- 🔄 Basic financial analysis
+
+## Key Features (Planned)
+
+### 🌞 Solar Power Modeling
+- Location-specific solar resource data
+- PV system calculations with environmental factors
+- Degradation modeling over time
 
 ### ⚡ Mining Equipment Management
-- **Comprehensive Miner Database**: 100+ ASIC miner models with detailed specifications
-- **Performance Degradation**: Realistic hashrate and efficiency decline modeling
-- **Economic Analysis**: ROI calculations with equipment replacement planning
-- **Power Optimization**: Dynamic power limiting and thermal management
+- ASIC miner specifications and performance data
+- Realistic degradation curves
+- Power consumption optimization
 
-### 📊 Advanced Projections
-- **Multi-Scenario Analysis**: Compare different equipment and power source combinations
-- **Monte Carlo Simulations**: Risk analysis with confidence intervals
-- **Long-term Modeling**: 1-10 year projections with degradation factors
-- **Real-time Adjustments**: Live parameter updates with instant recalculation
-
-### 📈 Economic Intelligence
-- **Profitability Analysis**: Detailed revenue vs. cost breakdown
-- **Break-even Calculations**: ROI and payback period analysis
-- **Sensitivity Analysis**: Impact assessment of key variables
-- **Market Integration**: Live Bitcoin price and network difficulty data
+### 💰 Economic Analysis
+- ROI calculations with equipment costs
+- Break-even analysis
+- Basic financial metrics (NPV, IRR, payback period)
 
 ## Technology Stack
 
-- **Backend**: Cloudflare Workers with TypeScript
-- **Database**: Cloudflare D1 (SQLite-based)
 - **Frontend**: React with TypeScript
-- **Build Tools**: Vite, ESLint, Prettier
-- **Testing**: Vitest for unit tests
-- **Deployment**: Cloudflare Workers & Pages
+- **Backend**: Cloudflare Workers
+- **Database**: Cloudflare D1 (SQLite-based)
+- **Styling**: Tailwind CSS
+- **Build Tool**: Vite
 
-## Documentation Structure
+## Project Structure
 
 ```
-docs/
-├── 01-PROJECT-OVERVIEW.md          # High-level project description and goals
-├── 02-DATABASE-SCHEMA.md           # Complete database design and relationships
-├── 03-API-SPECIFICATION.md         # REST API endpoints and data models
-├── 04-CALCULATION-ENGINES.md       # Mathematical models and algorithms
-├── 05-EQUIPMENT-SPECIFICATIONS.md  # Equipment catalogs and standards
-├── 06-USER-INTERFACE.md            # UI/UX design and workflows
-├── 07-DEPLOYMENT-GUIDE.md          # Setup and deployment instructions
-├── 08-ERROR-HANDLING.md            # Comprehensive error handling strategy
-├── 09-UI-DESIGN-PRINCIPLES.md      # Modern UI/UX design guidelines and best practices
-├── 10-WORKER-ARCHITECTURE.md       # Modular Cloudflare Workers architecture
-├── 11-PROJECT-STRUCTURE.md         # Complete directory structure and configuration reference
-└── CLAUDE.md                       # Development standards and practices
+src/
+├── client/                 # React frontend
+│   ├── App.tsx            # Main landing page
+│   ├── components/        # React components (empty - to be built)
+│   ├── pages/            # Page components (empty - to be built)
+│   ├── services/         # API services (empty - to be built)
+│   └── types/            # TypeScript types (empty - to be built)
+├── server/               # Cloudflare Workers backend
+│   ├── api/              # Main API worker
+│   ├── calculations/     # Calculation worker
+│   ├── data/             # Data collection worker
+│   └── shared/           # Shared utilities and database
+└── shared/               # Shared types and utilities
 ```
 
-## Quick Start
+## Development
 
-1. **Project Overview**: Start with `docs/01-PROJECT-OVERVIEW.md`
-2. **Project Structure**: Review `docs/11-PROJECT-STRUCTURE.md` for organization
-3. **Database Design**: Understand `docs/02-DATABASE-SCHEMA.md`
-4. **Worker Architecture**: Check `docs/10-WORKER-ARCHITECTURE.md`
-5. **Development Setup**: Follow `docs/07-DEPLOYMENT-GUIDE.md`
+### Prerequisites
+- Node.js 18+
+- Wrangler CLI
+- Cloudflare account
 
-## Project Status
+### Setup
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Configure Wrangler: `wrangler login`
+4. Set up database: `wrangler d1 execute DB --file=src/server/shared/database/migrations/0001_initial_schema.sql`
 
-🚧 **In Development** - Currently in documentation and planning phase
+### Development Commands
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run deploy` - Deploy to Cloudflare
 
-### Completed
-- ✅ Comprehensive requirements analysis
-- ✅ Database schema design
-- ✅ API specification planning
-- ✅ Calculation engine architecture
+## Database Schema
 
-### In Progress
-- 🔄 Documentation creation
-- 🔄 Database implementation
-- 🔄 API development
-- 🔄 Frontend interface
+The simplified database includes:
 
-### Planned
-- 📋 Testing suite implementation
-- 📋 Performance optimization
-- 📋 Deployment and hosting setup
+- **locations** - Geographic data for solar calculations
+- **miner_models** - ASIC miner specifications
+- **solar_panel_models** - Solar panel specifications
+- **storage_models** - Battery storage specifications
+- **bitcoin_network_data** - Current Bitcoin network stats
+- **bitcoin_price_data** - Current Bitcoin price data
+- **environmental_data** - Weather and solar resource data
+- **system_configs** - User system configurations
+- **projection_results** - Calculated projections
+
+## API Endpoints
+
+### Health Checks
+- `GET /health` - API worker health
+- `GET /calculate/health` - Calculation worker health
+- `GET /data/health` - Data worker health
+
+### API Routes (Coming Soon)
+- `/api/v1/equipment` - Equipment management
+- `/api/v1/projections` - Projection calculations
+- `/api/v1/system-configs` - System configurations
+- `/api/v1/locations` - Location data
+- `/api/v1/bitcoin` - Bitcoin network data
+- `/api/v1/environmental` - Environmental data
 
 ## Contributing
 
-This project follows strict TypeScript practices and comprehensive testing requirements. See `CLAUDE.md` for detailed contribution guidelines.
+This is a personal project for learning and experimentation. The focus is on building a practical tool for solar Bitcoin mining analysis.
 
 ## License
 
-MIT License - See LICENSE file for details.
+MIT License - see LICENSE file for details.

@@ -5,17 +5,20 @@ This document serves as the primary development guide for the Solar Bitcoin Mini
 ## Table of Contents
 
 1. [Project Architecture](#project-architecture)
-2. [TypeScript Standards](#typescript-standards)
-3. [React Development Patterns](#react-development-patterns)
-4. [Cloudflare Workers Best Practices](#cloudflare-workers-best-practices)
-5. [Database Design with D1](#database-design-with-d1)
-6. [Build System with Vite](#build-system-with-vite)
-7. [Code Organization](#code-organization)
-8. [Testing Standards](#testing-standards)
-9. [Error Handling](#error-handling)
-10. [Performance Guidelines](#performance-guidelines)
-11. [Development Workflow](#development-workflow)
-12. [Deployment and CI/CD](#deployment-and-cicd)
+2. [Enhanced Mining Calculator Features](#enhanced-mining-calculator-features)
+3. [Real-time Data Pipeline](#real-time-data-pipeline)
+4. [TypeScript Standards](#typescript-standards)
+5. [React Development Patterns](#react-development-patterns)
+6. [Cloudflare Workers Best Practices](#cloudflare-workers-best-practices)
+7. [Database Design with D1](#database-design-with-d1)
+8. [Advanced Calculation Engines](#advanced-calculation-engines)
+9. [Build System with Vite](#build-system-with-vite)
+10. [Code Organization](#code-organization)
+11. [Testing Standards](#testing-standards)
+12. [Error Handling](#error-handling)
+13. [Performance Guidelines](#performance-guidelines)
+14. [Development Workflow](#development-workflow)
+15. [Deployment and CI/CD](#deployment-and-cicd)
 
 ## Project Architecture
 
@@ -48,6 +51,122 @@ src/
 - **Development**: Local D1 database, hot module replacement
 - **Staging**: Preview D1 database, staging Workers deployment
 - **Production**: Production D1 database, production Workers deployment
+
+## Enhanced Mining Calculator Features
+
+### Competitive Analysis Integration
+
+Based on comprehensive research of leading Bitcoin mining calculators (WhatToMine, Hashrate Index, CoinWarz, Minerstat, 99Bitcoins), our calculator incorporates advanced features that set it apart in the renewable energy mining space.
+
+#### Key Differentiators
+- **Solar-specific optimization**: Unlike generic calculators, we specialize in solar/renewable energy mining
+- **Environmental factor modeling**: Temperature coefficients, cooling requirements, weather impact
+- **Advanced financial modeling**: Monte Carlo simulations, risk analysis, sensitivity testing
+- **Hardware optimization**: Equipment comparison and recommendation algorithms
+- **Real-time data integration**: Live Bitcoin network data, weather forecasting, hashprice tracking
+
+#### Feature Enhancement Roadmap
+
+**Phase 1: Core Data Enhancement**
+- Real-time Bitcoin network data (hashprice, difficulty, mempool)
+- Enhanced weather data with forecasting capabilities
+- Advanced equipment degradation modeling
+- Grid integration pricing (net metering, demand charges, TOU)
+
+**Phase 2: Advanced Analytics**
+- Monte Carlo risk simulations
+- Hardware comparison and optimization
+- Mining pool selection recommendations
+- Scenario modeling (bull/bear markets)
+
+**Phase 3: User Experience**
+- Guided configuration wizard
+- Pre-built templates for common setups
+- Export capabilities (PDF, Excel, CSV)
+- Real-time monitoring dashboard
+
+### Data Quality Standards
+
+#### Real-time Data Sources
+- **Bitcoin Network**: Multiple API sources with failover (Blockchain.info, Blockchair, Mempool.space)
+- **Weather Data**: NREL NSRDB, OpenWeatherMap, with data quality scoring
+- **Equipment Database**: Manufacturer specifications with verification flags
+- **Mining Pools**: Performance metrics with historical variance tracking
+
+#### Data Validation Requirements
+- Outlier detection for anomalous values
+- Cross-source validation for critical metrics
+- Data freshness tracking with automatic staleness alerts
+- Quality scoring system (0-1) for all data sources
+
+## Real-time Data Pipeline
+
+### Architecture Overview
+
+The real-time data pipeline enables live updates for critical mining profitability factors, setting our calculator apart from static competitors.
+
+#### Data Stream Management
+```typescript
+interface DataStreamConfig {
+  source: 'blockchain_api' | 'weather_api' | 'price_api' | 'pool_api';
+  update_frequency: number; // seconds
+  retry_policy: RetryConfig;
+  quality_threshold: number; // minimum acceptable quality score
+  cache_duration: number; // seconds
+  rate_limits: RateLimitConfig;
+}
+```
+
+#### WebSocket Integration
+- Real-time Bitcoin price and network stats
+- Live weather data for solar performance
+- Mining pool performance updates
+- Equipment availability and pricing
+
+#### Caching Strategy
+```typescript
+interface CachePolicy {
+  bitcoin_price: '30s';      // High frequency updates
+  network_stats: '5m';       // Medium frequency
+  weather_current: '15m';    // Weather updates
+  weather_forecast: '6h';    // Forecast updates
+  equipment_specs: '24h';    // Static data
+  pool_stats: '1h';          // Pool performance
+}
+```
+
+#### Rate Limiting and API Management
+- Intelligent request batching
+- Exponential backoff for failures
+- Multiple API key rotation
+- Cost optimization across data sources
+
+### Data Integration Patterns
+
+#### Multi-source Aggregation
+```typescript
+class DataAggregator {
+  async getBitcoinPrice(): Promise<PriceData> {
+    const sources = [
+      this.coinGeckoAPI,
+      this.coinMarketCapAPI,
+      this.binanceAPI
+    ];
+    
+    const results = await Promise.allSettled(
+      sources.map(source => source.getCurrentPrice())
+    );
+    
+    return this.consolidateResults(results);
+  }
+}
+```
+
+#### Quality Scoring System
+- Source reliability weighting
+- Data recency scoring
+- Cross-validation checks
+- Anomaly detection
 
 ## TypeScript Standards
 
@@ -167,6 +286,156 @@ type ProjectionResult =
 ```
 
 ## React Development Patterns
+
+### Enhanced User Experience Components
+
+#### Configuration Wizard Architecture
+
+Based on research of successful mining calculators, we implement a guided setup wizard that simplifies the complex configuration process.
+
+```typescript
+interface WizardStep {
+  id: string;
+  title: string;
+  description: string;
+  component: React.ComponentType<StepProps>;
+  validation: ValidationSchema;
+  dependencies: string[]; // Previous steps that must be completed
+  conditionalLogic?: ConditionalNavigation;
+}
+
+interface ConfigurationWizard {
+  steps: WizardStep[];
+  currentStep: number;
+  completedSteps: Set<string>;
+  configuration: Partial<SystemConfiguration>;
+}
+```
+
+#### Step-by-Step User Flow
+1. **Location & Climate**: Geographic setup with weather data preview
+2. **Budget & Goals**: Investment parameters and optimization objectives  
+3. **Equipment Selection**: Guided hardware comparison and recommendation
+4. **System Sizing**: Automated sizing based on goals and constraints
+5. **Financial Settings**: Grid integration, pricing, and economic parameters
+6. **Review & Optimize**: Final configuration review with optimization suggestions
+
+#### Template Library System
+```typescript
+interface ConfigurationTemplate {
+  id: string;
+  name: string;
+  category: 'beginner' | 'residential' | 'commercial' | 'industrial';
+  description: string;
+  suitability_criteria: {
+    budget_range: [number, number];
+    space_requirements: number; // m²
+    experience_level: 'novice' | 'intermediate' | 'expert';
+    risk_tolerance: 'low' | 'medium' | 'high';
+    climate_zones: string[]; // Köppen climate classifications
+  };
+  default_configuration: Partial<SystemConfiguration>;
+  customization_options: CustomizationField[];
+  expected_outcomes: {
+    roi_range: [number, number];
+    payback_period_months: [number, number];
+    risk_level: string;
+  };
+}
+```
+
+#### Pre-built Templates
+- **Beginner Solar Miner**: Small-scale residential setup with single ASIC
+- **Home Mining Farm**: Multi-miner residential installation with grid tie
+- **Commercial Operation**: Industrial-scale mining with advanced optimization
+- **Off-Grid Mining**: Standalone solar mining with battery storage
+- **Hybrid Grid/Solar**: Mixed power source optimization
+
+#### Hardware Comparison Components
+```typescript
+interface HardwareComparisonTable {
+  equipment_type: 'miners' | 'solar_panels' | 'inverters' | 'batteries';
+  comparison_metrics: ComparisonMetric[];
+  sorting_options: SortingOption[];
+  filtering_options: FilteringOption[];
+  visualization_modes: 'table' | 'cards' | 'charts';
+}
+
+interface ComparisonMetric {
+  key: string;
+  label: string;
+  unit: string;
+  format: 'number' | 'currency' | 'percentage' | 'ratio';
+  importance_weight: number; // For overall scoring
+  tooltip: string;
+}
+```
+
+#### Interactive Hardware Selection
+- **Side-by-side comparison**: Up to 5 equipment options
+- **Performance charts**: Efficiency, ROI, and payback visualizations
+- **Recommendation engine**: AI-powered equipment suggestions
+- **Real-time pricing**: Live market data integration
+- **Compatibility checking**: Automatic compatibility validation
+
+#### Export and Reporting Components
+```typescript
+interface ReportGenerator {
+  report_types: {
+    executive_summary: ExecutiveSummaryConfig;
+    technical_specifications: TechnicalSpecsConfig;
+    financial_analysis: FinancialAnalysisConfig;
+    risk_assessment: RiskAssessmentConfig;
+    implementation_guide: ImplementationGuideConfig;
+  };
+  
+  output_formats: {
+    pdf: PDFExportConfig;
+    excel: ExcelExportConfig;
+    csv: CSVExportConfig;
+    powerpoint: PowerPointConfig;
+  };
+  
+  customization: {
+    branding: BrandingOptions;
+    charts: ChartCustomization;
+    sections: SectionConfiguration;
+  };
+}
+```
+
+#### Export Capabilities
+- **Professional PDF reports**: Multi-page reports with charts and analysis
+- **Excel workbooks**: Detailed calculations and sensitivity analysis  
+- **CSV data export**: Raw data for external analysis
+- **PowerPoint presentations**: Investment pitch decks
+- **Real-time sharing**: Secure links with expiration dates
+
+#### Dashboard and Monitoring Components
+```typescript
+interface MonitoringDashboard {
+  real_time_metrics: {
+    current_profitability: ProfitabilityWidget;
+    bitcoin_price: BitcoinPriceWidget;
+    network_difficulty: NetworkStatsWidget;
+    weather_conditions: WeatherWidget;
+    system_performance: PerformanceWidget;
+  };
+  
+  alerts: {
+    profitability_threshold: AlertConfig;
+    equipment_maintenance: MaintenanceAlert;
+    weather_warnings: WeatherAlert;
+    market_opportunities: MarketAlert;
+  };
+  
+  historical_tracking: {
+    performance_charts: ChartConfiguration[];
+    comparison_metrics: ComparisonTracking;
+    goal_progress: GoalTracking;
+  };
+}
+```
 
 ### Component Architecture
 
@@ -585,6 +854,189 @@ export async function runMigrations(db: D1Database) {
         .run();
     }
   }
+}
+```
+
+## Advanced Calculation Engines
+
+### Monte Carlo Risk Analysis
+
+Monte Carlo simulation provides probabilistic analysis of mining profitability by running thousands of scenarios with varying input parameters.
+
+#### Implementation Architecture
+```typescript
+interface MonteCarloSimulation {
+  parameters: {
+    btc_price_distribution: ProbabilityDistribution;
+    difficulty_growth_distribution: ProbabilityDistribution;
+    electricity_cost_distribution: ProbabilityDistribution;
+    equipment_failure_distribution: ProbabilityDistribution;
+  };
+  constraints: {
+    simulation_runs: number; // 10,000+ for statistical significance
+    confidence_levels: number[]; // [0.05, 0.25, 0.5, 0.75, 0.95]
+    time_horizon_years: number;
+  };
+  correlations: CorrelationMatrix; // Variable interdependencies
+}
+```
+
+#### Key Risk Metrics
+- **Value at Risk (VaR)**: Maximum expected loss at given confidence level
+- **Conditional Value at Risk (CVaR)**: Expected loss beyond VaR threshold
+- **Probability of Loss**: Chance of negative ROI
+- **Expected Return**: Mean profitability across all scenarios
+- **Return Volatility**: Standard deviation of returns
+
+#### Scenario Generation
+```typescript
+class ScenarioGenerator {
+  generateBTCPriceScenarios(basePrice: number): number[] {
+    // Geometric Brownian Motion for Bitcoin price
+    // Incorporates historical volatility and trend
+    // Accounts for halving cycles and market cycles
+  }
+  
+  generateDifficultyScenarios(baseDifficulty: number): number[] {
+    // Network growth modeling
+    // Mining hardware deployment rates
+    // Energy market constraints
+  }
+  
+  generateWeatherScenarios(location: Location): WeatherScenario[] {
+    // Climate variability modeling
+    // Extreme weather event probability
+    // Long-term climate change effects
+  }
+}
+```
+
+### Hardware Optimization Algorithms
+
+#### Multi-objective Optimization
+```typescript
+interface OptimizationObjectives {
+  maximize_roi: number;        // Weight for ROI maximization
+  minimize_payback: number;    // Weight for payback minimization  
+  minimize_risk: number;       // Weight for risk minimization
+  maximize_hashrate: number;   // Weight for hashrate maximization
+}
+
+interface OptimizationConstraints {
+  max_budget_usd: number;
+  max_power_consumption_kw: number;
+  max_installation_area_m2: number;
+  min_equipment_efficiency: number;
+  geographic_restrictions: string[];
+}
+```
+
+#### Genetic Algorithm Implementation
+```typescript
+class EquipmentOptimizer {
+  async optimizeConfiguration(
+    objectives: OptimizationObjectives,
+    constraints: OptimizationConstraints,
+    location: GeographicLocation
+  ): Promise<OptimizationResult> {
+    // Genetic algorithm phases:
+    // 1. Population initialization with feasible configurations
+    // 2. Fitness evaluation using multi-objective scoring
+    // 3. Selection, crossover, and mutation operations
+    // 4. Convergence analysis and Pareto frontier identification
+    // 5. Solution ranking and alternative generation
+  }
+}
+```
+
+#### Pareto Frontier Analysis
+- Identifies trade-offs between conflicting objectives
+- Provides multiple optimal solutions for different priorities
+- Enables sensitivity analysis of objective weights
+
+### Environmental Impact Modeling
+
+#### Solar Performance Degradation
+```typescript
+interface SolarDegradationModel {
+  // Panel-level degradation factors
+  annual_degradation_rate: number;     // Base degradation (0.5-0.8% annually)
+  temperature_coefficient: number;     // Performance per °C above STC
+  soiling_degradation: number;         // Dust/debris impact
+  uv_degradation_factor: number;      // UV exposure impact
+  potential_induced_degradation: number; // PID susceptibility
+  
+  // System-level factors  
+  inverter_degradation_annual: number; // Inverter efficiency decline
+  wiring_losses_increase: number;      // Connection degradation
+  shading_impact_factor: number;       // Shading growth over time
+}
+```
+
+#### Mining Hardware Environmental Impact
+```typescript
+interface MinerEnvironmentalModel {
+  temperature_derating: {
+    optimal_temp_c: number;
+    derating_per_degree_c: number;
+    critical_temperature_c: number;
+  };
+  
+  altitude_derating: {
+    sea_level_performance: number;
+    derating_per_1000m: number;
+  };
+  
+  humidity_impact: {
+    optimal_humidity_range: [number, number];
+    corrosion_acceleration: number;
+    failure_rate_multiplier: number;
+  };
+  
+  dust_impact: {
+    cooling_efficiency_reduction: number;
+    maintenance_frequency_increase: number;
+    filter_replacement_cost: number;
+  };
+}
+```
+
+### Sensitivity Analysis Engine
+
+#### Variable Impact Assessment
+```typescript
+interface SensitivityAnalysis {
+  target_metric: 'roi' | 'payback_period' | 'total_profit' | 'risk_score';
+  input_variables: Array<{
+    variable_name: string;
+    base_value: number;
+    variation_range: [number, number]; // [min, max] or [±percentage]
+    step_size: number;
+  }>;
+  interaction_effects: boolean; // Include variable interactions
+}
+```
+
+#### Tornado Diagram Generation
+- Ranks variables by impact on target metric
+- Visualizes sensitivity ranges
+- Identifies critical assumptions for monitoring
+
+### Real-time Calculation Optimization
+
+#### Computational Efficiency
+- **Vectorized calculations**: Parallel processing of time series
+- **Memoization**: Cache intermediate results for similar scenarios
+- **Progressive refinement**: Start with coarse estimates, refine iteratively
+- **GPU acceleration**: Leverage WebGPU for intensive calculations
+
+#### Calculation Prioritization
+```typescript
+interface CalculationQueue {
+  high_priority: 'real_time_updates';      // Live profitability
+  medium_priority: 'scenario_analysis';    // What-if calculations  
+  low_priority: 'monte_carlo';            // Background simulations
+  batch_priority: 'optimization';         // Resource-intensive tasks
 }
 ```
 
@@ -1982,5 +2434,96 @@ export default {
 **Educational Explanation**: Good logging and debugging practices help you quickly identify and resolve issues in production. Cloudflare provides real-time logs through `wrangler tail`.
 
 This deployment and CI/CD setup provides a robust, automated pipeline that ensures code quality, handles deployments safely, and monitors your application in production. As you implement this system, you'll learn modern DevOps practices that are valuable for any web development project.
+
+## Enhanced Calculator Competitive Analysis Summary
+
+### Research-Based Improvements
+
+Our comprehensive analysis of leading Bitcoin mining calculators (WhatToMine, Hashrate Index, CoinWarz, Minerstat, 99Bitcoins) and solar-powered mining platforms has identified key enhancement opportunities that position our calculator as the most comprehensive tool for renewable energy Bitcoin mining analysis.
+
+#### Competitive Advantages Implemented
+
+**1. Advanced Environmental Modeling**
+- Temperature coefficient integration for both miners and solar panels
+- Cooling requirement calculations with environmental factors
+- Weather impact modeling (dust, humidity, altitude effects)
+- Long-term equipment degradation based on environmental conditions
+
+**2. Real-time Data Integration**
+- Live Bitcoin network data (hashprice, difficulty adjustments, mempool fees)
+- Enhanced weather forecasting with performance impact modeling
+- Mining pool performance tracking with recommendation engine
+- Dynamic equipment pricing and availability monitoring
+
+**3. Sophisticated Financial Analysis**
+- Monte Carlo risk simulations with 10,000+ scenario runs
+- Sensitivity analysis with tornado diagrams
+- Multi-objective hardware optimization algorithms
+- Advanced NPV/IRR calculations with equipment replacement modeling
+
+**4. User Experience Enhancements**
+- Guided configuration wizard for complex setups
+- Pre-built templates for common mining configurations  
+- Interactive hardware comparison with AI recommendations
+- Professional export capabilities (PDF, Excel, PowerPoint)
+
+#### Data Points Enhanced Beyond Competitors
+
+**Equipment Specifications:**
+- Environmental efficiency factors (temperature coefficients, cooling requirements)
+- Advanced degradation modeling (environmental factors, usage patterns)
+- Pool and network compatibility specifications
+- Overclocking and undervolting optimization parameters
+
+**Solar System Modeling:**
+- Enhanced environmental performance factors (shading tolerance, soiling sensitivity)
+- Advanced durability metrics (thermal cycling, humidity-freeze ratings)
+- Angle of incidence modifiers and spectral response data
+- Installation complexity factors and warranty modeling
+
+**System Configuration:**
+- Grid integration pricing (net metering, demand charges, time-of-use)
+- Mining pool optimization with fee and variance analysis
+- Advanced battery storage modeling with cycle life degradation
+- Risk and optimization parameters for portfolio management
+
+**Weather Data Enhancement:**
+- Plane of array irradiance calculations for tilted surfaces
+- Enhanced solar position algorithms with atmospheric modeling
+- Air quality factors affecting solar performance
+- Forecasting capabilities with confidence intervals
+
+#### Implementation Phases
+
+**Phase 1 - Foundation (Completed)**
+✅ Enhanced database schema with comprehensive data models  
+✅ API type definitions for advanced features  
+✅ Documentation of calculation methodologies  
+✅ User experience component architecture  
+
+**Phase 2 - Core Features (Next)**
+- Real-time data pipeline implementation
+- Basic Monte Carlo simulation engine
+- Hardware comparison and recommendation system
+- Configuration wizard with template library
+
+**Phase 3 - Advanced Analytics**
+- Full risk analysis suite with sensitivity testing
+- Equipment optimization algorithms
+- Environmental impact modeling
+- Professional reporting and export capabilities
+
+#### Unique Value Proposition
+
+Our enhanced calculator fills critical gaps in the current market:
+
+- **Only comprehensive solar-mining calculator**: Specialized for renewable energy applications
+- **Advanced risk modeling**: Professional-grade Monte Carlo analysis typically found only in enterprise tools
+- **Environmental factor integration**: Accounts for real-world performance impacts ignored by competitors
+- **Hardware optimization**: AI-powered equipment recommendations based on user constraints and objectives
+
+This positions us as the definitive tool for renewable energy Bitcoin mining analysis, serving everyone from individual enthusiasts to commercial mining operations planning solar-powered facilities.
+
+---
 
 This development guide should be referenced for all code contributions and maintained as the project evolves. Regular updates ensure alignment with best practices and emerging patterns in the ecosystem.
