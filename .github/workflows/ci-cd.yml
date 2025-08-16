@@ -84,7 +84,14 @@ jobs:
         run: npm run build:client
         
       - name: Build workers (dry-run)
-        run: npm run build:workers
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "Building for production environment..."
+            npm run build:workers
+          else
+            echo "Building for staging environment..."
+            npm run build:workers:dev
+          fi
         
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

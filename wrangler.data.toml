@@ -65,14 +65,12 @@ SOLAR_API_BASE_URL = "https://developer.nrel.gov/api/solar"
 BLOCKCHAIN_API_BASE_URL = "https://blockstream.info/api"
 
 # Scheduled triggers for data updates
-[[triggers]]
-crons = ["0 */6 * * *"]  # Every 6 hours - Bitcoin price updates
-
-[[triggers]]
-crons = ["0 0 * * *"]    # Daily - Equipment database updates
-
-[[triggers]]
-crons = ["0 12 * * 1"]   # Weekly Monday noon - Weather data refresh
+[triggers]
+crons = [
+  "0 */6 * * *",  # Every 6 hours - Bitcoin price updates
+  "0 0 * * *",    # Daily - Equipment database updates  
+  "0 12 * * 1"    # Weekly Monday noon - Weather data refresh
+]
 
 # CPU limits disabled for free plan
 # [limits]
