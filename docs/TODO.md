@@ -141,6 +141,7 @@
 - [ ] **Bitcoin network API** - Get current difficulty and hashrate data
 - [ ] **Weather API integration** - OpenWeatherMap for environmental data
 - [ ] **Solar irradiance data** - NREL API or similar for solar resource data
+- [ ] **Manual equipment updates** - User-triggered equipment price/spec updates (replaces daily cron trigger)
 - [ ] **API rate limiting** - Implement proper rate limiting and caching
 
 #### 14. Data Management & Caching
