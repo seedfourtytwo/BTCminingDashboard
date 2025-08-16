@@ -2,717 +2,541 @@
 
 ## Overview
 
-This guide covers the complete deployment process for the Solar Bitcoin Mining Calculator, from local development setup to production deployment on Cloudflare's edge infrastructure.
+This guide covers the deployment of the Solar Bitcoin Mining Calculator on Cloudflare Workers. The application uses a serverless architecture with separate workers for API, calculations, and data management.
+
+## Architecture Overview
+
+```
+Deployment Architecture:
+┌─────────────────────────────────────────────────────────┐
+│                    Cloudflare Workers                   │
+├─────────────────────────────────────────────────────────┤
+│  API Worker (wrangler.api.toml)                        │
+│  ├── REST API endpoints                                 │
+│  ├── Request routing                                    │
+│  └── Response formatting                                │
+├─────────────────────────────────────────────────────────┤
+│  Calculations Worker (wrangler.calculations.toml)      │
+│  ├── Solar generation calculations                     │
+│  ├── Mining performance modeling                       │
+│  └── Financial analysis                                │
+├─────────────────────────────────────────────────────────┤
+│  Data Worker (wrangler.data.toml)                      │
+│  ├── Equipment database                                │
+│  ├── User configurations                               │
+│  └── Caching layer                                     │
+└─────────────────────────────────────────────────────────┘
+```
 
 ## Prerequisites
 
-### Required Software
-```bash
-# Node.js (v18 or later)
-node --version  # Should be v18.0.0+
-npm --version   # Should be 9.0.0+
-
-# Git
-git --version
-
-# Cloudflare CLI (Wrangler)
-npm install -g wrangler
-wrangler --version
-```
+### Required Tools
+- **Node.js**: Version 18+ (LTS recommended)
+- **npm**: Package manager
+- **Wrangler CLI**: Cloudflare Workers deployment tool
+- **Git**: Version control
 
 ### Required Accounts
-1. **Cloudflare Account** (Free tier sufficient for development)
-2. **API Access Accounts**:
-   - OpenWeatherMap (for weather data)
-   - CoinGecko (for Bitcoin price data)
-   - Optional: Custom Bitcoin node access
+- **Cloudflare Account**: For Workers and D1 database
+- **GitHub Account**: For source code repository (optional)
 
-## Local Development Setup
+## Initial Setup
 
-### 1. Repository Setup
+### 1. Install Dependencies
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/solar-mining-calculator.git
-cd solar-mining-calculator
-
-# Install dependencies
+# Install Node.js dependencies
 npm install
 
-# Install frontend dependencies
-cd src/frontend
-npm install
-cd ../..
+# Install Wrangler CLI globally
+npm install -g wrangler
+
+# Install development dependencies
+npm install --save-dev @cloudflare/workers-types
 ```
 
-### 2. Environment Configuration
+### 2. Cloudflare Account Setup
 
-Create development environment file:
-```bash
-# Copy example environment file
-cp .env.example .env.local
-
-# Edit with your API keys
-nano .env.local
-```
-
-Required environment variables:
-```env
-# API Keys
-OPENWEATHER_API_KEY=your_openweather_api_key_here
-COINGECKO_API_KEY=your_coingecko_api_key_here
-BLOCKCHAIN_INFO_API_KEY=optional_blockchain_info_key
-
-# Database
-DATABASE_URL=local_d1_database_path
-
-# Application Settings
-ENVIRONMENT=development
-LOG_LEVEL=debug
-RATE_LIMIT_ENABLED=false
-
-# API Configuration
-API_RATE_LIMIT=1000
-API_TIMEOUT_MS=5000
-
-# External Service URLs
-BITCOIN_NODE_URL=https://bitcoin-node.example.com:8332
-NREL_API_URL=https://developer.nrel.gov/api
-```
-
-### 3. Database Setup
-
-#### Initialize local D1 database:
-```bash
-# Create local D1 database for development
-wrangler d1 create solar-mining-db-dev
-
-# Update wrangler.toml with the database ID
-# Copy the database_id from the output above
-```
-
-#### Run database migrations:
-```bash
-# Create the database schema
-wrangler d1 execute solar-mining-db-dev --local --file=src/database/schema.sql
-
-# Seed with initial data
-npm run db:seed
-```
-
-#### Verify database setup:
-```bash
-# Connect to local database
-wrangler d1 execute solar-mining-db-dev --local --command="SELECT * FROM locations LIMIT 5;"
-```
-
-### 4. Local Development Server
-
-#### Start the backend worker:
-```bash
-# Start Cloudflare Workers development server
-npm run dev
-
-# The API will be available at http://localhost:8787
-```
-
-#### Start the frontend development server:
-```bash
-# In a new terminal window
-npm run frontend:dev
-
-# The frontend will be available at http://localhost:5173
-```
-
-#### Verify the setup:
-```bash
-# Test API health endpoint
-curl http://localhost:8787/api/health
-
-# Expected response:
-# {"success": true, "status": "healthy", "version": "1.0.0"}
-```
-
-## Production Deployment
-
-### 1. Cloudflare Account Setup
-
-#### Create Cloudflare account and get API token:
 ```bash
 # Login to Cloudflare
 wrangler login
 
-# Verify authentication
+# Verify account access
 wrangler whoami
 ```
 
-#### Create production database:
-```bash
-# Create production D1 database
-wrangler d1 create solar-mining-db-prod
+### 3. Environment Configuration
 
-# Note the database ID for production configuration
+Create environment files for each worker:
+
+```bash
+# API Worker environment
+cp .env.example .env.api
+
+# Calculations Worker environment  
+cp .env.example .env.calculations
+
+# Data Worker environment
+cp .env.example .env.data
 ```
 
-### 2. Production Environment Configuration
+### 4. Database Setup
 
-#### Update wrangler.toml for production:
+```bash
+# Create D1 database
+wrangler d1 create solar-mining-calculator
+
+# Apply migrations
+wrangler d1 execute solar-mining-calculator --file=src/server/shared/database/migrations/0001_initial_schema.sql
+
+# Seed initial data
+wrangler d1 execute solar-mining-calculator --file=src/server/shared/database/migrations/seed.sql
+```
+
+## Worker Configuration
+
+### 1. API Worker Configuration
+
+**File**: `wrangler.api.toml`
+
 ```toml
-name = "solar-mining-calculator"
-main = "src/workers/index.ts"
-compatibility_date = "2024-10-01"
-compatibility_flags = ["nodejs_compat"]
+name = "solar-mining-calculator-api"
+main = "src/server/api/index.ts"
+compatibility_date = "2024-01-15"
 
 [env.production]
-name = "solar-mining-calculator-prod"
+name = "solar-mining-calculator-api"
+route = "api.solar-mining-calculator.com/*"
 
-[[d1_databases]]
+[env.staging]
+name = "solar-mining-calculator-api-staging"
+route = "staging-api.solar-mining-calculator.com/*"
+
+[[env.production.d1_databases]]
 binding = "DB"
-database_name = "solar-mining-db-prod"
-database_id = "your-production-database-id-here"
-migrations_dir = "src/database/migrations"
+database_name = "solar-mining-calculator"
+database_id = "your-production-db-id"
 
-[vars]
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "solar-mining-calculator-staging"
+database_id = "your-staging-db-id"
+
+[env.production.vars]
 ENVIRONMENT = "production"
-LOG_LEVEL = "info"
-RATE_LIMIT_ENABLED = "true"
+API_VERSION = "v1"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+API_VERSION = "v1"
+
+[env.production.r2_buckets]
+binding = "ASSETS"
+bucket_name = "solar-mining-calculator-assets"
+
+[env.staging.r2_buckets]
+binding = "ASSETS"
+bucket_name = "solar-mining-calculator-assets-staging"
 ```
 
-#### Set production secrets:
-```bash
-# Set API keys as secrets (encrypted)
-wrangler secret put OPENWEATHER_API_KEY --env production
-wrangler secret put COINGECKO_API_KEY --env production
-wrangler secret put JWT_SECRET --env production
-wrangler secret put API_KEY_SALT --env production
+### 2. Calculations Worker Configuration
 
-# Set optional secrets
-wrangler secret put BITCOIN_NODE_URL --env production
-wrangler secret put BLOCKCHAIN_INFO_API_KEY --env production
+**File**: `wrangler.calculations.toml`
+
+```toml
+name = "solar-mining-calculator-calculations"
+main = "src/server/calculations/index.ts"
+compatibility_date = "2024-01-15"
+
+[env.production]
+name = "solar-mining-calculator-calculations"
+route = "calculations.solar-mining-calculator.com/*"
+
+[env.staging]
+name = "solar-mining-calculator-calculations-staging"
+route = "staging-calculations.solar-mining-calculator.com/*"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "solar-mining-calculator"
+database_id = "your-production-db-id"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "solar-mining-calculator-staging"
+database_id = "your-staging-db-id"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+CALCULATION_TIMEOUT = "30000"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+CALCULATION_TIMEOUT = "30000"
 ```
 
-### 3. Database Migration to Production
+### 3. Data Worker Configuration
 
-#### Run production migrations:
-```bash
-# Apply database schema to production
-wrangler d1 execute solar-mining-db-prod --env production --file=src/database/schema.sql
+**File**: `wrangler.data.toml`
 
-# Seed production database with initial data
-wrangler d1 execute solar-mining-db-prod --env production --file=src/database/seed-data/initial-data.sql
+```toml
+name = "solar-mining-calculator-data"
+main = "src/server/data/index.ts"
+compatibility_date = "2024-01-15"
+
+[env.production]
+name = "solar-mining-calculator-data"
+route = "data.solar-mining-calculator.com/*"
+
+[env.staging]
+name = "solar-mining-calculator-data-staging"
+route = "staging-data.solar-mining-calculator.com/*"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "solar-mining-calculator"
+database_id = "your-production-db-id"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "solar-mining-calculator-staging"
+database_id = "your-staging-db-id"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+CACHE_TTL = "3600"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+CACHE_TTL = "1800"
 ```
 
-#### Verify production database:
+## Deployment Process
+
+### 1. Development Deployment
+
 ```bash
-# Test database connection
-wrangler d1 execute solar-mining-db-prod --env production --command="SELECT COUNT(*) as equipment_count FROM miner_models;"
+# Deploy to development environment
+wrangler deploy --config wrangler.api.toml --env development
+wrangler deploy --config wrangler.calculations.toml --env development
+wrangler deploy --config wrangler.data.toml --env development
 ```
 
-### 4. Deploy Backend (Cloudflare Workers)
+### 2. Staging Deployment
 
-#### Build and deploy:
 ```bash
-# Type check the project
-npm run type-check
-
-# Deploy to production
-wrangler deploy --env production
-
-# Verify deployment
-curl https://solar-mining-calculator-prod.your-subdomain.workers.dev/api/health
+# Deploy to staging environment
+wrangler deploy --config wrangler.api.toml --env staging
+wrangler deploy --config wrangler.calculations.toml --env staging
+wrangler deploy --config wrangler.data.toml --env staging
 ```
 
-#### Set up cron triggers:
-```bash
-# Cron triggers are automatically deployed with the worker
-# Verify they're active in Cloudflare dashboard > Workers > Triggers
+### 3. Production Deployment
 
-# Test cron endpoints manually
-curl https://solar-mining-calculator-prod.your-subdomain.workers.dev/cron/bitcoin-data
+```bash
+# Deploy to production environment
+wrangler deploy --config wrangler.api.toml --env production
+wrangler deploy --config wrangler.calculations.toml --env production
+wrangler deploy --config wrangler.data.toml --env production
 ```
 
-### 5. Deploy Frontend (Cloudflare Pages)
+### 4. Frontend Deployment
 
-#### Build frontend:
 ```bash
-cd src/frontend
-
-# Install production dependencies
-npm ci --only=production
-
-# Build for production
+# Build the frontend
 npm run build
 
-# Verify build output
-ls -la dist/
-```
-
-#### Deploy to Cloudflare Pages:
-```bash
-# Initialize Pages project
-wrangler pages project create solar-mining-calculator-frontend
-
-# Deploy frontend
+# Deploy to Cloudflare Pages
 wrangler pages deploy dist --project-name solar-mining-calculator-frontend
-
-# Set environment variables for frontend
-wrangler pages secret put VITE_API_BASE_URL --project-name solar-mining-calculator-frontend
-# Value: https://solar-mining-calculator-prod.your-subdomain.workers.dev
 ```
 
-#### Configure custom domain (optional):
+## Environment Variables
+
+### Required Environment Variables
+
 ```bash
-# Add custom domain in Cloudflare dashboard
-# DNS settings will be provided after domain verification
+# Database Configuration
+DATABASE_URL="your-d1-database-url"
+
+# API Configuration
+API_SECRET="your-api-secret-key"
+CORS_ORIGIN="https://solar-mining-calculator.com"
+
+# External API Keys
+BITCOIN_API_KEY="your-bitcoin-api-key"
+SOLAR_API_KEY="your-solar-resource-api-key"
+
+# Monitoring
+LOG_LEVEL="info"
+ENVIRONMENT="production"
 ```
 
-## Configuration Management
+### Optional Environment Variables
 
-### 1. Environment Variables
+```bash
+# Rate Limiting
+RATE_LIMIT_REQUESTS=100
+RATE_LIMIT_WINDOW=60000
 
-#### Development vs Production:
+# Caching
+CACHE_TTL=3600
+CACHE_MAX_SIZE=1000
+
+# Performance
+CALCULATION_TIMEOUT=30000
+MAX_CONCURRENT_CALCULATIONS=10
+```
+
+## Database Management
+
+### 1. Migration Management
+
+```bash
+# Create new migration
+wrangler d1 migrations create solar-mining-calculator add_new_table
+
+# Apply migrations to development
+wrangler d1 migrations apply solar-mining-calculator --local
+
+# Apply migrations to production
+wrangler d1 migrations apply solar-mining-calculator
+```
+
+### 2. Database Backup
+
+```bash
+# Export database
+wrangler d1 export solar-mining-calculator --output=backup.sql
+
+# Import database
+wrangler d1 execute solar-mining-calculator --file=backup.sql
+```
+
+### 3. Database Monitoring
+
+```bash
+# View database usage
+wrangler d1 info solar-mining-calculator
+
+# Execute queries
+wrangler d1 execute solar-mining-calculator --command="SELECT COUNT(*) FROM equipment"
+```
+
+## Monitoring and Logging
+
+### 1. Cloudflare Analytics
+
+```bash
+# View worker analytics
+wrangler tail solar-mining-calculator-api
+
+# Monitor specific worker
+wrangler tail solar-mining-calculator-calculations
+```
+
+### 2. Error Monitoring
+
 ```javascript
-// Environment-specific configurations
-const config = {
-  development: {
-    logLevel: 'debug',
-    rateLimitEnabled: false,
-    apiTimeout: 30000,
-    cacheTimeout: 300000, // 5 minutes
-  },
-  production: {
-    logLevel: 'info',
-    rateLimitEnabled: true,
-    apiTimeout: 10000,
-    cacheTimeout: 3600000, // 1 hour
-  }
-};
+// Basic error logging in workers
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request).catch(err => {
+    console.error('Worker error:', err);
+    return new Response('Internal Server Error', { status: 500 });
+  }));
+});
 ```
 
-### 2. Database Configuration
+### 3. Performance Monitoring
 
-#### Connection settings:
-```typescript
-// Database configuration based on environment
-export const dbConfig = {
-  development: {
-    maxConnections: 5,
-    queryTimeout: 30000,
-    retryAttempts: 3,
-  },
-  production: {
-    maxConnections: 25,
-    queryTimeout: 10000,
-    retryAttempts: 5,
-  }
-};
-```
-
-### 3. External API Configuration
-
-#### Rate limiting and failover:
-```typescript
-export const apiConfig = {
-  bitcoin: {
-    primary: 'https://api.blockchain.info',
-    fallback: 'https://blockstream.info/api',
-    rateLimit: 100, // requests per minute
-    timeout: 5000,
-  },
-  weather: {
-    primary: 'https://api.openweathermap.org/data/2.5',
-    rateLimit: 1000, // requests per day (free tier)
-    timeout: 3000,
-  },
-  price: {
-    primary: 'https://api.coingecko.com/api/v3',
-    fallback: 'https://api.coinmarketcap.com/v1',
-    rateLimit: 50, // requests per minute (free tier)
-    timeout: 3000,
-  }
-};
-```
-
-## Monitoring and Observability
-
-### 1. Application Monitoring
-
-#### Cloudflare Analytics:
-```typescript
-// Custom analytics events
-export const trackEvent = (eventName: string, data: any) => {
-  if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
-    navigator.sendBeacon('/api/analytics', JSON.stringify({
-      event: eventName,
-      data,
-      timestamp: Date.now(),
-      userAgent: navigator.userAgent
-    }));
-  }
-};
-
-// Key events to track
-trackEvent('scenario_calculated', { scenarioId, calculationTime });
-trackEvent('equipment_selected', { equipmentType, modelId });
-trackEvent('projection_exported', { format, timeRange });
-```
-
-#### Performance Monitoring:
-```typescript
-// Worker performance metrics
-export const performanceMetrics = {
-  async measureExecutionTime<T>(
-    operation: string,
-    fn: () => Promise<T>
-  ): Promise<T> {
-    const start = Date.now();
-    try {
-      const result = await fn();
-      const duration = Date.now() - start;
-      
-      // Log to Cloudflare Analytics
-      console.log(`${operation} completed in ${duration}ms`);
-      
-      return result;
-    } catch (error) {
-      const duration = Date.now() - start;
-      console.error(`${operation} failed after ${duration}ms:`, error);
-      throw error;
-    }
-  }
-};
-```
-
-### 2. Error Tracking
-
-#### Error reporting:
-```typescript
-export class ErrorReporter {
-  static report(error: Error, context: any = {}) {
-    const errorData = {
-      message: error.message,
-      stack: error.stack,
-      context,
-      timestamp: new Date().toISOString(),
-      environment: ENV.ENVIRONMENT
-    };
-    
-    // Log to console (captured by Cloudflare)
-    console.error('Application Error:', errorData);
-    
-    // Send to external error tracking service if configured
-    if (ENV.SENTRY_DSN) {
-      // Sentry integration code
-    }
-  }
-}
-```
-
-### 3. Health Checks
-
-#### API health endpoint:
-```typescript
-export const healthCheck = async (request: Request): Promise<Response> => {
-  const checks = {
-    database: await checkDatabaseHealth(),
-    externalAPIs: await checkExternalAPIHealth(),
-    calculations: await checkCalculationEngineHealth()
-  };
-  
-  const allHealthy = Object.values(checks).every(check => check.healthy);
-  
-  return new Response(JSON.stringify({
-    status: allHealthy ? 'healthy' : 'unhealthy',
-    timestamp: new Date().toISOString(),
-    checks
-  }), {
-    status: allHealthy ? 200 : 503,
-    headers: { 'Content-Type': 'application/json' }
-  });
-};
+```javascript
+// Performance tracking
+const startTime = Date.now();
+// ... worker logic ...
+const duration = Date.now() - startTime;
+console.log(`Request processed in ${duration}ms`);
 ```
 
 ## Security Configuration
 
-### 1. API Security
+### 1. CORS Configuration
 
-#### Rate limiting:
-```typescript
-export class RateLimiter {
-  private static limits = new Map<string, { count: number; resetTime: number }>();
-  
-  static async checkRateLimit(
-    identifier: string,
-    maxRequests: number = 100,
-    windowMinutes: number = 1
-  ): Promise<boolean> {
-    const now = Date.now();
-    const windowMs = windowMinutes * 60 * 1000;
-    const key = `${identifier}:${Math.floor(now / windowMs)}`;
-    
-    const current = this.limits.get(key) || { count: 0, resetTime: now + windowMs };
-    
-    if (current.count >= maxRequests) {
-      return false; // Rate limit exceeded
-    }
-    
-    current.count++;
-    this.limits.set(key, current);
-    
-    return true;
+```javascript
+// CORS headers for API worker
+const corsHeaders = {
+  'Access-Control-Allow-Origin': env.CORS_ORIGIN,
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Max-Age': '86400',
+};
+```
+
+### 2. Rate Limiting
+
+```javascript
+// Basic rate limiting implementation
+const rateLimit = {
+  requests: 100,
+  window: 60000, // 1 minute
+  store: new Map(),
+};
+```
+
+### 3. Input Validation
+
+```javascript
+// Request validation
+function validateRequest(request) {
+  const contentType = request.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    throw new Error('Invalid content type');
   }
+  // Additional validation logic
 }
-```
-
-#### Input validation:
-```typescript
-import { z } from 'zod';
-
-export const requestSchemas = {
-  createScenario: z.object({
-    scenario_name: z.string().min(1).max(100),
-    system_config_id: z.number().int().positive(),
-    btc_price_model: z.object({
-      type: z.enum(['exponential', 'stochastic', 'conservative']),
-      parameters: z.record(z.number())
-    }),
-    projection_start_date: z.string().date(),
-    projection_end_date: z.string().date()
-  })
-};
-
-export const validateRequest = (schema: z.ZodSchema, data: any) => {
-  const result = schema.safeParse(data);
-  if (!result.success) {
-    throw new ValidationError(result.error.issues);
-  }
-  return result.data;
-};
-```
-
-### 2. Data Protection
-
-#### Sensitive data handling:
-```typescript
-export class DataProtection {
-  // Hash API keys for storage
-  static hashAPIKey(key: string): string {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(key + ENV.API_KEY_SALT);
-    return crypto.subtle.digest('SHA-256', data).then(
-      buffer => Array.from(new Uint8Array(buffer))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('')
-    );
-  }
-  
-  // Encrypt sensitive configuration data
-  static async encryptConfig(config: any): Promise<string> {
-    const key = await crypto.subtle.importKey(
-      'raw',
-      new TextEncoder().encode(ENV.JWT_SECRET),
-      { name: 'AES-GCM' },
-      false,
-      ['encrypt']
-    );
-    
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const encrypted = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv },
-      key,
-      new TextEncoder().encode(JSON.stringify(config))
-    );
-    
-    return btoa(String.fromCharCode(...new Uint8Array(encrypted)));
-  }
-}
-```
-
-## Backup and Recovery
-
-### 1. Database Backup
-
-#### Automated backup script:
-```bash
-#!/bin/bash
-# backup-database.sh
-
-DATE=$(date +%Y%m%d_%H%M%S)
-BACKUP_FILE="backup_${DATE}.sql"
-
-echo "Creating database backup: ${BACKUP_FILE}"
-
-# Export database schema and data
-wrangler d1 export solar-mining-db-prod --output ${BACKUP_FILE}
-
-# Upload to cloud storage (optional)
-# aws s3 cp ${BACKUP_FILE} s3://your-backup-bucket/database-backups/
-
-echo "Backup completed: ${BACKUP_FILE}"
-```
-
-#### Schedule automated backups:
-```bash
-# Add to crontab for daily backups at 2 AM
-# crontab -e
-0 2 * * * /path/to/backup-database.sh >> /var/log/backup.log 2>&1
-```
-
-### 2. Configuration Backup
-
-#### Export configuration:
-```typescript
-export const exportConfiguration = async () => {
-  const config = {
-    equipment_models: await DB.prepare('SELECT * FROM miner_models').all(),
-    power_sources: await DB.prepare('SELECT * FROM power_source_models').all(),
-    storage_models: await DB.prepare('SELECT * FROM storage_models').all(),
-    locations: await DB.prepare('SELECT * FROM locations').all()
-  };
-  
-  return JSON.stringify(config, null, 2);
-};
 ```
 
 ## Troubleshooting
 
-### 1. Common Issues
+### Common Issues
 
-#### Database Connection Issues:
-```bash
-# Check database status
-wrangler d1 info solar-mining-db-prod
+#### 1. Worker Deployment Failures
 
-# Test database connectivity
-wrangler d1 execute solar-mining-db-prod --command="SELECT 1 as test;"
-
-# Reset database if corrupted
-wrangler d1 execute solar-mining-db-prod --file=src/database/schema.sql
-```
-
-#### API Rate Limiting:
-```typescript
-// Check rate limit status
-const checkRateLimits = async () => {
-  const apis = ['bitcoin', 'weather', 'price'];
-  
-  for (const api of apis) {
-    const response = await fetch(`/api/status/${api}`);
-    const status = await response.json();
-    console.log(`${api} API:`, status);
-  }
-};
-```
-
-#### Worker Deployment Issues:
 ```bash
 # Check worker status
-wrangler status
+wrangler whoami
 
-# View worker logs
-wrangler tail
+# Verify configuration
+wrangler deploy --dry-run
 
-# Force redeploy
-wrangler deploy --force
+# Check logs
+wrangler tail worker-name
 ```
 
-### 2. Performance Optimization
+#### 2. Database Connection Issues
 
-#### Optimize calculation performance:
-```typescript
-// Use Worker KV for caching expensive calculations
-export const cacheCalculation = async (
-  key: string,
-  calculation: () => Promise<any>,
-  ttlSeconds: number = 3600
-) => {
-  // Check cache first
-  const cached = await KV.get(key);
-  if (cached) {
-    return JSON.parse(cached);
-  }
-  
-  // Perform calculation
-  const result = await calculation();
-  
-  // Cache result
-  await KV.put(key, JSON.stringify(result), { expirationTtl: ttlSeconds });
-  
-  return result;
+```bash
+# Test database connection
+wrangler d1 execute database-name --command="SELECT 1"
+
+# Check database permissions
+wrangler d1 info database-name
+```
+
+#### 3. Environment Variable Issues
+
+```bash
+# List environment variables
+wrangler secret list
+
+# Set new secret
+wrangler secret put SECRET_NAME
+```
+
+### Debug Commands
+
+```bash
+# Local development
+wrangler dev --local
+
+# Remote development
+wrangler dev
+
+# Test specific worker
+wrangler dev --config wrangler.api.toml
+```
+
+## Performance Optimization
+
+### 1. Worker Optimization
+
+```javascript
+// Use WebAssembly for calculations
+import { calculateSolarGeneration } from './calculations.wasm';
+
+// Implement caching
+const cache = new Map();
+const CACHE_TTL = 3600000; // 1 hour
+```
+
+### 2. Database Optimization
+
+```sql
+-- Add indexes for common queries
+CREATE INDEX idx_equipment_manufacturer ON equipment(manufacturer);
+CREATE INDEX idx_configurations_user ON system_configurations(user_id);
+CREATE INDEX idx_projections_config ON projections(system_config_id);
+```
+
+### 3. Caching Strategy
+
+```javascript
+// Implement multi-level caching
+const cacheStrategy = {
+  memory: new Map(), // In-memory cache
+  kv: env.CACHE_KV,  // Cloudflare KV
+  ttl: 3600,         // 1 hour
 };
 ```
 
-#### Database query optimization:
-```sql
--- Add indexes for common queries
-CREATE INDEX idx_projection_results_scenario_date 
-ON projection_results(scenario_id, projection_date);
+## Backup and Recovery
 
-CREATE INDEX idx_equipment_performance_config_date 
-ON equipment_performance_history(config_id, recorded_date);
+### 1. Automated Backups
 
--- Use EXPLAIN QUERY PLAN to analyze slow queries
-EXPLAIN QUERY PLAN SELECT * FROM projection_results 
-WHERE scenario_id = ? AND projection_date >= ?;
+```bash
+#!/bin/bash
+# backup.sh
+DATE=$(date +%Y%m%d_%H%M%S)
+wrangler d1 export solar-mining-calculator --output=backup_$DATE.sql
+aws s3 cp backup_$DATE.sql s3://backup-bucket/
 ```
 
-## Maintenance Tasks
+### 2. Disaster Recovery
 
-### 1. Regular Maintenance
-
-#### Weekly tasks:
 ```bash
-# Update equipment prices from manufacturers
-npm run update-equipment-prices
+# Restore from backup
+wrangler d1 execute solar-mining-calculator --file=backup_20241219_143022.sql
 
-# Clean up old projection results (>1 year)
-npm run cleanup-old-projections
-
-# Update Bitcoin network statistics
-npm run update-network-stats
-```
-
-#### Monthly tasks:
-```bash
-# Update solar irradiance historical data
-npm run update-solar-data
-
-# Review and update equipment specifications
-npm run review-equipment-specs
-
-# Generate usage analytics report
-npm run generate-analytics-report
-```
-
-### 2. Version Updates
-
-#### Update dependencies:
-```bash
-# Check for outdated packages
-npm outdated
-
-# Update packages (test thoroughly)
-npm update
-
-# Update Wrangler CLI
-npm install -g wrangler@latest
-```
-
-#### Deploy updates:
-```bash
-# Test in development first
-npm run dev
-npm run test
-
-# Deploy to staging
-wrangler deploy --env staging
-
-# Deploy to production after verification
-wrangler deploy --env production
+# Verify restoration
+wrangler d1 execute solar-mining-calculator --command="SELECT COUNT(*) FROM equipment"
 ```
 
 ---
 
-**Document Status**: Draft v1.0  
-**Last Updated**: 2024-08-11  
-**Next Review**: After CLAUDE.md completion
+## Future Implementation
+
+### Advanced Deployment Features (Planned for Later Phases)
+
+#### Advanced Monitoring
+- Real-time performance dashboards
+- Advanced error tracking and alerting
+- Custom metrics and KPIs
+- Automated health checks
+
+#### Advanced Security
+- API key management system
+- Advanced rate limiting strategies
+- DDoS protection
+- Security audit tools
+
+#### Advanced Scaling
+- Auto-scaling based on demand
+- Load balancing across regions
+- Advanced caching strategies
+- Database sharding
+
+#### Advanced CI/CD
+- Automated testing pipelines
+- Blue-green deployments
+- Canary releases
+- Rollback automation
+
+#### Advanced Data Management
+- Data archival strategies
+- Advanced backup solutions
+- Data migration tools
+- Multi-region data replication
+
+---
+
+**Document Status**: Current Plan v1.0  
+**Last Updated**: 2024-12-19  
+**Next Review**: After Phase 1 implementation

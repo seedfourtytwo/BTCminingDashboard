@@ -18,6 +18,7 @@
 - [x] **Equipment specifications** - Equipment catalogs and standards
 - [x] **API specification** - REST API endpoints and data models
 - [x] **Worker architecture** - Modular Cloudflare Workers design
+- [x] **Mermaid diagrams** - Complete system architecture visualization
 
 ### Architecture
 - [x] **Database migrations** - Initial schema with essential tables
@@ -33,170 +34,197 @@
 
 ## 📋 Next Steps (In Logical Order)
 
-### Phase 1: Foundation & Data (Priority: High)
-**Goal**: Get basic data flowing through the system
+### Phase 1: Foundation & Core Infrastructure (Priority: Critical)
+**Goal**: Establish solid foundation with basic UI and error handling
 
-#### 1. Database Seeding & Initial Data
+#### 1. Database Seeding & Static Data
 - [ ] **Seed equipment data** - Populate miner_models with current ASIC specifications
 - [ ] **Seed solar panel data** - Add popular solar panel models with specifications
 - [ ] **Seed storage data** - Add battery storage system specifications
 - [ ] **Seed location data** - Add major cities with geographic coordinates
 - [ ] **Data validation** - Ensure all seeded data meets schema requirements
+- [ ] **Static market data** - Add sample Bitcoin prices and network data
 
-#### 2. Basic API Implementation
+#### 2. Basic React Component Foundation
+- [ ] **Core UI components** - Button, Input, Card, Modal, Toast components
+- [ ] **Layout components** - Header, Sidebar, PageContainer, AppLayout
+- [ ] **Form components** - Basic form handling with validation
+- [ ] **Error boundary setup** - React error boundaries and error handling
+- [ ] **Loading states** - Loading spinners and skeleton components
+- [ ] **Basic routing** - React Router setup with placeholder pages
+
+#### 3. API Client & Error Handling Foundation
+- [ ] **API client setup** - HTTP client with error handling and retry logic
+- [ ] **Error handling middleware** - Centralized error handling for all workers
+- [ ] **Request/response interceptors** - Logging, validation, error transformation
+- [ ] **Toast notification system** - User feedback for API operations
+- [ ] **Basic API services** - Equipment, locations, and system config services
+
+#### 4. Basic API Implementation (Static Data)
 - [ ] **Equipment endpoints** - GET /api/v1/equipment/miners, /solar-panels, /storage
 - [ ] **Location endpoints** - GET /api/v1/locations, POST /api/v1/locations
 - [ ] **System config endpoints** - CRUD operations for system configurations
 - [ ] **Data validation middleware** - Input validation and error handling
-- [ ] **API documentation** - OpenAPI/Swagger documentation
+- [ ] **Static data responses** - Return seeded data without external dependencies
 
-#### 3. External Data Integration
+#### 5. Foundation Testing
+- [ ] **Component unit tests** - Test all React components
+- [ ] **API endpoint tests** - Test all basic endpoints with static data
+- [ ] **Error handling tests** - Test error scenarios and recovery
+- [ ] **Integration tests** - Test frontend-backend communication
+
+**Phase 1 Success Criteria**: Basic UI working, APIs returning static data, error handling functional
+
+### Phase 2: Core Calculations & Basic UI (Priority: High)
+**Goal**: Implement basic calculations with simple UI validation
+
+#### 6. Basic Calculation Engines
+- [ ] **Solar power calculations** - Basic PV system output modeling
+- [ ] **Mining performance calculations** - Hashrate and power consumption
+- [ ] **Financial analysis** - ROI, payback period, basic projections
+- [ ] **Calculation validation** - Unit tests for all mathematical functions
+- [ ] **Performance optimization** - Ensure calculations complete <1 second
+
+#### 7. Basic UI for Calculations
+- [ ] **Equipment selection interface** - Simple dropdown/radio button selection
+- [ ] **Basic configuration form** - Location, equipment, financial parameters
+- [ ] **Results display** - Simple table/chart showing calculation results
+- [ ] **Form validation** - Real-time validation of user inputs
+- [ ] **Basic charts** - Simple bar/line charts for results visualization
+
+#### 8. Calculation API Integration
+- [ ] **Calculation endpoints** - POST /api/v1/projections/calculate
+- [ ] **Calculation worker integration** - Connect API to calculation engine
+- [ ] **Result storage** - Save calculation results to database
+- [ ] **Calculation caching** - Cache results to avoid recalculation
+- [ ] **Progress indicators** - Show calculation progress to users
+
+#### 9. Calculation Testing
+- [ ] **Calculation accuracy tests** - Verify results against known values
+- [ ] **Performance tests** - Ensure calculations meet time requirements
+- [ ] **UI integration tests** - Test full calculation workflow
+- [ ] **Error handling tests** - Test calculation failures and recovery
+
+**Phase 2 Success Criteria**: Basic calculations working with simple UI, results accurate
+
+### Phase 3: Enhanced UI & User Experience (Priority: High)
+**Goal**: Create intuitive user experience with advanced UI components
+
+#### 10. Advanced UI Components
+- [ ] **Equipment comparison interface** - Side-by-side equipment comparison
+- [ ] **Advanced charts** - Interactive charts with zoom, pan, tooltips
+- [ ] **Configuration wizard** - Step-by-step system configuration
+- [ ] **Results dashboard** - Comprehensive results display with multiple views
+- [ ] **Mobile responsiveness** - Ensure UI works on tablets and larger phones
+
+#### 11. User Experience Enhancements
+- [ ] **Configuration saving/loading** - Save and load system configurations
+- [ ] **Configuration templates** - Pre-built configurations for common scenarios
+- [ ] **Export functionality** - Export results as PDF, CSV, or Excel
+- [ ] **Search and filtering** - Advanced equipment search and filtering
+- [ ] **Keyboard shortcuts** - Power user keyboard navigation
+
+#### 12. UI Testing & Quality
+- [ ] **UI component tests** - Test all interactive components
+- [ ] **User workflow tests** - Test complete user journeys
+- [ ] **Accessibility testing** - Ensure UI meets accessibility standards
+- [ ] **Cross-browser testing** - Test in Chrome, Firefox, Safari, Edge
+
+**Phase 3 Success Criteria**: Intuitive UI, smooth user experience, all major workflows functional
+
+### Phase 4: External Data Integration (Priority: Medium)
+**Goal**: Replace static data with real-time external data
+
+#### 13. External API Integration
 - [ ] **Bitcoin price API** - Integrate CoinGecko or similar for real-time prices
 - [ ] **Bitcoin network API** - Get current difficulty and hashrate data
 - [ ] **Weather API integration** - OpenWeatherMap for environmental data
 - [ ] **Solar irradiance data** - NREL API or similar for solar resource data
-- [ ] **Data caching strategy** - Implement Redis or similar for performance
+- [ ] **API rate limiting** - Implement proper rate limiting and caching
 
-**Phase 1 Success Criteria**: Database populated, APIs working, external data flowing
+#### 14. Data Management & Caching
+- [ ] **Data caching strategy** - Implement efficient caching for external data
+- [ ] **Data synchronization** - Regular updates of external data
+- [ ] **Fallback mechanisms** - Graceful degradation when APIs are unavailable
+- [ ] **Data validation** - Validate external data before use
+- [ ] **Error recovery** - Handle API failures gracefully
 
-### Phase 2: Core Calculations (Priority: High)
-**Goal**: Implement basic mathematical models
+#### 15. External Data Testing
+- [ ] **API integration tests** - Test all external API integrations
+- [ ] **Caching tests** - Test data caching and invalidation
+- [ ] **Fallback tests** - Test system behavior when APIs fail
+- [ ] **Performance tests** - Ensure external data doesn't slow down system
 
-#### 4. Solar Power Calculations
-- [ ] **Basic solar position calculations** - Sun elevation and azimuth
-- [ ] **PV system output modeling** - Power generation based on irradiance
-- [ ] **Temperature effects** - Module temperature impact on efficiency
-- [ ] **System losses modeling** - Inverter efficiency, wiring losses
-- [ ] **Degradation calculations** - Annual performance decline
+**Phase 4 Success Criteria**: Real-time data integration working, system remains responsive
 
-#### 5. Mining Performance Calculations
-- [ ] **Hashrate calculations** - Effective hashrate with degradation
-- [ ] **Power consumption modeling** - Actual power usage over time
-- [ ] **BTC earnings calculation** - Daily/monthly mining rewards
-- [ ] **Revenue calculations** - USD earnings based on current prices
-- [ ] **Efficiency tracking** - J/TH calculations and monitoring
+### Phase 5: Advanced Features & Optimization (Priority: Medium)
+**Goal**: Add sophisticated capabilities and performance optimization
 
-#### 6. Financial Analysis
-- [ ] **Equipment cost calculations** - Total investment requirements
-- [ ] **Operating cost modeling** - Electricity, maintenance, cooling
-- [ ] **Revenue projections** - Monthly/annual income estimates
-- [ ] **ROI calculations** - Return on investment analysis
-- [ ] **Break-even analysis** - Time to profitability calculations
-
-**Phase 2 Success Criteria**: All basic calculations working, accurate results
-
-### Phase 3: User Interface (Priority: Medium)
-**Goal**: Create intuitive user experience
-
-#### 7. Equipment Selection Interface
-- [ ] **Miner selection component** - Browse and select ASIC miners
-- [ ] **Solar panel selection** - Choose solar panels with specifications
-- [ ] **Storage selection** - Battery system configuration
-- [ ] **Equipment comparison** - Side-by-side specification comparison
-- [ ] **Equipment search/filter** - Find equipment by criteria
-
-#### 8. System Configuration Interface
-- [ ] **Location selection** - Geographic location picker with coordinates
-- [ ] **System builder** - Drag-and-drop equipment configuration
-- [ ] **Configuration validation** - Real-time validation of system setup
-- [ ] **Configuration saving** - Save and load system configurations
-- [ ] **Configuration sharing** - Export/import system setups
-
-#### 9. Projection Interface
-- [ ] **Projection dashboard** - Main results display
-- [ ] **Financial charts** - Revenue, costs, and profit visualization
-- [ ] **Performance charts** - Hashrate and efficiency over time
-- [ ] **Solar production charts** - Energy generation visualization
-- [ ] **Comparison tools** - Multiple scenario comparison
-
-**Phase 3 Success Criteria**: Users can easily configure and view results
-
-### Phase 4: Testing & Quality (Priority: High)
-**Goal**: Ensure reliability and performance
-
-#### 10. Unit Testing
-- [ ] **Calculation engine tests** - Test all mathematical functions
-- [ ] **API endpoint tests** - Test all REST endpoints
-- [ ] **Database tests** - Test data operations and constraints
-- [ ] **Utility function tests** - Test helper functions and utilities
-- [ ] **Type safety tests** - Ensure TypeScript types are correct
-
-#### 11. Integration Testing
-- [ ] **API integration tests** - Test worker communication
-- [ ] **Database integration tests** - Test data flow end-to-end
-- [ ] **External API tests** - Test third-party service integration
-- [ ] **Frontend-backend integration** - Test full user workflows
-
-#### 12. Performance Testing
-- [ ] **Load testing** - Test system under high load
-- [ ] **Calculation performance** - Benchmark calculation speeds
-- [ ] **Database performance** - Test query performance and optimization
-- [ ] **API response times** - Ensure sub-second response times
-
-**Phase 4 Success Criteria**: System is reliable, performant, and well-tested
-
-### Phase 5: Advanced Features (Priority: Medium)
-**Goal**: Add sophisticated capabilities
-
-#### 13. Scenario Management
-- [ ] **Multiple scenario support** - Save and compare different setups
-- [ ] **Scenario templates** - Pre-built configurations for common use cases
-- [ ] **Scenario sharing** - Community sharing of configurations
-- [ ] **Scenario versioning** - Track changes to configurations over time
-
-#### 14. Advanced Calculations
+#### 16. Advanced Calculations
 - [ ] **Monte Carlo simulations** - Risk analysis with confidence intervals
 - [ ] **Sensitivity analysis** - Impact of parameter changes on results
 - [ ] **Optimization algorithms** - Find optimal equipment combinations
 - [ ] **Seasonal analysis** - Monthly/seasonal performance variations
+- [ ] **Advanced financial modeling** - Tax implications, depreciation, inflation
 
-#### 15. Real-time Updates
-- [ ] **Live price updates** - Real-time Bitcoin price integration
-- [ ] **Live difficulty updates** - Current network difficulty
-- [ ] **Live weather updates** - Current environmental conditions
-- [ ] **WebSocket integration** - Real-time data streaming
+#### 17. Performance Optimization
+- [ ] **Database optimization** - Query optimization and indexing
+- [ ] **Frontend optimization** - Code splitting, lazy loading, memoization
+- [ ] **API optimization** - Response caching, compression, pagination
+- [ ] **Calculation optimization** - Parallel processing, background jobs
+- [ ] **CDN optimization** - Static asset optimization and caching
 
-**Phase 5 Success Criteria**: Advanced features working, enhanced user experience
+#### 18. Advanced Features
+- [ ] **Real-time updates** - WebSocket integration for live data
+- [ ] **Scenario management** - Save, compare, and share configurations
+- [ ] **Advanced reporting** - Comprehensive PDF reports and analytics
+- [ ] **User preferences** - Customizable UI and calculation preferences
+- [ ] **Data export/import** - Advanced data exchange capabilities
 
-### Phase 6: Deployment & Monitoring (Priority: Medium)
-**Goal**: Production-ready system
+**Phase 5 Success Criteria**: Advanced features working, system highly performant
 
-#### 16. Production Deployment
-- [ ] **Production environment setup** - Configure production workers
-- [ ] **Database migration** - Deploy production database
+### Phase 6: Production Deployment & Monitoring (Priority: Medium)
+**Goal**: Production-ready system with comprehensive monitoring
+
+#### 19. Production Deployment
+- [ ] **Production environment setup** - Configure production workers and database
 - [ ] **SSL certificates** - Ensure secure connections
 - [ ] **CDN configuration** - Optimize content delivery
-- [ ] **Monitoring setup** - Application performance monitoring
+- [ ] **Database migration** - Deploy production database with data
+- [ ] **Environment validation** - Verify all production systems working
 
-#### 17. Error Handling & Logging
-- [ ] **Comprehensive error handling** - Graceful error management
-- [ ] **Structured logging** - Detailed application logs
-- [ ] **Error reporting** - User-friendly error messages
-- [ ] **Debug tools** - Development debugging utilities
+#### 20. Monitoring & Observability
+- [ ] **Application monitoring** - Performance monitoring and alerting
+- [ ] **Error tracking** - Comprehensive error logging and reporting
+- [ ] **User analytics** - Track user behavior and system usage
+- [ ] **Health checks** - Automated health monitoring and alerting
+- [ ] **Performance metrics** - Track key performance indicators
 
-#### 18. Security & Compliance
+#### 21. Security & Compliance
 - [ ] **Input sanitization** - Prevent injection attacks
 - [ ] **Rate limiting** - Prevent API abuse
 - [ ] **Data validation** - Ensure data integrity
-- [ ] **Privacy compliance** - GDPR and data protection
+- [ ] **Privacy compliance** - GDPR and data protection measures
+- [ ] **Security audit** - Comprehensive security review
 
-**Phase 6 Success Criteria**: System is production-ready and secure
+**Phase 6 Success Criteria**: System production-ready, secure, and well-monitored
 
 ### Phase 7: Documentation & Support (Priority: Low)
 **Goal**: Complete user and developer support
 
-#### 19. User Documentation
-- [ ] **User manual** - Complete user guide
-- [ ] **API documentation** - Developer API reference
+#### 22. User Documentation
+- [ ] **User manual** - Complete user guide with screenshots
+- [ ] **API documentation** - Developer API reference with examples
 - [ ] **Tutorial videos** - Step-by-step usage guides
 - [ ] **FAQ section** - Common questions and answers
 - [ ] **Help system** - In-app help and tooltips
 
-#### 20. Developer Documentation
+#### 23. Developer Documentation
 - [ ] **Architecture documentation** - System design and patterns
 - [ ] **Deployment guide** - Setup and deployment instructions
-- [ ] **Contributing guidelines** - Development standards
+- [ ] **Contributing guidelines** - Development standards and processes
 - [ ] **Code documentation** - Inline code comments and JSDoc
+- [ ] **Troubleshooting guide** - Common issues and solutions
 
 **Phase 7 Success Criteria**: Complete documentation and support system
 
@@ -204,39 +232,39 @@
 
 ### Phase 1 Success
 - [ ] Database populated with real equipment data
-- [ ] All basic API endpoints working
-- [ ] External data sources integrated
-- [ ] Basic calculations functional
+- [ ] Basic React components working and tested
+- [ ] API endpoints returning static data correctly
+- [ ] Error handling functional across all layers
 
 ### Phase 2 Success
-- [ ] Solar calculations accurate within 5%
-- [ ] Mining calculations match real-world performance
-- [ ] Financial analysis provides actionable insights
-- [ ] All calculations performant (<1 second)
+- [ ] Basic calculations accurate within 5%
+- [ ] Simple UI allows users to configure and view results
+- [ ] Calculation performance meets requirements (<1 second)
+- [ ] All calculation workflows tested and working
 
 ### Phase 3 Success
-- [ ] Users can easily configure systems
-- [ ] Results are clearly presented
-- [ ] Interface is intuitive and responsive
+- [ ] Intuitive UI with smooth user experience
 - [ ] All major user workflows functional
+- [ ] UI responsive and accessible
+- [ ] Advanced UI components working correctly
 
 ### Phase 4 Success
-- [ ] All tests passing
-- [ ] System handles load gracefully
-- [ ] Performance meets requirements
-- [ ] Code quality standards met
+- [ ] Real-time external data integration working
+- [ ] System remains responsive with external APIs
+- [ ] Graceful handling of API failures
+- [ ] Data caching and synchronization working
 
 ### Phase 5 Success
 - [ ] Advanced features working correctly
-- [ ] Real-time updates functional
-- [ ] Scenario management intuitive
-- [ ] Enhanced user experience delivered
+- [ ] System performance optimized
+- [ ] Monte Carlo and sensitivity analysis functional
+- [ ] Real-time updates working
 
 ### Phase 6 Success
-- [ ] Production deployment successful
-- [ ] System monitoring active
-- [ ] Security measures implemented
-- [ ] Error handling comprehensive
+- [ ] Production deployment successful and stable
+- [ ] Comprehensive monitoring and alerting active
+- [ ] Security measures implemented and tested
+- [ ] System handles production load gracefully
 
 ### Overall Success
 - [ ] Application provides value to Bitcoin miners
@@ -248,31 +276,40 @@
 ## 📝 Notes
 
 ### Learning Focus Areas
-- **Phase 1-2**: Core development skills, API design, database operations
-- **Phase 3**: Frontend development, UI/UX design, React patterns
-- **Phase 4**: Testing methodologies, quality assurance, performance optimization
-- **Phase 5**: Advanced algorithms, real-time systems, complex state management
+- **Phase 1**: Foundation skills, React patterns, error handling, testing
+- **Phase 2**: Mathematical modeling, calculation optimization, UI integration
+- **Phase 3**: Advanced UI/UX, user experience design, accessibility
+- **Phase 4**: External API integration, data management, system resilience
+- **Phase 5**: Advanced algorithms, performance optimization, complex features
 - **Phase 6**: DevOps, production deployment, security, monitoring
 - **Phase 7**: Documentation, user experience, project management
 
 ### Dependencies
 - Each phase builds on the previous phase
-- Testing should be implemented alongside each phase
-- Documentation should be updated as features are completed
-- Focus on learning one concept at a time
+- Testing is integrated throughout, not a separate phase
+- UI development happens alongside backend development
+- External dependencies are introduced gradually
 
 ### Risk Mitigation
-- Start with simple calculations and enhance gradually
-- Test thoroughly before adding complexity
-- Keep user interface simple and intuitive
-- Focus on accuracy over features initially
+- Start with static data to validate core functionality
+- Build and test incrementally - no big-bang development
+- Validate API design through UI usage early
+- Focus on accuracy and reliability over features initially
 - Learn from each phase before moving to the next
 
 ### Engineering Learning Value
-- **Microservices**: Multiple workers with specific responsibilities
-- **DevOps**: CI/CD, deployment, monitoring
-- **Database Design**: Schema design, migrations, optimization
+- **Full-Stack Development**: Frontend and backend integration
+- **Testing**: Unit, integration, and end-to-end testing
 - **API Design**: RESTful endpoints, validation, error handling
-- **Frontend Development**: React, TypeScript, modern UI patterns
-- **Testing**: Unit, integration, performance testing
-- **Security**: Input validation, rate limiting, data protection
+- **UI/UX Design**: User experience, accessibility, responsive design
+- **Performance**: Optimization, caching, monitoring
+- **DevOps**: CI/CD, deployment, security, monitoring
+- **Data Management**: External APIs, caching, synchronization
+
+### Key Principles
+1. **Test-Driven Development**: Write tests alongside features
+2. **Incremental Development**: Build and validate small pieces
+3. **User-Centric Design**: Validate through UI usage early
+4. **Performance First**: Optimize as you build, not after
+5. **Error Handling**: Comprehensive error handling from day one
+6. **Documentation**: Document as you build, not at the end

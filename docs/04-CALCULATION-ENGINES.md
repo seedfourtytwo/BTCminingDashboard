@@ -1,8 +1,8 @@
-# Calculation Engines - Solar Bitcoin Mining Calculator (Simplified)
+# Calculation Engines - Solar Bitcoin Mining Calculator
 
 ## Overview
 
-The calculation engines form the core mathematical foundation of the Solar Bitcoin Mining Calculator. These engines model the interactions between solar energy generation, Bitcoin mining economics, and equipment degradation to provide accurate projections.
+The calculation engines form the mathematical foundation of the Solar Bitcoin Mining Calculator. These engines model the interactions between solar energy generation, Bitcoin mining economics, and equipment degradation to provide accurate projections.
 
 ## Engine Architecture
 
@@ -16,7 +16,7 @@ Calculation Engine Stack:
 
 ## 1. Solar Generation Engine
 
-### 1.1 Core Solar Calculations
+### 1.1 Basic Solar Calculations
 
 The solar generation engine uses established photovoltaic modeling principles.
 
@@ -25,7 +25,6 @@ The solar generation engine uses established photovoltaic modeling principles.
 interface SolarPosition {
   elevation: number;    // Solar elevation angle (degrees)
   azimuth: number;     // Solar azimuth angle (degrees)
-  zenith: number;      // Solar zenith angle (degrees)
 }
 
 function calculateSolarPosition(
@@ -34,7 +33,7 @@ function calculateSolarPosition(
   date: Date,
   timezone: string
 ): SolarPosition {
-  // Basic solar position calculation
+  // Basic solar position calculation using simplified model
   const dayOfYear = getDayOfYear(date);
   const declination = calculateSolarDeclination(dayOfYear);
   const hourAngle = calculateHourAngle(date, longitude, timezone);
@@ -44,7 +43,7 @@ function calculateSolarPosition(
     Math.cos(latitude * Math.PI/180) * Math.cos(declination) * Math.cos(hourAngle)
   ) * 180/Math.PI;
   
-  return { elevation, azimuth: 0, zenith: 90 - elevation };
+  return { elevation, azimuth: 0 };
 }
 ```
 
@@ -62,8 +61,8 @@ function calculatePVOutput(
   panelSpecs: SolarPanelModel,
   systemConfig: PVSystemConfig
 ): PVSystemOutput {
-  // Calculate module temperature
-  const moduleTemp = ambientTemp + (irradiance / 1000) * 25; // Simple temperature model
+  // Calculate module temperature (simplified model)
+  const moduleTemp = ambientTemp + (irradiance / 1000) * 25;
   
   // Temperature coefficient effect
   const tempCoeff = panelSpecs.temperature_coefficient / 100;
@@ -87,7 +86,7 @@ function calculatePVOutput(
   return {
     dcPower: dcPowerAfterLosses,
     acPower: acPower,
-    efficiency: (acPower / (irradiance * systemConfig.quantity * 2)) * 100 // Approximate panel area
+    efficiency: (acPower / (irradiance * systemConfig.quantity * 2)) * 100
   };
 }
 ```
@@ -298,9 +297,64 @@ function calculateIRR(
 }
 ```
 
-## 5. Performance Optimization
+## 5. Basic Calculation Workflow
 
-### 5.1 Calculation Caching
+### 5.1 Projection Calculation Process
+
+```typescript
+async function calculateProjection(
+  systemConfig: SystemConfiguration,
+  projectionYears: number = 5
+): Promise<ProjectionResult[]> {
+  const results: ProjectionResult[] = [];
+  
+  // Get current Bitcoin network data
+  const networkData = await getCurrentBitcoinData();
+  
+  // Calculate for each month
+  for (let month = 0; month < projectionYears * 12; month++) {
+    const date = new Date();
+    date.setMonth(date.getMonth() + month);
+    
+    // Calculate solar generation for this month
+    const solarGeneration = await calculateMonthlySolarGeneration(
+      systemConfig,
+      date
+    );
+    
+    // Calculate mining performance for this month
+    const miningPerformance = calculateMiningPerformance(
+      systemConfig.miners,
+      networkData,
+      month
+    );
+    
+    // Calculate costs
+    const electricityCost = calculateElectricityCost(
+      miningPerformance.power_consumption,
+      solarGeneration.acPower,
+      systemConfig.electricity_rate_usd_kwh
+    );
+    
+    // Store results
+    results.push({
+      projection_date: date,
+      solar_generation_kwh: solarGeneration.monthlyEnergy,
+      mining_consumption_kwh: miningPerformance.power_consumption * 24 * 30,
+      btc_mined: miningPerformance.daily_btc_earned * 30,
+      revenue_usd: miningPerformance.daily_revenue_usd * 30,
+      costs_usd: electricityCost,
+      profit_usd: (miningPerformance.daily_revenue_usd * 30) - electricityCost
+    });
+  }
+  
+  return results;
+}
+```
+
+## 6. Performance Optimization
+
+### 6.1 Basic Caching
 
 ```typescript
 class CalculationCache {
@@ -323,12 +377,12 @@ class CalculationCache {
     });
   }
   
-  generateCacheKey(scenario: ProjectionScenario): string {
-    // Create deterministic cache key from scenario parameters
+  generateCacheKey(config: SystemConfiguration): string {
+    // Create deterministic cache key from configuration
     return JSON.stringify({
-      config_id: scenario.system_config_id,
-      start_date: scenario.projection_start_date,
-      end_date: scenario.projection_end_date
+      config_id: config.id,
+      solar_panels: config.solar_panels,
+      miners: config.miners
     });
   }
 }
@@ -336,6 +390,42 @@ class CalculationCache {
 
 ---
 
-**Document Status**: Simplified v1.0  
+## Future Implementation
+
+### Advanced Calculation Features (Planned for Later Phases)
+
+#### Monte Carlo Simulations
+- Risk analysis with confidence intervals
+- Multiple scenario generation
+- Probability-based projections
+- Sensitivity analysis
+
+#### Advanced Solar Modeling
+- Detailed solar position calculations
+- Shading analysis
+- Advanced temperature modeling
+- Bifacial panel support
+
+#### Enhanced Mining Calculations
+- Real-time difficulty adjustments
+- Pool fee calculations
+- Transaction fee modeling
+- Network congestion effects
+
+#### Advanced Financial Analysis
+- Tax implications
+- Depreciation modeling
+- Inflation adjustments
+- Currency hedging
+
+#### Optimization Algorithms
+- Equipment selection optimization
+- Power system sizing
+- Cost minimization
+- Performance maximization
+
+---
+
+**Document Status**: Current Plan v1.0  
 **Last Updated**: 2024-12-19  
 **Next Review**: After Phase 1 implementation

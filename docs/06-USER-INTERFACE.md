@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Solar Bitcoin Mining Calculator features a desktop-first React application designed for comprehensive mining operation planning and analysis. The interface prioritizes data visualization, ease of configuration, and powerful scenario comparison capabilities.
+The Solar Bitcoin Mining Calculator features a desktop-first React application designed for mining operation planning and analysis. The interface prioritizes data visualization, ease of configuration, and basic scenario comparison capabilities.
 
 ## Design Principles
 
@@ -83,7 +83,6 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
     <h3>Bitcoin Price</h3>
     <div class="value">$45,250</div>
     <div class="change positive">+2.15% (24h)</div>
-    <div class="trend-sparkline"></div>
   </div>
   
   <div class="metric-card network-difficulty">
@@ -170,17 +169,9 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
       <span class="icon">☀️</span>
       Solar Panels
     </button>
-    <button class="tab" data-category="wind">
-      <span class="icon">💨</span>
-      Wind Turbines
-    </button>
     <button class="tab" data-category="storage">
       <span class="icon">🔋</span>
       Batteries
-    </button>
-    <button class="tab" data-category="custom">
-      <span class="icon">⚙️</span>
-      Custom Sources
     </button>
   </div>
 </div>
@@ -221,7 +212,7 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
   
   <!-- Equipment Grid -->
   <div class="equipment-grid">
-    <div class="equipment-card" data-id="8">
+    <div class="equipment-card" data-id="1">
       <div class="card-header">
         <h4>Antminer S19 Pro</h4>
         <span class="manufacturer">Bitmain</span>
@@ -253,50 +244,6 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
     </div>
     
     <!-- More equipment cards... -->
-  </div>
-</div>
-```
-
-#### 2.3 Equipment Comparison Modal
-```html
-<div class="equipment-comparison-modal">
-  <div class="modal-header">
-    <h2>Equipment Comparison</h2>
-    <button class="close-btn">×</button>
-  </div>
-  
-  <div class="comparison-table">
-    <table>
-      <thead>
-        <tr>
-          <th>Specification</th>
-          <th>Antminer S19 Pro</th>
-          <th>WhatsMiner M30S++</th>
-          <th>AvalonMiner 1246</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Hashrate (TH/s)</td>
-          <td class="best-value">110</td>
-          <td>112</td>
-          <td>90</td>
-        </tr>
-        <tr>
-          <td>Power (W)</td>
-          <td>3,250</td>
-          <td>3,472</td>
-          <td>3,420</td>
-        </tr>
-        <tr>
-          <td>Efficiency (J/TH)</td>
-          <td class="best-value">29.5</td>
-          <td>31.0</td>
-          <td>38.0</td>
-        </tr>
-        <!-- More rows... -->
-      </tbody>
-    </table>
   </div>
 </div>
 ```
@@ -350,9 +297,9 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
       <div class="config-item">
         <label>Location</label>
         <select id="location-select">
-          <option value="12">Phoenix, AZ</option>
-          <option value="15">Las Vegas, NV</option>
-          <option value="8">Austin, TX</option>
+          <option value="1">Phoenix, AZ</option>
+          <option value="2">Las Vegas, NV</option>
+          <option value="3">Austin, TX</option>
         </select>
       </div>
       
@@ -368,8 +315,8 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
         <label>Mining Equipment</label>
         <div class="equipment-selector">
           <select id="miner-model">
-            <option value="8">Antminer S19 Pro</option>
-            <option value="9">WhatsMiner M30S++</option>
+            <option value="1">Antminer S19 Pro</option>
+            <option value="2">WhatsMiner M30S++</option>
           </select>
           <input type="number" value="10" min="1" max="100" placeholder="Quantity" />
         </div>
@@ -393,7 +340,6 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
         <label>Bitcoin Price Model</label>
         <select id="price-model">
           <option value="exponential">Exponential Growth</option>
-          <option value="stochastic">Stochastic Model</option>
           <option value="conservative">Conservative Linear</option>
         </select>
       </div>
@@ -411,15 +357,6 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
           <option value="3">3 Years</option>
           <option value="5" selected>5 Years</option>
           <option value="10">10 Years</option>
-        </select>
-      </div>
-      
-      <div class="config-item">
-        <label>Monte Carlo Runs</label>
-        <select id="simulation-runs">
-          <option value="100">100 (Fast)</option>
-          <option value="1000" selected>1,000 (Standard)</option>
-          <option value="10000">10,000 (Detailed)</option>
         </select>
       </div>
     </div>
@@ -478,20 +415,18 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
       <div class="selector-group">
         <label>Scenario A</label>
         <select id="scenario-a">
-          <option value="15">Conservative 5-Year</option>
-          <option value="16">Optimistic Growth Scenario</option>
+          <option value="1">Conservative 5-Year</option>
+          <option value="2">Optimistic Growth Scenario</option>
         </select>
       </div>
       
       <div class="selector-group">
         <label>Scenario B</label>
         <select id="scenario-b">
-          <option value="16" selected>Optimistic Growth Scenario</option>
-<option value="17">Conservative Survival</option>
+          <option value="2" selected>Optimistic Growth Scenario</option>
+          <option value="3">Conservative Survival</option>
         </select>
       </div>
-      
-      <button class="btn-add-scenario">+ Add Scenario C</button>
     </div>
   </div>
   
@@ -521,64 +456,6 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
 </div>
 ```
 
-#### 4.2 Risk Analysis Dashboard
-```html
-<div class="risk-analysis">
-  <h3>Risk Analysis</h3>
-  
-  <div class="risk-metrics">
-    <div class="risk-card">
-      <h4>Value at Risk (5%)</h4>
-      <div class="var-value">-$125,000</div>
-      <div class="var-explanation">5% chance of losing more than this amount</div>
-    </div>
-    
-    <div class="risk-card">
-      <h4>Probability of Loss</h4>
-      <div class="prob-value">12.5%</div>
-      <div class="prob-explanation">Chance of negative ROI over 5 years</div>
-    </div>
-    
-    <div class="risk-card">
-      <h4>Maximum Drawdown</h4>
-      <div class="drawdown-value">-45%</div>
-      <div class="drawdown-explanation">Worst-case portfolio decline</div>
-    </div>
-  </div>
-  
-  <div class="confidence-intervals">
-    <h4>Profit Distribution (5-Year)</h4>
-    <div class="distribution-chart">
-      <canvas id="profit-distribution"></canvas>
-    </div>
-    
-    <div class="confidence-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Confidence Level</th>
-            <th>Minimum Profit</th>
-            <th>Maximum Profit</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>90% (5th-95th percentile)</td>
-            <td>$1,856,000</td>
-            <td>$3,542,000</td>
-          </tr>
-          <tr>
-            <td>50% (25th-75th percentile)</td>
-            <td>$2,125,000</td>
-            <td>$2,784,000</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-```
-
 ### 5. SETTINGS & CONFIGURATION PAGE
 
 #### 5.1 General Settings
@@ -587,7 +464,6 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
   <div class="settings-nav">
     <button class="settings-tab active" data-section="general">General</button>
     <button class="settings-tab" data-section="api">API Keys</button>
-    <button class="settings-tab" data-section="notifications">Notifications</button>
     <button class="settings-tab" data-section="export">Export/Import</button>
   </div>
   
@@ -686,10 +562,6 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
           Solar + Storage<br>
           <small>Solar with battery backup</small>
         </button>
-        <button class="equipment-option" data-power="mixed">
-          Mixed Sources<br>
-          <small>Solar + wind + grid</small>
-        </button>
       </div>
     </div>
   </div>
@@ -733,29 +605,29 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
 
 #### Phase 1: Basic Configuration
 1. **Location Selection**: Choose or add new location
-2. **Power Sources**: Select and configure solar/wind/other
+2. **Power Sources**: Select and configure solar panels
 3. **Mining Equipment**: Choose miners and quantities
 4. **Storage**: Optional battery configuration
 
 #### Phase 2: Economic Parameters
-1. **Electricity Rates**: Grid rates, time-of-use, net metering
+1. **Electricity Rates**: Grid rates and net metering
 2. **Initial Investment**: Equipment costs, installation
 3. **Operating Costs**: Maintenance, insurance, etc.
 
 #### Phase 3: Bitcoin Assumptions
-1. **Bitcoin Price Model**: Growth scenarios, volatility
+1. **Bitcoin Price Model**: Growth scenarios
 2. **Network Difficulty**: Growth projections
 3. **Equipment Degradation**: Performance decline rates
 
 #### Phase 4: Projection Calculation
 1. **Time Horizon**: 1-10 years
-2. **Calculation Frequency**: Daily, weekly, monthly
-3. **Monte Carlo Settings**: Number of simulation runs
+2. **Calculation Frequency**: Monthly
+3. **Basic Analysis**: ROI, payback period, profitability
 
 ### 3. EQUIPMENT COMPARISON WORKFLOW
 
 #### Step 1: Equipment Discovery
-- Browse categories (miners, solar, wind, storage)
+- Browse categories (miners, solar, storage)
 - Filter by specifications (efficiency, power, price)
 - Search by model or manufacturer
 
@@ -785,7 +657,6 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
 
 ### Unsupported: Mobile Portrait
 - **Redirect Message**: "This application is optimized for desktop and tablet use"
-- **Mobile App Suggestion**: Link to potential future mobile app
 - **Basic Calculator**: Simple ROI calculator for mobile users
 
 ## Accessibility Features
@@ -810,6 +681,42 @@ The Solar Bitcoin Mining Calculator features a desktop-first React application d
 
 ---
 
-**Document Status**: Draft v1.0  
-**Last Updated**: 2024-08-11  
-**Next Review**: After deployment documentation
+## Future Implementation
+
+### Advanced UI Features (Planned for Later Phases)
+
+#### Advanced Data Visualization
+- Interactive 3D charts
+- Real-time data streaming
+- Advanced filtering and drill-down
+- Custom chart creation
+
+#### Enhanced User Experience
+- Drag-and-drop interface
+- Advanced search and filtering
+- User preferences and customization
+- Mobile app development
+
+#### Advanced Analytics
+- Risk analysis dashboards
+- Sensitivity analysis tools
+- Monte Carlo simulation interface
+- Advanced reporting features
+
+#### Collaboration Features
+- Scenario sharing
+- Team collaboration tools
+- Community features
+- Expert consultation integration
+
+#### Advanced Configuration
+- Multi-location setups
+- Complex system configurations
+- Advanced economic modeling
+- Custom equipment specifications
+
+---
+
+**Document Status**: Current Plan v1.0  
+**Last Updated**: 2024-12-19  
+**Next Review**: After Phase 1 implementation

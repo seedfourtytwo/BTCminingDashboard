@@ -5,194 +5,142 @@ This document serves as the primary development guide for the Solar Bitcoin Mini
 ## Table of Contents
 
 1. [Project Architecture](#project-architecture)
-2. [Enhanced Mining Calculator Features](#enhanced-mining-calculator-features)
-3. [Real-time Data Pipeline](#real-time-data-pipeline)
-4. [TypeScript Standards](#typescript-standards)
-5. [React Development Patterns](#react-development-patterns)
-6. [Cloudflare Workers Best Practices](#cloudflare-workers-best-practices)
-7. [Database Design with D1](#database-design-with-d1)
-8. [Advanced Calculation Engines](#advanced-calculation-engines)
-9. [Build System with Vite](#build-system-with-vite)
-10. [Code Organization](#code-organization)
-11. [Testing Standards](#testing-standards)
-12. [Error Handling](#error-handling)
-13. [Performance Guidelines](#performance-guidelines)
-14. [Development Workflow](#development-workflow)
-15. [Deployment and CI/CD](#deployment-and-cicd)
+2. [Current Implementation Status](#current-implementation-status)
+3. [TypeScript Standards](#typescript-standards)
+4. [React Development Patterns](#react-development-patterns)
+5. [Cloudflare Workers Best Practices](#cloudflare-workers-best-practices)
+6. [Database Design with D1](#database-design-with-d1)
+7. [Build System with Vite](#build-system-with-vite)
+8. [Code Organization](#code-organization)
+9. [Testing Standards](#testing-standards)
+10. [Error Handling](#error-handling)
+11. [Performance Guidelines](#performance-guidelines)
+12. [Development Workflow](#development-workflow)
+13. [Future Roadmap](#future-roadmap)
 
 ## Project Architecture
 
-### Monorepo Structure
+### Actual Project Structure (Current)
 ```
 src/
-├── client/           # React frontend application
-│   ├── components/   # Reusable UI components
-│   ├── hooks/        # Custom React hooks
-│   ├── pages/        # Page-level components
-│   ├── services/     # API client logic
-│   ├── types/        # TypeScript type definitions
-│   └── utils/        # Client-side utilities
-├── server/           # Cloudflare Workers backend
-│   ├── handlers/     # Route handlers
-│   ├── services/     # Business logic services
-│   ├── models/       # Data models and schemas
-│   ├── migrations/   # Database migrations
-│   └── utils/        # Server-side utilities
-├── shared/           # Shared types and utilities
-│   ├── types/        # Common TypeScript interfaces
-│   └── constants/    # Shared constants
-└── tests/            # Test files
-    ├── unit/         # Unit tests
-    ├── integration/  # Integration tests
-    └── fixtures/     # Test fixtures
+├── client/                    # React frontend application
+│   ├── components/            # React components
+│   │   ├── ui/                # Basic UI components
+│   │   ├── forms/             # Form components  
+│   │   ├── charts/            # Data visualization
+│   │   └── layout/            # Layout components
+│   ├── hooks/                 # Custom React hooks
+│   ├── pages/                 # Page-level components
+│   ├── services/              # API client services
+│   ├── types/                 # Client-specific types
+│   └── utils/                 # Client-side utilities
+├── server/                    # Cloudflare Workers backend (3-worker architecture)
+│   ├── api/                   # Main API Worker (port 8787)
+│   │   ├── handlers/          # Route handlers
+│   │   ├── services/          # Business logic
+│   │   ├── models/            # Data models
+│   │   └── utils/             # API utilities
+│   ├── calculations/          # Calculation Worker (port 8788)
+│   │   ├── engines/           # Calculation engines
+│   │   ├── services/          # Calculation services
+│   │   └── utils/             # Calculation utilities
+│   ├── data/                  # Data Worker (port 8789)
+│   │   ├── providers/         # External API integrations
+│   │   ├── cache/             # Data caching
+│   │   ├── schedulers/        # Scheduled jobs
+│   │   └── utils/             # Data utilities
+│   ├── shared/                # Shared server code
+│   │   ├── database/          # Database layer
+│   │   │   ├── migrations/    # SQL migrations
+│   │   │   └── repository-base.ts
+│   │   ├── errors/            # Error classes
+│   │   ├── middleware/        # Shared middleware
+│   │   ├── utils/             # Shared utilities
+│   │   └── validation/        # Data validation
+│   └── types/                 # Server-wide types
+└── shared/                    # Code shared between client and server
+    ├── types/                 # Common TypeScript interfaces
+    ├── constants/             # Shared constants
+    ├── config/                # Configuration utilities
+    └── monitoring/            # Telemetry and monitoring
 ```
 
-### Environment Configuration
-- **Development**: Local D1 database, hot module replacement
-- **Staging**: Preview D1 database, staging Workers deployment
-- **Production**: Production D1 database, production Workers deployment
+### Multi-Worker Architecture Benefits
+- **API Worker** (`wrangler.api.toml`): Handles UI interactions, CRUD operations, routing
+- **Calculation Worker** (`wrangler.calculations.toml`): Performs heavy computational tasks and projections  
+- **Data Worker** (`wrangler.data.toml`): Manages external API calls, caching, and scheduled jobs
+- **Independent Scaling**: Each worker scales based on its specific workload
+- **Isolated Failures**: Issues in one worker don't affect others
+- **Optimized Performance**: Different CPU limits and resources per worker type
 
-## Enhanced Mining Calculator Features
+### Environment Configuration  
+- **Development**: Local D1 database (`solar-mining-db-dev`), hot module replacement
+- **Production**: Production D1 database (`solar-mining-db`), production Workers deployment
 
-### Competitive Analysis Integration
+## Current Implementation Status
 
-Based on comprehensive research of leading Bitcoin mining calculators (WhatToMine, Hashrate Index, CoinWarz, Minerstat, 99Bitcoins), our calculator incorporates advanced features that set it apart in the renewable energy mining space.
+### ✅ Completed Components
+- **Project Structure**: Organized 3-worker architecture with proper separation of concerns
+- **TypeScript Configuration**: Strict mode enabled with comprehensive type checking  
+- **Build System**: Vite configured with path aliases, code splitting, and optimization
+- **Testing Setup**: Vitest configured with coverage reporting and test utilities
+- **Database Schema**: Comprehensive schema with 8 core tables (miners, solar panels, storage, locations, etc.)
+- **Development Workflow**: Complete npm scripts for all development tasks
+- **Code Quality**: ESLint, Prettier, and Husky pre-commit hooks configured
+- **CI/CD Pipeline**: GitHub Actions workflow with quality checks, builds, and deployment
+- **Documentation**: Complete project documentation in docs/ directory
 
-#### Key Differentiators
-- **Solar-specific optimization**: Unlike generic calculators, we specialize in solar/renewable energy mining
-- **Environmental factor modeling**: Temperature coefficients, cooling requirements, weather impact
-- **Advanced financial modeling**: Monte Carlo simulations, risk analysis, sensitivity testing
-- **Hardware optimization**: Equipment comparison and recommendation algorithms
-- **Real-time data integration**: Live Bitcoin network data, weather forecasting, hashprice tracking
+### 🔄 In Progress (Phase 1: Foundation & Data)
+- **Database Seeding**: Populating equipment data with real ASIC and solar panel specifications
+- **Basic API Implementation**: Equipment endpoints and system configuration CRUD operations
+- **External Data Integration**: Bitcoin price, network data, and weather API integration
+- **Frontend Implementation**: React components and pages (basic structure exists)
 
-#### Feature Enhancement Roadmap
-
-**Phase 1: Core Data Enhancement**
-- Real-time Bitcoin network data (hashprice, difficulty, mempool)
-- Enhanced weather data with forecasting capabilities
-- Advanced equipment degradation modeling
-- Grid integration pricing (net metering, demand charges, TOU)
-
-**Phase 2: Advanced Analytics**
-- Monte Carlo risk simulations
-- Hardware comparison and optimization
-- Mining pool selection recommendations
-- Scenario modeling (bull/bear markets)
-
-**Phase 3: User Experience**
-- Guided configuration wizard
-- Pre-built templates for common setups
-- Export capabilities (PDF, Excel, CSV)
-- Real-time monitoring dashboard
-
-### Data Quality Standards
-
-#### Real-time Data Sources
-- **Bitcoin Network**: Multiple API sources with failover (Blockchain.info, Blockchair, Mempool.space)
-- **Weather Data**: NREL NSRDB, OpenWeatherMap, with data quality scoring
-- **Equipment Database**: Manufacturer specifications with verification flags
-- **Mining Pools**: Performance metrics with historical variance tracking
-
-#### Data Validation Requirements
-- Outlier detection for anomalous values
-- Cross-source validation for critical metrics
-- Data freshness tracking with automatic staleness alerts
-- Quality scoring system (0-1) for all data sources
-
-## Real-time Data Pipeline
-
-### Architecture Overview
-
-The real-time data pipeline enables live updates for critical mining profitability factors, setting our calculator apart from static competitors.
-
-#### Data Stream Management
-```typescript
-interface DataStreamConfig {
-  source: 'blockchain_api' | 'weather_api' | 'price_api' | 'pool_api';
-  update_frequency: number; // seconds
-  retry_policy: RetryConfig;
-  quality_threshold: number; // minimum acceptable quality score
-  cache_duration: number; // seconds
-  rate_limits: RateLimitConfig;
-}
-```
-
-#### WebSocket Integration
-- Real-time Bitcoin price and network stats
-- Live weather data for solar performance
-- Mining pool performance updates
-- Equipment availability and pricing
-
-#### Caching Strategy
-```typescript
-interface CachePolicy {
-  bitcoin_price: '30s';      // High frequency updates
-  network_stats: '5m';       // Medium frequency
-  weather_current: '15m';    // Weather updates
-  weather_forecast: '6h';    // Forecast updates
-  equipment_specs: '24h';    // Static data
-  pool_stats: '1h';          // Pool performance
-}
-```
-
-#### Rate Limiting and API Management
-- Intelligent request batching
-- Exponential backoff for failures
-- Multiple API key rotation
-- Cost optimization across data sources
-
-### Data Integration Patterns
-
-#### Multi-source Aggregation
-```typescript
-class DataAggregator {
-  async getBitcoinPrice(): Promise<PriceData> {
-    const sources = [
-      this.coinGeckoAPI,
-      this.coinMarketCapAPI,
-      this.binanceAPI
-    ];
-    
-    const results = await Promise.allSettled(
-      sources.map(source => source.getCurrentPrice())
-    );
-    
-    return this.consolidateResults(results);
-  }
-}
-```
-
-#### Quality Scoring System
-- Source reliability weighting
-- Data recency scoring
-- Cross-validation checks
-- Anomaly detection
+### 📋 Planned Features
+- **Real-time Data Integration**: Live Bitcoin network data, weather forecasting
+- **Advanced Calculations**: Monte Carlo simulations, risk analysis, sensitivity testing
+- **Hardware Optimization**: Equipment comparison and recommendation algorithms
+- **User Experience Enhancements**: Configuration wizard, templates, export capabilities
+- **Environmental Modeling**: Temperature coefficients, degradation factors, weather impact
 
 ## TypeScript Standards
 
-### Configuration Requirements
+### Current Configuration
 
-#### Strict Mode (Required)
+The project uses strict TypeScript configuration with comprehensive type checking:
+
+#### Strict Mode (Enabled)
 ```json
-// tsconfig.json
+// tsconfig.json (actual configuration)
 {
   "compilerOptions": {
+    "target": "ES2022",
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true
-  }
-}
-```
-
-#### Module Resolution
-```json
-{
-  "compilerOptions": {
+    "exactOptionalPropertyProperties": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true
   }
 }
+```
+
+#### Path Aliases (Configured)
+```typescript
+// Available path aliases
+"@/*": ["src/*"]
+"@/client/*": ["src/client/*"]  
+"@/server/*": ["src/server/*"]
+"@/shared/*": ["src/shared/*"]
+"@/components/*": ["src/client/components/*"]
+"@/hooks/*": ["src/client/hooks/*"]
+"@/services/*": ["src/client/services/*"]
+"@/utils/*": ["src/client/utils/*"]
+"@/types/*": ["src/shared/types/*"]
 ```
 
 ### Type Definition Patterns
@@ -287,155 +235,37 @@ type ProjectionResult =
 
 ## React Development Patterns
 
-### Enhanced User Experience Components
+### Current Component Structure
 
-#### Configuration Wizard Architecture
+The project uses a organized component architecture with clear separation of concerns:
 
-Based on research of successful mining calculators, we implement a guided setup wizard that simplifies the complex configuration process.
-
-```typescript
-interface WizardStep {
-  id: string;
-  title: string;
-  description: string;
-  component: React.ComponentType<StepProps>;
-  validation: ValidationSchema;
-  dependencies: string[]; // Previous steps that must be completed
-  conditionalLogic?: ConditionalNavigation;
-}
-
-interface ConfigurationWizard {
-  steps: WizardStep[];
-  currentStep: number;
-  completedSteps: Set<string>;
-  configuration: Partial<SystemConfiguration>;
-}
+```
+src/client/components/
+├── ui/           # Basic UI components (Button, Input, Card, etc.)
+├── forms/        # Form components and form logic
+├── charts/       # Data visualization components
+└── layout/       # Layout components (Header, Sidebar, etc.)
 ```
 
-#### Step-by-Step User Flow
-1. **Location & Climate**: Geographic setup with weather data preview
-2. **Budget & Goals**: Investment parameters and optimization objectives  
-3. **Equipment Selection**: Guided hardware comparison and recommendation
-4. **System Sizing**: Automated sizing based on goals and constraints
-5. **Financial Settings**: Grid integration, pricing, and economic parameters
-6. **Review & Optimize**: Final configuration review with optimization suggestions
+### Planned User Experience Components
 
-#### Template Library System
-```typescript
-interface ConfigurationTemplate {
-  id: string;
-  name: string;
-  category: 'beginner' | 'residential' | 'commercial' | 'industrial';
-  description: string;
-  suitability_criteria: {
-    budget_range: [number, number];
-    space_requirements: number; // m²
-    experience_level: 'novice' | 'intermediate' | 'expert';
-    risk_tolerance: 'low' | 'medium' | 'high';
-    climate_zones: string[]; // Köppen climate classifications
-  };
-  default_configuration: Partial<SystemConfiguration>;
-  customization_options: CustomizationField[];
-  expected_outcomes: {
-    roi_range: [number, number];
-    payback_period_months: [number, number];
-    risk_level: string;
-  };
-}
-```
+#### Configuration Wizard (Future)
+- Step-by-step setup process for complex mining configurations
+- Location & climate data integration
+- Equipment selection and comparison
+- Financial settings and optimization
 
-#### Pre-built Templates
-- **Beginner Solar Miner**: Small-scale residential setup with single ASIC
-- **Home Mining Farm**: Multi-miner residential installation with grid tie
-- **Commercial Operation**: Industrial-scale mining with advanced optimization
-- **Off-Grid Mining**: Standalone solar mining with battery storage
-- **Hybrid Grid/Solar**: Mixed power source optimization
+#### Hardware Comparison (Future)  
+- Side-by-side equipment comparison tables
+- Performance charts and visualizations
+- Equipment recommendation algorithms
+- Real-time pricing integration
 
-#### Hardware Comparison Components
-```typescript
-interface HardwareComparisonTable {
-  equipment_type: 'miners' | 'solar_panels' | 'inverters' | 'batteries';
-  comparison_metrics: ComparisonMetric[];
-  sorting_options: SortingOption[];
-  filtering_options: FilteringOption[];
-  visualization_modes: 'table' | 'cards' | 'charts';
-}
-
-interface ComparisonMetric {
-  key: string;
-  label: string;
-  unit: string;
-  format: 'number' | 'currency' | 'percentage' | 'ratio';
-  importance_weight: number; // For overall scoring
-  tooltip: string;
-}
-```
-
-#### Interactive Hardware Selection
-- **Side-by-side comparison**: Up to 5 equipment options
-- **Performance charts**: Efficiency, ROI, and payback visualizations
-- **Recommendation engine**: AI-powered equipment suggestions
-- **Real-time pricing**: Live market data integration
-- **Compatibility checking**: Automatic compatibility validation
-
-#### Export and Reporting Components
-```typescript
-interface ReportGenerator {
-  report_types: {
-    executive_summary: ExecutiveSummaryConfig;
-    technical_specifications: TechnicalSpecsConfig;
-    financial_analysis: FinancialAnalysisConfig;
-    risk_assessment: RiskAssessmentConfig;
-    implementation_guide: ImplementationGuideConfig;
-  };
-  
-  output_formats: {
-    pdf: PDFExportConfig;
-    excel: ExcelExportConfig;
-    csv: CSVExportConfig;
-    powerpoint: PowerPointConfig;
-  };
-  
-  customization: {
-    branding: BrandingOptions;
-    charts: ChartCustomization;
-    sections: SectionConfiguration;
-  };
-}
-```
-
-#### Export Capabilities
-- **Professional PDF reports**: Multi-page reports with charts and analysis
-- **Excel workbooks**: Detailed calculations and sensitivity analysis  
-- **CSV data export**: Raw data for external analysis
-- **PowerPoint presentations**: Investment pitch decks
-- **Real-time sharing**: Secure links with expiration dates
-
-#### Dashboard and Monitoring Components
-```typescript
-interface MonitoringDashboard {
-  real_time_metrics: {
-    current_profitability: ProfitabilityWidget;
-    bitcoin_price: BitcoinPriceWidget;
-    network_difficulty: NetworkStatsWidget;
-    weather_conditions: WeatherWidget;
-    system_performance: PerformanceWidget;
-  };
-  
-  alerts: {
-    profitability_threshold: AlertConfig;
-    equipment_maintenance: MaintenanceAlert;
-    weather_warnings: WeatherAlert;
-    market_opportunities: MarketAlert;
-  };
-  
-  historical_tracking: {
-    performance_charts: ChartConfiguration[];
-    comparison_metrics: ComparisonTracking;
-    goal_progress: GoalTracking;
-  };
-}
-```
+#### Export and Reporting (Future)
+- PDF report generation
+- Excel workbook exports
+- CSV data exports
+- Shareable calculation results
 
 ### Component Architecture
 
@@ -716,34 +546,60 @@ class DatabaseService {
 
 ### Schema Design Principles
 
-#### Table Structure
+#### Current Database Schema (Implemented)
 ```sql
--- ✅ Good: Normalized schema with proper constraints
-CREATE TABLE miners (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  manufacturer TEXT NOT NULL,
-  hashrate_th REAL NOT NULL CHECK (hashrate_th > 0),
-  power_consumption_w INTEGER NOT NULL CHECK (power_consumption_w > 0),
-  efficiency_j_th REAL NOT NULL CHECK (efficiency_j_th > 0),
-  release_date DATE,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+-- Core tables in the current database schema
+-- Complete schema is in src/server/shared/database/migrations/0001_initial_schema.sql
+
+-- Equipment specifications
+CREATE TABLE miner_models (
+  id INTEGER PRIMARY KEY,
+  manufacturer VARCHAR(50) NOT NULL,
+  model_name VARCHAR(100) NOT NULL,
+  hashrate_th REAL NOT NULL,
+  power_consumption_w INTEGER NOT NULL,
+  efficiency_j_th REAL NOT NULL,
+  -- Degradation and environmental factors
+  hashrate_degradation_annual REAL DEFAULT 0.05,
+  operating_temp_min INTEGER,
+  operating_temp_max INTEGER,
+  current_price_usd REAL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE projections (
-  id TEXT PRIMARY KEY,
-  user_id TEXT,
-  miner_id TEXT NOT NULL,
-  solar_config TEXT NOT NULL, -- JSON
-  projection_config TEXT NOT NULL, -- JSON
-  results TEXT NOT NULL, -- JSON
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (miner_id) REFERENCES miners(id)
+CREATE TABLE solar_panel_models (
+  id INTEGER PRIMARY KEY,
+  manufacturer VARCHAR(50) NOT NULL,
+  model_name VARCHAR(100) NOT NULL,
+  rated_power_w INTEGER NOT NULL,
+  efficiency_percent REAL NOT NULL,
+  temperature_coefficient REAL NOT NULL,
+  degradation_rate_annual REAL DEFAULT 0.5,
+  cost_per_watt REAL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_projections_user_created ON projections(user_id, created_at DESC);
-CREATE INDEX idx_miners_efficiency ON miners(efficiency_j_th);
+-- System configurations and projections
+CREATE TABLE system_configs (
+  id INTEGER PRIMARY KEY,
+  config_name VARCHAR(100) NOT NULL,
+  location_id INTEGER NOT NULL,
+  solar_panels JSON NOT NULL,
+  miners JSON NOT NULL,
+  electricity_rate_usd_kwh REAL NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Market and environmental data tables
+CREATE TABLE bitcoin_price_data (
+  id INTEGER PRIMARY KEY,
+  recorded_date DATE NOT NULL,
+  price_usd REAL NOT NULL,
+  data_source VARCHAR(50) NOT NULL
+);
+
+-- Complete schema includes 8 tables total
+-- See migration file for full table definitions
 ```
 
 #### Query Patterns
@@ -857,220 +713,117 @@ export async function runMigrations(db: D1Database) {
 }
 ```
 
-## Advanced Calculation Engines
+## Calculation Engine Architecture (Planned)
 
-### Monte Carlo Risk Analysis
+### Current Calculation Structure
+The project is structured to support advanced calculations in the dedicated Calculation Worker:
 
-Monte Carlo simulation provides probabilistic analysis of mining profitability by running thousands of scenarios with varying input parameters.
-
-#### Implementation Architecture
-```typescript
-interface MonteCarloSimulation {
-  parameters: {
-    btc_price_distribution: ProbabilityDistribution;
-    difficulty_growth_distribution: ProbabilityDistribution;
-    electricity_cost_distribution: ProbabilityDistribution;
-    equipment_failure_distribution: ProbabilityDistribution;
-  };
-  constraints: {
-    simulation_runs: number; // 10,000+ for statistical significance
-    confidence_levels: number[]; // [0.05, 0.25, 0.5, 0.75, 0.95]
-    time_horizon_years: number;
-  };
-  correlations: CorrelationMatrix; // Variable interdependencies
-}
+```
+src/server/calculations/
+├── engines/          # Mathematical calculation engines
+├── services/         # Calculation business logic
+├── utils/           # Calculation utilities
+└── index.ts         # Calculation Worker entry point
 ```
 
-#### Key Risk Metrics
-- **Value at Risk (VaR)**: Maximum expected loss at given confidence level
-- **Conditional Value at Risk (CVaR)**: Expected loss beyond VaR threshold
-- **Probability of Loss**: Chance of negative ROI
-- **Expected Return**: Mean profitability across all scenarios
-- **Return Volatility**: Standard deviation of returns
+### Planned Calculation Features
 
-#### Scenario Generation
+#### Phase 2: Basic Calculations (Next)
+- **Solar power output**: PV system modeling with irradiance data
+- **Mining hashrate**: Effective hashrate with environmental factors
+- **Financial projections**: ROI, payback period, operating costs
+- **Performance degradation**: Equipment aging and efficiency decline
+
+#### Phase 3: Advanced Analytics (Future)
+- **Monte Carlo simulations**: Risk analysis with confidence intervals
+- **Sensitivity analysis**: Parameter impact assessment
+- **Hardware optimization**: Multi-objective equipment selection
+- **Environmental modeling**: Temperature and weather impact
+
+### Basic Calculation Types
+
+#### Solar Energy Calculations (Implementation Ready)
 ```typescript
-class ScenarioGenerator {
-  generateBTCPriceScenarios(basePrice: number): number[] {
-    // Geometric Brownian Motion for Bitcoin price
-    // Incorporates historical volatility and trend
-    // Accounts for halving cycles and market cycles
-  }
-  
-  generateDifficultyScenarios(baseDifficulty: number): number[] {
-    // Network growth modeling
-    // Mining hardware deployment rates
-    // Energy market constraints
-  }
-  
-  generateWeatherScenarios(location: Location): WeatherScenario[] {
-    // Climate variability modeling
-    // Extreme weather event probability
-    // Long-term climate change effects
-  }
-}
-```
-
-### Hardware Optimization Algorithms
-
-#### Multi-objective Optimization
-```typescript
-interface OptimizationObjectives {
-  maximize_roi: number;        // Weight for ROI maximization
-  minimize_payback: number;    // Weight for payback minimization  
-  minimize_risk: number;       // Weight for risk minimization
-  maximize_hashrate: number;   // Weight for hashrate maximization
-}
-
-interface OptimizationConstraints {
-  max_budget_usd: number;
-  max_power_consumption_kw: number;
-  max_installation_area_m2: number;
-  min_equipment_efficiency: number;
-  geographic_restrictions: string[];
-}
-```
-
-#### Genetic Algorithm Implementation
-```typescript
-class EquipmentOptimizer {
-  async optimizeConfiguration(
-    objectives: OptimizationObjectives,
-    constraints: OptimizationConstraints,
-    location: GeographicLocation
-  ): Promise<OptimizationResult> {
-    // Genetic algorithm phases:
-    // 1. Population initialization with feasible configurations
-    // 2. Fitness evaluation using multi-objective scoring
-    // 3. Selection, crossover, and mutation operations
-    // 4. Convergence analysis and Pareto frontier identification
-    // 5. Solution ranking and alternative generation
-  }
-}
-```
-
-#### Pareto Frontier Analysis
-- Identifies trade-offs between conflicting objectives
-- Provides multiple optimal solutions for different priorities
-- Enables sensitivity analysis of objective weights
-
-### Environmental Impact Modeling
-
-#### Solar Performance Degradation
-```typescript
-interface SolarDegradationModel {
-  // Panel-level degradation factors
-  annual_degradation_rate: number;     // Base degradation (0.5-0.8% annually)
-  temperature_coefficient: number;     // Performance per °C above STC
-  soiling_degradation: number;         // Dust/debris impact
-  uv_degradation_factor: number;      // UV exposure impact
-  potential_induced_degradation: number; // PID susceptibility
-  
-  // System-level factors  
-  inverter_degradation_annual: number; // Inverter efficiency decline
-  wiring_losses_increase: number;      // Connection degradation
-  shading_impact_factor: number;       // Shading growth over time
-}
-```
-
-#### Mining Hardware Environmental Impact
-```typescript
-interface MinerEnvironmentalModel {
-  temperature_derating: {
-    optimal_temp_c: number;
-    derating_per_degree_c: number;
-    critical_temperature_c: number;
+interface SolarCalculationConfig {
+  panels: {
+    count: number;
+    watts_per_panel: number;
+    efficiency: number;
+    degradation_rate: number;
   };
-  
-  altitude_derating: {
-    sea_level_performance: number;
-    derating_per_1000m: number;
+  location: {
+    latitude: number;
+    longitude: number;
+    irradiance_data: number[];
   };
-  
-  humidity_impact: {
-    optimal_humidity_range: [number, number];
-    corrosion_acceleration: number;
-    failure_rate_multiplier: number;
-  };
-  
-  dust_impact: {
-    cooling_efficiency_reduction: number;
-    maintenance_frequency_increase: number;
-    filter_replacement_cost: number;
+  environmental: {
+    temperature_coefficient: number;
+    soiling_losses: number;
+    system_losses: number;
   };
 }
 ```
 
-### Sensitivity Analysis Engine
-
-#### Variable Impact Assessment
+#### Mining Performance Calculations (Implementation Ready)
 ```typescript
-interface SensitivityAnalysis {
-  target_metric: 'roi' | 'payback_period' | 'total_profit' | 'risk_score';
-  input_variables: Array<{
-    variable_name: string;
-    base_value: number;
-    variation_range: [number, number]; // [min, max] or [±percentage]
-    step_size: number;
-  }>;
-  interaction_effects: boolean; // Include variable interactions
+interface MiningCalculationConfig {
+  equipment: {
+    hashrate_th: number;
+    power_consumption_w: number;
+    efficiency_j_th: number;
+    degradation_rate: number;
+  };
+  network: {
+    difficulty: number;
+    block_reward: number;
+    btc_price_usd: number;
+  };
+  costs: {
+    electricity_rate_kwh: number;
+    maintenance_costs: number;
+  };
 }
 ```
 
-#### Tornado Diagram Generation
-- Ranks variables by impact on target metric
-- Visualizes sensitivity ranges
-- Identifies critical assumptions for monitoring
-
-### Real-time Calculation Optimization
-
-#### Computational Efficiency
-- **Vectorized calculations**: Parallel processing of time series
-- **Memoization**: Cache intermediate results for similar scenarios
-- **Progressive refinement**: Start with coarse estimates, refine iteratively
-- **GPU acceleration**: Leverage WebGPU for intensive calculations
-
-#### Calculation Prioritization
+#### Financial Analysis (Implementation Ready)
 ```typescript
-interface CalculationQueue {
-  high_priority: 'real_time_updates';      // Live profitability
-  medium_priority: 'scenario_analysis';    // What-if calculations  
-  low_priority: 'monte_carlo';            // Background simulations
-  batch_priority: 'optimization';         // Resource-intensive tasks
+interface FinancialProjection {
+  initial_investment: number;
+  monthly_revenue: number[];
+  monthly_costs: number[];
+  net_present_value: number;
+  internal_rate_of_return: number;
+  payback_period_months: number;
+  total_roi_percent: number;
 }
 ```
 
 ## Build System with Vite
 
-### Configuration
+### Current Configuration
 
-#### Base Configuration
+#### Production Vite Configuration
 ```typescript
-// vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
-
+// vite.config.ts (actual current configuration)
 export default defineConfig({
   plugins: [react()],
   
-  // TypeScript configuration
-  esbuild: {
-    target: 'es2022'
-  },
+  esbuild: { target: 'es2022' },
   
-  // Path resolution
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      '@shared': resolve(__dirname, 'src/shared'),
-      '@components': resolve(__dirname, 'src/client/components'),
-      '@hooks': resolve(__dirname, 'src/client/hooks'),
-      '@services': resolve(__dirname, 'src/client/services')
+      '@/client': resolve(__dirname, 'src/client'),
+      '@/server': resolve(__dirname, 'src/server'),
+      '@/shared': resolve(__dirname, 'src/shared'),
+      '@/components': resolve(__dirname, 'src/client/components'),
+      '@/hooks': resolve(__dirname, 'src/client/hooks'),
+      '@/services': resolve(__dirname, 'src/client/services'),
+      '@/utils': resolve(__dirname, 'src/client/utils'),
+      '@/types': resolve(__dirname, 'src/shared/types')
     }
   },
   
-  // Development server
   server: {
     port: 3000,
     proxy: {
@@ -1081,26 +834,24 @@ export default defineConfig({
     }
   },
 
-  // Build configuration
   build: {
     target: 'es2022',
+    outDir: 'dist',
     sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          utils: ['date-fns', 'zod']
+          router: ['react-router-dom'],
+          utils: ['date-fns', 'zod', 'clsx']
         }
       }
     }
   },
 
-  // Optimization
   optimizeDeps: {
-    include: ['react', 'react-dom', 'date-fns'],
-    esbuildOptions: {
-      target: 'es2022'
-    }
+    include: ['react', 'react-dom', 'react-router-dom', 'date-fns'],
+    esbuildOptions: { target: 'es2022' }
   }
 });
 ```
@@ -1645,884 +1396,128 @@ Closes #123
 - [ ] Tests provide adequate coverage
 - [ ] Types are properly defined
 
-### Development Commands
+### Development Commands (Current NPM Scripts)
 
 ```bash
-# Development
-npm run dev          # Start development servers
-npm run dev:client   # Start client only
-npm run dev:server   # Start server only
+# Development (Multi-Worker Architecture)
+npm run dev                    # Start all services (client + all workers)
+npm run dev:client             # Start frontend only (port 3000)
+npm run dev:api                # Start API Worker only (port 8787)
+npm run dev:calculations       # Start Calculation Worker only (port 8788)
+npm run dev:data               # Start Data Worker only (port 8789)
 
 # Building
-npm run build        # Build both client and server
-npm run build:client # Build client only
-npm run build:server # Build server only
+npm run build                  # Build all components
+npm run build:client           # Build frontend only
+npm run build:workers          # Build all workers
+npm run build:api              # Build API Worker only
+npm run build:calculations     # Build Calculation Worker only
+npm run build:data             # Build Data Worker only
 
 # Testing
-npm run test         # Run all tests
-npm run test:unit    # Run unit tests only
-npm run test:integration # Run integration tests
-npm run test:coverage    # Generate coverage report
+npm run test                   # Run tests in watch mode
+npm run test:ci                # Run tests with coverage (CI mode)
+npm run test:coverage          # Run tests with verbose coverage
+npm run test:unit              # Run unit tests only
+npm run test:integration       # Run integration tests only
+npm run test:smoke             # Run smoke tests
 
-# Quality Assurance
-npm run lint         # Run ESLint
-npm run lint:fix     # Fix ESLint issues
-npm run type-check   # Run TypeScript compiler
-npm run format       # Format with Prettier
+# Code Quality
+npm run lint                   # Run ESLint
+npm run lint:fix               # Fix ESLint issues automatically
+npm run lint:ci                # Run ESLint with JUnit output for CI
+npm run format                 # Format code with Prettier
+npm run format:check           # Check code formatting
+npm run type-check             # Run TypeScript compiler checks
 
-# Database
-npm run db:migrate   # Run database migrations
-npm run db:seed      # Seed database with sample data
-npm run db:reset     # Reset and reseed database
+# Database Management
+npm run db:migrate             # Run database migrations (development)
+npm run db:migrate:production  # Run database migrations (production)
+npm run db:seed                # Seed database with sample data
+npm run db:reset               # Reset and reseed database
+
+# Deployment
+npm run deploy                 # Deploy all workers to production
+npm run deploy:dev             # Deploy all workers to development
+npm run deploy:api             # Deploy API Worker to production
+npm run deploy:calculations    # Deploy Calculation Worker to production
+npm run deploy:data            # Deploy Data Worker to production
+npm run pages:deploy           # Deploy frontend to Cloudflare Pages
+
+# Monitoring
+npm run logs:api               # View API Worker logs
+npm run logs:calculations      # View Calculation Worker logs
+npm run logs:data              # View Data Worker logs
 ```
 
-## Deployment and CI/CD
+## Future Roadmap
 
-> **Educational Note**: This section covers modern deployment practices using GitHub Actions and Cloudflare's automated deployment system. Each step includes explanations to help you understand the concepts and implementation details.
+### Phase 1: Core Implementation (Current Focus)
+- ✅ Project architecture and configuration setup
+- 🔄 Basic frontend components and pages
+- 🔄 API endpoints and database integration
+- 🔄 Basic mining profitability calculations
+- 📋 Equipment database integration
 
-### Overview
+### Phase 2: Advanced Features
+- 📋 Real-time data integration (Bitcoin network, weather)
+- 📋 Monte Carlo risk analysis
+- 📋 Hardware optimization algorithms
+- 📋 Advanced environmental modeling
+- 📋 Configuration wizard and templates
 
-This project uses a modern CI/CD pipeline that automatically deploys your application whenever you push code to GitHub. Here's how it works:
+### Phase 3: User Experience Enhancement
+- 📋 Interactive charts and visualizations
+- 📋 Export capabilities (PDF, Excel, CSV)
+- 📋 Hardware comparison tools
+- 📋 Real-time monitoring dashboard
+- 📋 Mobile-responsive design optimization
 
-1. **Code Push to GitHub** → Triggers GitHub Actions workflow
-2. **GitHub Actions** → Runs tests, builds, and validates code
-3. **Cloudflare Integration** → Automatically deploys to Cloudflare Workers and Pages
-4. **Database Migrations** → Automatically applied to D1 database
+### Phase 4: Enterprise Features
+- 📋 Multi-user support and authentication
+- 📋 Portfolio management for multiple projects
+- 📋 Advanced reporting and analytics
+- 📋 API access for third-party integrations
+- 📋 White-label solutions
 
-### Repository Setup and GitHub Integration
+## Deployment Strategy
 
-#### Initial Repository Setup
+### Current CI/CD Pipeline (Implemented)
+
+The project has a complete GitHub Actions workflow at `.github/workflows/ci-cd.yml` with the following pipeline:
+
+#### Quality Checks Job
+- **TypeScript type checking**: Ensures all types are valid
+- **ESLint code quality**: Checks code standards and best practices
+- **Prettier formatting**: Validates consistent code formatting
+- **Test coverage**: Runs all tests with coverage reporting
+- **Claude Code Analysis**: AI-powered code review on pull requests
+
+#### Build Job
+- **Client build**: Compiles React frontend for production
+- **Worker build**: Validates all 3 Cloudflare Workers (dry-run)
+- **Artifact storage**: Saves build outputs for deployment
+
+#### Staging Deployment
+- **Triggers**: Automatic on pull requests and non-main branches
+- **Multi-worker deployment**: Deploys all 3 workers to development environment
+- **Frontend deployment**: Deploys to Cloudflare Pages staging
+
+#### Production Deployment
+- **Triggers**: Automatic on main branch push (with approval)
+- **Environment**: Production environment with URL: https://solar-mining-calculator.pages.dev
+- **Multi-worker deployment**: Deploys all 3 workers to production
+- **Frontend deployment**: Deploys to production Cloudflare Pages
+
+### Manual Deployment (Alternative)
 ```bash
-# Initialize git repository (if not already done)
-git init
+# Build and deploy all workers
+npm run build
+npm run deploy
 
-# Add all files to staging
-git add .
-
-# Create initial commit
-git commit -m "feat: initial project setup with documentation
-
-- Add comprehensive project documentation
-- Setup TypeScript configuration
-- Create database schema design
-- Implement calculation engines architecture
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
-
-# Add GitHub remote (replace with your repository URL)
-git remote add origin https://github.com/yourusername/solar-mining-calculator.git
-
-# Push to GitHub
-git push -u origin main
+# Deploy frontend to Cloudflare Pages
+npm run pages:deploy
 ```
-
-**Educational Explanation**: Git is our version control system that tracks changes to your code. GitHub is a cloud platform that hosts your repository and provides collaboration tools. The `-u origin main` flag sets up tracking between your local main branch and the remote repository.
-
-#### Repository Configuration
-
-Create these essential files for proper GitHub integration:
-
-##### `.github/ISSUE_TEMPLATE/bug_report.md`
-```markdown
----
-name: Bug report
-about: Create a report to help us improve
-title: '[BUG] '
-labels: bug
-assignees: ''
----
-
-**Describe the bug**
-A clear and concise description of what the bug is.
-
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
-
-**Expected behavior**
-A clear and concise description of what you expected to happen.
-
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Environment:**
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
-```
-
-##### `.github/ISSUE_TEMPLATE/feature_request.md`
-```markdown
----
-name: Feature request
-about: Suggest an idea for this project
-title: '[FEATURE] '
-labels: enhancement
-assignees: ''
----
-
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is.
-
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
-
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.
-```
-
-**Educational Explanation**: Issue templates standardize how bugs and feature requests are reported, making it easier to understand and address problems. They're stored in the `.github` directory which GitHub automatically recognizes.
-
-### GitHub Actions CI/CD Pipeline
-
-#### Main Workflow Configuration
-
-Create `.github/workflows/ci-cd.yml`:
-
-```yaml
-name: CI/CD Pipeline
-
-# Trigger workflow on push to main branch and pull requests
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-# Define environment variables used across jobs
-env:
-  NODE_VERSION: '18'
-  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-# Define jobs that run in parallel or sequence
-jobs:
-  # Job 1: Code Quality and Testing
-  quality-check:
-    name: Code Quality & Testing
-    runs-on: ubuntu-latest
-    
-    steps:
-      # Check out the repository code
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      # Setup Node.js environment
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          
-      # Install project dependencies
-      - name: Install dependencies
-        run: npm ci
-        
-      # Run TypeScript type checking
-      - name: Type checking
-        run: npm run type-check
-        
-      # Run ESLint for code quality
-      - name: Lint code
-        run: npm run lint
-        
-      # Run Prettier for code formatting
-      - name: Check formatting
-        run: npm run format:check
-        
-      # Run unit tests with coverage
-      - name: Run tests
-        run: npm run test:coverage
-        
-      # Upload test coverage results
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage/lcov.info
-          fail_ci_if_error: true
-
-  # Job 2: Build Application
-  build:
-    name: Build Application
-    runs-on: ubuntu-latest
-    needs: quality-check # Only run if quality checks pass
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci
-        
-      # Build the frontend application
-      - name: Build frontend
-        run: npm run build:client
-        
-      # Build the backend Workers
-      - name: Build backend
-        run: npm run build:server
-        
-      # Store build artifacts for deployment
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-files
-          path: |
-            dist/
-            build/
-          retention-days: 1
-
-  # Job 3: Deploy to Staging (on pull requests)
-  deploy-staging:
-    name: Deploy to Staging
-    runs-on: ubuntu-latest
-    needs: [quality-check, build]
-    if: github.event_name == 'pull_request'
-    environment: staging
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci
-        
-      # Download build artifacts from build job
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build-files
-          
-      # Deploy to Cloudflare Workers (staging)
-      - name: Deploy Workers to staging
-        run: npx wrangler deploy --env staging
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          
-      # Deploy to Cloudflare Pages (staging)
-      - name: Deploy Pages to staging
-        run: npx wrangler pages deploy dist --project-name solar-mining-calc-staging
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-  # Job 4: Deploy to Production (on main branch)
-  deploy-production:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: [quality-check, build]
-    if: github.ref == 'refs/heads/main'
-    environment: production
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci
-        
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build-files
-          
-      # Run database migrations in production
-      - name: Run database migrations
-        run: npx wrangler d1 migrations apply solar-mining-db --env production
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          
-      # Deploy to Cloudflare Workers (production)
-      - name: Deploy Workers to production
-        run: npx wrangler deploy --env production
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          
-      # Deploy to Cloudflare Pages (production)
-      - name: Deploy Pages to production
-        run: npx wrangler pages deploy dist --project-name solar-mining-calculator
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          
-      # Create GitHub release on successful deployment
-      - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ github.run_number }}
-          release_name: Release v${{ github.run_number }}
-          body: |
-            Automated release created by GitHub Actions
-            
-            Changes in this release:
-            ${{ github.event.head_commit.message }}
-          draft: false
-          prerelease: false
-```
-
-**Educational Explanation**: This GitHub Actions workflow automates your entire deployment process. Here's what each part does:
-
-- **Triggers**: The workflow runs on pushes to main and pull requests
-- **Jobs**: Different tasks run in parallel or sequence (quality checks, building, deploying)
-- **Environments**: Separate staging and production deployments for safety
-- **Artifacts**: Build files are stored and shared between jobs
-- **Secrets**: Sensitive information like API tokens are stored securely in GitHub
-
-#### Additional Workflow for Dependency Updates
-
-Create `.github/workflows/dependency-updates.yml`:
-
-```yaml
-name: Dependency Updates
-
-on:
-  schedule:
-    # Run every Monday at 9 AM UTC
-    - cron: '0 9 * * 1'
-  workflow_dispatch: # Allow manual triggering
-
-jobs:
-  update-dependencies:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          
-      # Check for outdated packages
-      - name: Check for updates
-        run: |
-          npm outdated || true
-          echo "UPDATES_AVAILABLE=$(npm outdated --json | jq 'length')" >> $GITHUB_ENV
-          
-      # Update dependencies if updates are available
-      - name: Update dependencies
-        if: env.UPDATES_AVAILABLE != '0'
-        run: |
-          npm update
-          npm audit fix
-          
-      # Create pull request with updates
-      - name: Create Pull Request
-        if: env.UPDATES_AVAILABLE != '0'
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: 'chore: update dependencies'
-          title: 'Automated Dependency Updates'
-          body: |
-            This PR contains automated dependency updates.
-            
-            Please review the changes and ensure all tests pass before merging.
-            
-            🤖 Generated automatically by GitHub Actions
-          branch: dependency-updates
-          delete-branch: true
-```
-
-**Educational Explanation**: This workflow automatically checks for dependency updates weekly and creates pull requests when updates are available. This helps keep your project secure and up-to-date.
-
-### Cloudflare Integration Setup
-
-#### Cloudflare Account Configuration
-
-1. **Create Cloudflare Account**
-   - Go to [cloudflare.com](https://cloudflare.com) and sign up
-   - Navigate to the Cloudflare dashboard
-
-2. **Get API Credentials**
-   ```bash
-   # Get your Account ID from the Cloudflare dashboard right sidebar
-   # Get your API Token by going to "My Profile" > "API Tokens" > "Create Token"
-   # Use the "Custom token" template with these permissions:
-   # - Account: Cloudflare Workers:Edit
-   # - Zone: Zone Settings:Read, Zone:Read
-   # - Account: Account Settings:Read
-   ```
-
-3. **Add Secrets to GitHub**
-   - Go to your GitHub repository
-   - Navigate to Settings > Secrets and variables > Actions
-   - Add these repository secrets:
-     - `CLOUDFLARE_API_TOKEN`: Your Cloudflare API token
-     - `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID
-
-**Educational Explanation**: API tokens are secure ways to authenticate with external services. Storing them as GitHub secrets ensures they're encrypted and only accessible to your workflows.
-
-#### Wrangler Configuration
-
-Create `wrangler.toml` for Cloudflare Workers configuration:
-
-```toml
-# Wrangler configuration for Cloudflare Workers
-name = "solar-mining-calculator"
-main = "src/server/index.ts"
-compatibility_date = "2024-01-01"
-
-# Build configuration
-[build]
-command = "npm run build:server"
-
-# Environment configurations
-[env.staging]
-name = "solar-mining-calculator-staging"
-vars = { ENVIRONMENT = "staging" }
-
-[env.production]
-name = "solar-mining-calculator"
-vars = { ENVIRONMENT = "production" }
-
-# Database binding for D1
-[[env.staging.d1_databases]]
-binding = "DB"
-database_name = "solar-mining-db-staging"
-database_id = "your-staging-database-id"
-
-[[env.production.d1_databases]]
-binding = "DB"
-database_name = "solar-mining-db"
-database_id = "your-production-database-id"
-
-# KV namespace for caching (optional)
-[[env.production.kv_namespaces]]
-binding = "CACHE"
-id = "your-kv-namespace-id"
-
-# Environment variables (add API keys here)
-[env.production.vars]
-BITCOIN_API_KEY = "your-api-key"
-WEATHER_API_KEY = "your-weather-api-key"
-```
-
-**Educational Explanation**: Wrangler is Cloudflare's CLI tool that manages your Workers and related services. This configuration file tells Wrangler how to deploy your application and what resources to use.
-
-#### Database Setup Commands
-
-```bash
-# Create D1 databases
-npx wrangler d1 create solar-mining-db-staging
-npx wrangler d1 create solar-mining-db
-
-# Create database tables
-npx wrangler d1 execute solar-mining-db-staging --file=src/server/migrations/001_initial_schema.sql
-npx wrangler d1 execute solar-mining-db --file=src/server/migrations/001_initial_schema.sql
-
-# List your databases
-npx wrangler d1 list
-```
-
-**Educational Explanation**: D1 is Cloudflare's SQL database service built on SQLite. These commands create separate databases for staging and production environments, ensuring your test data doesn't affect your live application.
-
-### Environment Management
-
-#### Environment-Specific Configuration
-
-Create `src/shared/config/environments.ts`:
-
-```typescript
-interface EnvironmentConfig {
-  apiBaseUrl: string;
-  databaseUrl: string;
-  logLevel: 'debug' | 'info' | 'warn' | 'error';
-  features: {
-    enableAnalytics: boolean;
-    enableDebugMode: boolean;
-    enableExperimentalFeatures: boolean;
-  };
-}
-
-const environments: Record<string, EnvironmentConfig> = {
-  development: {
-    apiBaseUrl: 'http://localhost:8787',
-    databaseUrl: 'local',
-    logLevel: 'debug',
-    features: {
-      enableAnalytics: false,
-      enableDebugMode: true,
-      enableExperimentalFeatures: true
-    }
-  },
-  
-  staging: {
-    apiBaseUrl: 'https://solar-mining-calculator-staging.your-subdomain.workers.dev',
-    databaseUrl: 'staging',
-    logLevel: 'info',
-    features: {
-      enableAnalytics: true,
-      enableDebugMode: true,
-      enableExperimentalFeatures: true
-    }
-  },
-  
-  production: {
-    apiBaseUrl: 'https://solar-mining-calculator.your-subdomain.workers.dev',
-    databaseUrl: 'production',
-    logLevel: 'warn',
-    features: {
-      enableAnalytics: true,
-      enableDebugMode: false,
-      enableExperimentalFeatures: false
-    }
-  }
-};
-
-export function getEnvironmentConfig(): EnvironmentConfig {
-  const env = process.env.NODE_ENV || 'development';
-  return environments[env] || environments.development;
-}
-```
-
-**Educational Explanation**: Environment configuration allows your application to behave differently in development, staging, and production. For example, you might enable debug logging in development but disable it in production for security and performance.
-
-### Automated Testing in CI/CD
-
-#### Test Configuration for CI
-
-Update `package.json` to include CI-specific test scripts:
-
-```json
-{
-  "scripts": {
-    "test": "vitest",
-    "test:ci": "vitest run --coverage",
-    "test:coverage": "vitest run --coverage --reporter=verbose",
-    "test:unit": "vitest run src/**/*.test.ts",
-    "test:integration": "vitest run tests/integration/**/*.test.ts",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
-    "lint:ci": "eslint src --ext .ts,.tsx --format=junit --output-file=eslint-report.xml"
-  }
-}
-```
-
-#### Quality Gates Configuration
-
-Create `.github/branch-protection.json` (for reference):
-
-```json
-{
-  "required_status_checks": {
-    "strict": true,
-    "contexts": [
-      "Code Quality & Testing",
-      "Build Application"
-    ]
-  },
-  "enforce_admins": false,
-  "required_pull_request_reviews": {
-    "required_approving_review_count": 1,
-    "dismiss_stale_reviews": true,
-    "require_code_owner_reviews": false
-  },
-  "restrictions": null
-}
-```
-
-**Educational Explanation**: Quality gates ensure code quality by requiring tests to pass and code reviews before merging. This prevents broken code from reaching production.
-
-### Monitoring and Observability
-
-#### Application Performance Monitoring
-
-Create `src/shared/monitoring/telemetry.ts`:
-
-```typescript
-interface TelemetryEvent {
-  name: string;
-  properties: Record<string, any>;
-  timestamp: Date;
-  environment: string;
-}
-
-export class TelemetryService {
-  private events: TelemetryEvent[] = [];
-  
-  track(name: string, properties: Record<string, any> = {}) {
-    const event: TelemetryEvent = {
-      name,
-      properties,
-      timestamp: new Date(),
-      environment: process.env.NODE_ENV || 'unknown'
-    };
-    
-    this.events.push(event);
-    
-    // Send to monitoring service in production
-    if (process.env.NODE_ENV === 'production') {
-      this.sendToMonitoring(event);
-    } else {
-      console.log('Telemetry Event:', event);
-    }
-  }
-  
-  private async sendToMonitoring(event: TelemetryEvent) {
-    // Implementation for sending to monitoring service
-    // Could be Cloudflare Analytics, DataDog, etc.
-  }
-}
-
-export const telemetry = new TelemetryService();
-```
-
-#### Error Tracking Integration
-
-```typescript
-// src/shared/monitoring/error-tracking.ts
-export class ErrorTracker {
-  static captureException(error: Error, context?: Record<string, any>) {
-    const errorInfo = {
-      message: error.message,
-      stack: error.stack,
-      timestamp: new Date().toISOString(),
-      context,
-      environment: process.env.NODE_ENV
-    };
-    
-    if (process.env.NODE_ENV === 'production') {
-      // Send to error tracking service (Sentry, Bugsnag, etc.)
-      console.error('Production Error:', errorInfo);
-    } else {
-      console.error('Development Error:', error);
-    }
-  }
-}
-```
-
-**Educational Explanation**: Monitoring and error tracking help you understand how your application performs in production and quickly identify issues. This is crucial for maintaining a reliable service.
-
-### Deployment Best Practices
-
-#### Pre-deployment Checklist
-
-Before deploying to production, ensure:
-
-- [ ] All tests pass in CI/CD pipeline
-- [ ] Code has been reviewed and approved
-- [ ] Database migrations are tested and ready
-- [ ] Environment variables are properly configured
-- [ ] Monitoring and alerting are set up
-- [ ] Rollback plan is documented
-- [ ] Performance testing has been completed
-
-#### Rolling Deployment Strategy
-
-```yaml
-# Example of blue-green deployment using Cloudflare
-# This would be added to your GitHub Actions workflow
-
-- name: Deploy with zero downtime
-  run: |
-    # Deploy to staging slot first
-    npx wrangler deploy --env staging
-    
-    # Run smoke tests against staging
-    npm run test:smoke:staging
-    
-    # If tests pass, deploy to production
-    if [ $? -eq 0 ]; then
-      npx wrangler deploy --env production
-    else
-      echo "Smoke tests failed, aborting deployment"
-      exit 1
-    fi
-```
-
-**Educational Explanation**: Rolling deployments minimize downtime by deploying to a staging environment first, testing it, and then promoting to production only if tests pass.
-
-### Troubleshooting Common Issues
-
-#### Common CI/CD Problems and Solutions
-
-1. **Build Failures**
-   ```bash
-   # Check Node.js version compatibility
-   node --version
-   npm --version
-   
-   # Clear npm cache if dependencies fail
-   npm cache clean --force
-   rm -rf node_modules package-lock.json
-   npm install
-   ```
-
-2. **Deployment Failures**
-   ```bash
-   # Check Wrangler authentication
-   npx wrangler auth list
-   
-   # Verify environment configuration
-   npx wrangler tail --env production
-   
-   # Check D1 database connectivity
-   npx wrangler d1 info solar-mining-db
-   ```
-
-3. **Environment Variable Issues**
-   ```bash
-   # List current environment variables
-   npx wrangler secret list
-   
-   # Set missing secrets
-   npx wrangler secret put API_KEY
-   ```
-
-#### Debugging Deployment Issues
-
-```typescript
-// Add debug logging to your Workers
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    console.log('Request received:', {
-      url: request.url,
-      method: request.method,
-      headers: Object.fromEntries(request.headers),
-      timestamp: new Date().toISOString()
-    });
-    
-    try {
-      // Your application logic
-      return new Response('OK');
-    } catch (error) {
-      console.error('Worker error:', error);
-      return new Response('Internal Server Error', { status: 500 });
-    }
-  }
-};
-```
-
-**Educational Explanation**: Good logging and debugging practices help you quickly identify and resolve issues in production. Cloudflare provides real-time logs through `wrangler tail`.
-
-This deployment and CI/CD setup provides a robust, automated pipeline that ensures code quality, handles deployments safely, and monitors your application in production. As you implement this system, you'll learn modern DevOps practices that are valuable for any web development project.
-
-## Enhanced Calculator Competitive Analysis Summary
-
-### Research-Based Improvements
-
-Our comprehensive analysis of leading Bitcoin mining calculators (WhatToMine, Hashrate Index, CoinWarz, Minerstat, 99Bitcoins) and solar-powered mining platforms has identified key enhancement opportunities that position our calculator as the most comprehensive tool for renewable energy Bitcoin mining analysis.
-
-#### Competitive Advantages Implemented
-
-**1. Advanced Environmental Modeling**
-- Temperature coefficient integration for both miners and solar panels
-- Cooling requirement calculations with environmental factors
-- Weather impact modeling (dust, humidity, altitude effects)
-- Long-term equipment degradation based on environmental conditions
-
-**2. Real-time Data Integration**
-- Live Bitcoin network data (hashprice, difficulty adjustments, mempool fees)
-- Enhanced weather forecasting with performance impact modeling
-- Mining pool performance tracking with recommendation engine
-- Dynamic equipment pricing and availability monitoring
-
-**3. Sophisticated Financial Analysis**
-- Monte Carlo risk simulations with 10,000+ scenario runs
-- Sensitivity analysis with tornado diagrams
-- Multi-objective hardware optimization algorithms
-- Advanced NPV/IRR calculations with equipment replacement modeling
-
-**4. User Experience Enhancements**
-- Guided configuration wizard for complex setups
-- Pre-built templates for common mining configurations  
-- Interactive hardware comparison with AI recommendations
-- Professional export capabilities (PDF, Excel, PowerPoint)
-
-#### Data Points Enhanced Beyond Competitors
-
-**Equipment Specifications:**
-- Environmental efficiency factors (temperature coefficients, cooling requirements)
-- Advanced degradation modeling (environmental factors, usage patterns)
-- Pool and network compatibility specifications
-- Overclocking and undervolting optimization parameters
-
-**Solar System Modeling:**
-- Enhanced environmental performance factors (shading tolerance, soiling sensitivity)
-- Advanced durability metrics (thermal cycling, humidity-freeze ratings)
-- Angle of incidence modifiers and spectral response data
-- Installation complexity factors and warranty modeling
-
-**System Configuration:**
-- Grid integration pricing (net metering, demand charges, time-of-use)
-- Mining pool optimization with fee and variance analysis
-- Advanced battery storage modeling with cycle life degradation
-- Risk and optimization parameters for portfolio management
-
-**Weather Data Enhancement:**
-- Plane of array irradiance calculations for tilted surfaces
-- Enhanced solar position algorithms with atmospheric modeling
-- Air quality factors affecting solar performance
-- Forecasting capabilities with confidence intervals
-
-#### Implementation Phases
-
-**Phase 1 - Foundation (Completed)**
-✅ Enhanced database schema with comprehensive data models  
-✅ API type definitions for advanced features  
-✅ Documentation of calculation methodologies  
-✅ User experience component architecture  
-
-**Phase 2 - Core Features (Next)**
-- Real-time data pipeline implementation
-- Basic Monte Carlo simulation engine
-- Hardware comparison and recommendation system
-- Configuration wizard with template library
-
-**Phase 3 - Advanced Analytics**
-- Full risk analysis suite with sensitivity testing
-- Equipment optimization algorithms
-- Environmental impact modeling
-- Professional reporting and export capabilities
-
-#### Unique Value Proposition
-
-Our enhanced calculator fills critical gaps in the current market:
-
-- **Only comprehensive solar-mining calculator**: Specialized for renewable energy applications
-- **Advanced risk modeling**: Professional-grade Monte Carlo analysis typically found only in enterprise tools
-- **Environmental factor integration**: Accounts for real-world performance impacts ignored by competitors
-- **Hardware optimization**: AI-powered equipment recommendations based on user constraints and objectives
-
-This positions us as the definitive tool for renewable energy Bitcoin mining analysis, serving everyone from individual enthusiasts to commercial mining operations planning solar-powered facilities.
 
 ---
 

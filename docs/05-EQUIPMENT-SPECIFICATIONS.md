@@ -2,39 +2,27 @@
 
 ## Overview
 
-This document defines the comprehensive equipment specifications and standards used in the Solar Bitcoin Mining Calculator. The system supports a wide range of equipment types with detailed technical specifications, performance characteristics, and economic parameters.
+This document defines the equipment specifications and standards used in the Solar Bitcoin Mining Calculator. The system supports essential equipment types with core technical specifications, performance characteristics, and economic parameters.
 
 ## Equipment Categories
 
 ```
 Equipment Hierarchy:
 ├── Power Generation Equipment
-│   ├── Solar Panels (Photovoltaic Systems)
-│   ├── Wind Turbines (Small-scale & Micro)
-│   ├── Micro-Hydroelectric Generators
-│   ├── Grid Connections (Utility Power)
-│   └── Custom Power Sources (User-defined)
+│   └── Solar Panels (Photovoltaic Systems)
 ├── Energy Storage Equipment
-│   ├── Lithium-ion Battery Systems
-│   ├── LiFePO4 Battery Systems
-│   ├── Lead-acid Battery Systems
-│   └── Alternative Storage Technologies
+│   └── Battery Storage Systems
 ├── Mining Equipment
-│   ├── SHA-256 ASIC Miners
-│   ├── Cooling Systems
-│   └── Power Distribution Units
+│   └── SHA-256 ASIC Miners
 └── System Components
-    ├── Inverters (DC/AC Conversion)
-    ├── Charge Controllers (Solar/Wind)
-    ├── Monitoring Equipment
-    └── Safety & Protection Systems
+    └── Basic Inverters (DC/AC Conversion)
 ```
 
 ## 1. SOLAR PANEL SPECIFICATIONS
 
 ### 1.1 Standard Solar Panel Models
 
-The system includes comprehensive specifications for current and historical solar panel models from major manufacturers.
+The system includes specifications for current solar panel models from major manufacturers.
 
 #### Tier 1 Manufacturers (Premium)
 ```json
@@ -55,7 +43,7 @@ The system includes comprehensive specifications for current and historical sola
 #### Example: High-Efficiency Monocrystalline Panel
 ```json
 {
-  "id": 15,
+  "id": 1,
   "manufacturer": "SunPower",
   "model_name": "Maxeon 3 400W",
   "technology": "Monocrystalline",
@@ -65,37 +53,27 @@ The system includes comprehensive specifications for current and historical sola
     "temperature_coefficient": -0.29,
     "degradation_rate_annual": 0.25,
     "voltage_mpp": 67.8,
-    "current_mpp": 5.90,
-    "voltage_oc": 78.2,
-    "current_sc": 6.46,
-    "max_system_voltage": 1500,
-    "fire_rating": "Class A",
-    "wind_load": 2400,
-    "snow_load": 5400
+    "current_mpp": 5.90
   },
   "physical": {
     "length_mm": 1690,
     "width_mm": 1046,
     "thickness_mm": 40,
-    "weight_kg": 20.6,
-    "frame_material": "Anodized Aluminum",
-    "glass_type": "Anti-reflective Tempered Glass"
+    "weight_kg": 20.6
   },
   "economic": {
     "cost_per_unit": 280.00,
     "cost_per_watt": 0.70,
-    "availability": "In Stock",
     "warranty_power": 25,
     "warranty_product": 25
-  },
-  "certifications": ["IEC 61215", "IEC 61730", "UL 1703", "CEC Listed"]
+  }
 }
 ```
 
 #### Example: Cost-Effective Polycrystalline Panel
 ```json
 {
-  "id": 16,
+  "id": 2,
   "manufacturer": "Canadian Solar",
   "model_name": "CS3W-400P",
   "technology": "Polycrystalline",
@@ -105,9 +83,7 @@ The system includes comprehensive specifications for current and historical sola
     "temperature_coefficient": -0.38,
     "degradation_rate_annual": 0.50,
     "voltage_mpp": 40.1,
-    "current_mpp": 9.98,
-    "voltage_oc": 48.4,
-    "current_sc": 10.58
+    "current_mpp": 9.98
   },
   "physical": {
     "length_mm": 2000,
@@ -124,205 +100,55 @@ The system includes comprehensive specifications for current and historical sola
 }
 ```
 
-### 1.2 Specialized Solar Technologies
+## 2. BITCOIN MINER SPECIFICATIONS
 
-#### Bifacial Solar Panels
+### 2.1 Current Generation ASIC Miners (2024)
+
+#### High Efficiency Models
 ```json
 {
-  "technology_type": "Bifacial Monocrystalline",
-  "bifacial_factor": 0.70,
-  "additional_yield": 0.15,
-  "mounting_requirements": "Elevated mounting for rear-side illumination",
-  "cost_premium": 0.15
-}
-```
-
-#### Building-Integrated Photovoltaics (BIPV)
-```json
-{
-  "technology_type": "BIPV Roof Tiles",
-  "integration_factor": "Replaces traditional roofing material",
-  "installation_complexity": "High",
-  "aesthetic_rating": "Excellent",
-  "cost_premium": 2.5
-}
-```
-
-## 2. WIND TURBINE SPECIFICATIONS
-
-### 2.1 Small Wind Turbines (Under 100kW)
-
-#### Horizontal Axis Wind Turbines
-```json
-{
-  "id": 3,
-  "manufacturer": "Bergey",
-  "model_name": "Excel 10",
-  "technology": "Horizontal Axis",
-  "specifications": {
-    "rated_power_w": 10000,
-    "cut_in_speed_ms": 2.5,
-    "rated_speed_ms": 11.0,
-    "cut_out_speed_ms": 20.0,
-    "rotor_diameter_m": 7.0,
-    "swept_area_m2": 38.5,
-    "power_curve": [
-      {"wind_speed": 2.5, "power": 0},
-      {"wind_speed": 5.0, "power": 500},
-      {"wind_speed": 7.5, "power": 2500},
-      {"wind_speed": 10.0, "power": 7500},
-      {"wind_speed": 11.0, "power": 10000},
-      {"wind_speed": 15.0, "power": 10000},
-      {"wind_speed": 20.0, "power": 0}
-    ]
-  },
-  "physical": {
-    "hub_height_options": [18, 24, 30, 37],
-    "weight_turbine_kg": 545,
-    "weight_tower_kg": 1500,
-    "foundation_requirements": "Concrete pad 3m x 3m x 1.5m deep"
-  },
-  "economic": {
-    "cost_turbine": 45000,
-    "cost_tower": 15000,
-    "cost_installation": 25000,
-    "warranty_years": 5,
-    "expected_lifespan": 20
-  }
-}
-```
-
-#### Vertical Axis Wind Turbines
-```json
-{
-  "id": 4,
-  "manufacturer": "Urban Green Energy",
-  "model_name": "VisionAIR3",
-  "technology": "Vertical Axis (Helical)",
-  "specifications": {
-    "rated_power_w": 3200,
-    "cut_in_speed_ms": 2.0,
-    "rated_speed_ms": 11.0,
-    "height_m": 2.7,
-    "diameter_m": 1.8,
-    "noise_level_db": 38,
-    "turbulence_tolerance": "High"
-  },
-  "features": [
-    "Low noise operation",
-    "Handles turbulent wind well",
-    "Compact installation footprint",
-    "No wind direction tracking needed"
-  ],
-  "economic": {
-    "cost_per_unit": 18000,
-    "installation_cost": 5000,
-    "maintenance_cost_annual": 500
-  }
-}
-```
-
-### 2.2 Wind Resource Assessment
-
-#### Wind Speed Classifications
-```json
-{
-  "wind_classes": {
-    "Class_1": {
-      "avg_wind_speed_ms": 4.5,
-      "avg_power_density": 200,
-      "suitability": "Poor - Not recommended"
-    },
-    "Class_2": {
-      "avg_wind_speed_ms": 5.5,
-      "avg_power_density": 300,
-      "suitability": "Marginal - Small turbines only"
-    },
-    "Class_3": {
-      "avg_wind_speed_ms": 6.5,
-      "avg_power_density": 400,
-      "suitability": "Fair - Good for small turbines"
-    },
-    "Class_4": {
-      "avg_wind_speed_ms": 7.5,
-      "avg_power_density": 500,
-      "suitability": "Good - Suitable for most turbines"
-    },
-    "Class_5": {
-      "avg_wind_speed_ms": 8.5,
-      "avg_power_density": 600,
-      "suitability": "Excellent - Optimal for all turbines"
-    }
-  }
-}
-```
-
-## 3. BITCOIN MINER SPECIFICATIONS
-
-### 3.1 Current Generation ASIC Miners (2024)
-
-#### Flagship Models - High Efficiency
-```json
-{
-  "id": 8,
+  "id": 1,
   "manufacturer": "Bitmain",
-  "model_name": "Antminer S19 XP",
+  "model_name": "Antminer S19 Pro",
   "generation": "7nm",
-  "release_date": "2022-07-15",
+  "release_date": "2021-03-15",
   "performance": {
-    "hashrate_th": 140.0,
-    "power_consumption_w": 3010,
-    "efficiency_j_th": 21.5
+    "hashrate_th": 110.0,
+    "power_consumption_w": 3250,
+    "efficiency_j_th": 29.5
   },
   "degradation_model": {
-    "hashrate_degradation_annual": 0.04,
-    "efficiency_degradation_annual": 0.025,
-    "failure_rate_annual": 0.08,
-    "performance_curve": {
-      "months": [0, 6, 12, 18, 24, 30, 36, 42, 48],
-      "hashrate_retention": [1.00, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84],
-      "efficiency_retention": [1.00, 0.99, 0.98, 0.97, 0.95, 0.94, 0.92, 0.90, 0.88]
-    }
+    "hashrate_degradation_annual": 0.05,
+    "efficiency_degradation_annual": 0.03,
+    "failure_rate_annual": 0.10
   },
   "environmental": {
     "operating_temp_min": 5,
-    "operating_temp_max": 45,
-    "humidity_max": 85,
-    "altitude_max": 2000,
-    "noise_level_db": 75
+    "operating_temp_max": 40,
+    "humidity_max": 85
   },
   "physical": {
     "dimensions_l_mm": 400,
     "dimensions_w_mm": 195,
     "dimensions_h_mm": 290,
-    "weight_kg": 14.5,
-    "cooling_type": "Dual Fan Air Cooling"
+    "weight_kg": 13.2
   },
   "economic": {
-    "msrp_usd": 6000,
-    "current_price_usd": 3800,
+    "current_price_usd": 3500.00,
     "warranty_months": 36,
-    "expected_lifespan_years": 5,
-    "resale_value_curve": [1.0, 0.7, 0.5, 0.3, 0.15, 0.05]
+    "expected_lifespan_years": 5
   },
   "power_requirements": {
     "voltage_v": 220,
-    "power_connection": "C19 IEC Connector",
-    "power_factor": 0.93,
-    "startup_current_a": 25,
-    "power_efficiency_curve": [
-      {"load_percent": 50, "efficiency": 0.91},
-      {"load_percent": 75, "efficiency": 0.93},
-      {"load_percent": 100, "efficiency": 0.93}
-    ]
+    "power_connection": "C19 IEC Connector"
   }
 }
 ```
 
-#### Mid-Range Models - Balanced Performance
+#### Mid-Range Models
 ```json
 {
-  "id": 9,
+  "id": 2,
   "manufacturer": "MicroBT",
   "model_name": "WhatsMiner M30S++",
   "generation": "8nm",
@@ -332,16 +158,16 @@ The system includes comprehensive specifications for current and historical sola
     "efficiency_j_th": 31.0
   },
   "economic": {
-    "current_price_usd": 2500,
+    "current_price_usd": 2500.00,
     "value_proposition": "Good balance of price and performance"
   }
 }
 ```
 
-#### Budget Models - High Volume Operations
+#### Budget Models
 ```json
 {
-  "id": 10,
+  "id": 3,
   "manufacturer": "Canaan",
   "model_name": "AvalonMiner 1246",
   "generation": "7nm",
@@ -351,85 +177,20 @@ The system includes comprehensive specifications for current and historical sola
     "efficiency_j_th": 38.0
   },
   "economic": {
-    "current_price_usd": 1800,
+    "current_price_usd": 1800.00,
     "value_proposition": "Low upfront cost, suitable for low electricity rates"
   }
 }
 ```
 
-### 3.2 Immersion Cooling Miners
+## 3. ENERGY STORAGE SPECIFICATIONS
 
-```json
-{
-  "cooling_technology": "Immersion Cooling",
-  "cooling_fluid": "Dielectric Fluid (3M Novec or equivalent)",
-  "features": [
-    "Higher power density (up to 50kW/rack)",
-    "Improved efficiency (+3-5%)",
-    "Reduced noise (<40dB)",
-    "Better thermal management",
-    "Extended equipment lifespan"
-  ],
-  "infrastructure_requirements": {
-    "cooling_infrastructure": "Immersion tanks with heat exchangers",
-    "facility_modifications": "Reinforced flooring, spill containment",
-    "maintenance_complexity": "Specialized technician training required"
-  },
-  "cost_implications": {
-    "infrastructure_cost_premium": 2.0,
-    "operational_savings_annual": 0.15,
-    "maintenance_cost_reduction": 0.25
-  }
-}
-```
-
-### 3.3 Mining Performance Optimization
-
-#### Power Limiting and Overclocking
-```json
-{
-  "power_management": {
-    "power_limiting": {
-      "range_percent": [70, 100],
-      "efficiency_impact": "Linear improvement at lower power",
-      "hashrate_impact": "Near-linear reduction",
-      "longevity_impact": "Improved at <90% power"
-    },
-    "overclocking": {
-      "range_percent": [100, 120],
-      "efficiency_impact": "Degraded beyond 110%",
-      "failure_risk": "Exponentially increased beyond 115%",
-      "warranty_impact": "Voided if detected"
-    }
-  }
-}
-```
-
-#### Thermal Management
-```json
-{
-  "thermal_optimization": {
-    "optimal_intake_temp": 25,
-    "max_safe_temp": 85,
-    "thermal_throttling_start": 75,
-    "cooling_strategies": [
-      "Ambient air cooling",
-      "Evaporative cooling",
-      "Immersion cooling",
-      "Liquid cooling"
-    ]
-  }
-}
-```
-
-## 4. ENERGY STORAGE SPECIFICATIONS
-
-### 4.1 Lithium-ion Battery Systems
+### 3.1 Lithium-ion Battery Systems
 
 #### Tesla Powerwall (Residential Scale)
 ```json
 {
-  "id": 2,
+  "id": 1,
   "manufacturer": "Tesla",
   "model_name": "Powerwall 2",
   "technology": "Li-ion NMC",
@@ -444,23 +205,17 @@ The system includes comprehensive specifications for current and historical sola
   },
   "degradation_model": {
     "cycle_life": 6000,
-    "calendar_degradation_annual": 0.02,
-    "capacity_retention_curve": {
-      "cycles": [0, 1000, 2000, 3000, 4000, 5000, 6000],
-      "capacity_retention": [1.00, 0.95, 0.92, 0.88, 0.85, 0.82, 0.80]
-    }
+    "calendar_degradation_annual": 0.02
   },
   "economic": {
     "cost_per_unit": 11500,
     "cost_per_kwh": 852,
     "installation_cost": 2000,
-    "warranty_years": 10,
-    "warranty_cycles": 37800
+    "warranty_years": 10
   },
   "integration": {
     "inverter_included": true,
-    "monitoring_system": "Tesla app",
-    "grid_services": ["Load shifting", "Backup power", "Grid stabilization"]
+    "monitoring_system": "Tesla app"
   }
 }
 ```
@@ -468,7 +223,7 @@ The system includes comprehensive specifications for current and historical sola
 #### Commercial LiFePO4 System
 ```json
 {
-  "id": 3,
+  "id": 2,
   "manufacturer": "BYD",
   "model_name": "B-Box Pro 13.8",
   "technology": "LiFePO4",
@@ -482,11 +237,7 @@ The system includes comprehensive specifications for current and historical sola
   },
   "degradation_model": {
     "cycle_life": 10000,
-    "calendar_degradation_annual": 0.015,
-    "temperature_acceleration": {
-      "base_temp": 25,
-      "degradation_doubling_temp": 10
-    }
+    "calendar_degradation_annual": 0.015
   },
   "features": [
     "Longer cycle life than Li-ion",
@@ -502,30 +253,9 @@ The system includes comprehensive specifications for current and historical sola
 }
 ```
 
-### 4.2 Battery Management and Safety
+## 4. SYSTEM INTEGRATION COMPONENTS
 
-#### Battery Management System (BMS) Requirements
-```json
-{
-  "bms_features": {
-    "cell_monitoring": "Individual cell voltage and temperature",
-    "balancing": "Active or passive cell balancing",
-    "protection": "Overcurrent, overvoltage, thermal protection",
-    "communication": "CAN bus, Modbus, or proprietary protocols",
-    "safety_systems": "Emergency disconnect, fire suppression integration"
-  },
-  "safety_standards": [
-    "UL 9540 (Energy Storage Systems)",
-    "IEC 62933 (Electrical Energy Storage Systems)",
-    "NFPA 855 (Energy Storage Systems)",
-    "UL 1973 (Batteries for Use in Stationary Applications)"
-  ]
-}
-```
-
-## 5. SYSTEM INTEGRATION COMPONENTS
-
-### 5.1 Inverters and Power Electronics
+### 4.1 Basic Inverters
 
 #### String Inverters (Residential/Small Commercial)
 ```json
@@ -548,51 +278,9 @@ The system includes comprehensive specifications for current and historical sola
 }
 ```
 
-#### Power Optimizers
-```json
-{
-  "type": "Power Optimizer",
-  "application": "Module-level power electronics",
-  "benefits": [
-    "Individual panel MPPT",
-    "Shade mitigation",
-    "Module-level monitoring",
-    "Enhanced safety (module-level shutdown)"
-  ],
-  "cost_impact": {
-    "equipment_cost_increase": 0.15,
-    "performance_gain": 0.08,
-    "monitoring_value": "High"
-  }
-}
-```
+## 5. EQUIPMENT SELECTION GUIDELINES
 
-### 5.2 Monitoring and Control Systems
-
-#### Production Monitoring
-```json
-{
-  "monitoring_levels": {
-    "system_level": {
-      "metrics": ["Total power", "Energy production", "System efficiency"],
-      "update_frequency": "Real-time (1-5 minutes)"
-    },
-    "string_level": {
-      "metrics": ["String current", "String voltage", "String power"],
-      "diagnostic_value": "Medium"
-    },
-    "module_level": {
-      "metrics": ["Individual panel performance", "Hot spot detection"],
-      "diagnostic_value": "High",
-      "cost_premium": "Significant"
-    }
-  }
-}
-```
-
-## 6. EQUIPMENT SELECTION GUIDELINES
-
-### 6.1 Solar System Sizing
+### 5.1 Solar System Sizing
 
 #### Basic Sizing Methodology
 ```json
@@ -622,7 +310,7 @@ The system includes comprehensive specifications for current and historical sola
 }
 ```
 
-### 6.2 Equipment Compatibility Matrix
+### 5.2 Equipment Compatibility Matrix
 
 #### Solar Panel + Inverter Compatibility
 ```json
@@ -644,9 +332,9 @@ The system includes comprehensive specifications for current and historical sola
 }
 ```
 
-## 7. COST MODELS AND ECONOMIC ANALYSIS
+## 6. COST MODELS AND ECONOMIC ANALYSIS
 
-### 7.1 Equipment Cost Trends
+### 6.1 Equipment Cost Trends
 
 #### Historical Cost Trends (2019-2024)
 ```json
@@ -672,7 +360,7 @@ The system includes comprehensive specifications for current and historical sola
 }
 ```
 
-### 7.2 Total Cost of Ownership Models
+### 6.2 Total Cost of Ownership Models
 
 #### Solar System TCO Components
 ```json
@@ -696,9 +384,9 @@ The system includes comprehensive specifications for current and historical sola
 }
 ```
 
-## 8. PERFORMANCE BENCHMARKS
+## 7. PERFORMANCE BENCHMARKS
 
-### 8.1 Industry Performance Standards
+### 7.1 Industry Performance Standards
 
 #### Solar System Performance Ratios
 ```json
@@ -749,6 +437,48 @@ The system includes comprehensive specifications for current and historical sola
 
 ---
 
-**Document Status**: Draft v1.0  
-**Last Updated**: 2024-08-11  
-**Next Review**: After user interface documentation
+## Future Implementation
+
+### Advanced Equipment Features (Planned for Later Phases)
+
+#### Advanced Solar Technologies
+- Bifacial solar panels
+- Building-integrated photovoltaics (BIPV)
+- Solar tracking systems
+- Concentrated solar power
+
+#### Wind Power Integration
+- Small wind turbines
+- Hybrid solar-wind systems
+- Wind resource assessment
+- Micro-hydroelectric systems
+
+#### Advanced Mining Equipment
+- Immersion cooling systems
+- Liquid cooling solutions
+- Advanced thermal management
+- Power optimization features
+
+#### Enhanced Storage Systems
+- Flow batteries
+- Compressed air storage
+- Hydrogen storage systems
+- Advanced battery chemistries
+
+#### Smart Grid Integration
+- Demand response systems
+- Grid services participation
+- Advanced monitoring systems
+- Predictive maintenance
+
+#### Equipment Performance Tracking
+- Real-time performance monitoring
+- Predictive failure analysis
+- Performance optimization algorithms
+- Automated maintenance scheduling
+
+---
+
+**Document Status**: Current Plan v1.0  
+**Last Updated**: 2024-12-19  
+**Next Review**: After Phase 1 implementation
