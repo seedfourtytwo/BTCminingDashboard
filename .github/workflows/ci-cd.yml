@@ -1,11 +1,11 @@
 name: CI/CD Pipeline
 
-# Triggers: Run on pull requests and pushes to main/develop branches
+# Triggers: Run on pull requests and pushes to any branch
 on:
   pull_request:
     branches: [main, develop]
   push:
-    branches: [main, develop]
+    branches-ignore: []  # Run on all branches
 
 # Environment variables available to all jobs
 env:
@@ -102,7 +102,7 @@ jobs:
             .wrangler/
           retention-days: 7
 
-  # Job 3: Deploy to Staging - Only on PRs or non-main branches
+  # Job 3: Deploy to Staging - Runs on any branch except main
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
