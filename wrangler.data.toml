@@ -64,10 +64,11 @@ WEATHER_API_BASE_URL = "https://api.openweathermap.org/data/2.5"
 SOLAR_API_BASE_URL = "https://developer.nrel.gov/api/solar"
 BLOCKCHAIN_API_BASE_URL = "https://blockstream.info/api"
 
-# Scheduled triggers for data updates
+# Scheduled triggers for data updates (PRODUCTION ONLY)
 # Note: Equipment database updates moved to manual user-triggered updates
-# to stay under Cloudflare's 5 cron trigger limit (3 prod + 2 staging = 5 total)
-[triggers]
+# Staging: No cron triggers (for development/testing)
+# Production: 2 cron triggers (Bitcoin updates + Weather refresh)
+[env.production.triggers]
 crons = [
   "0 */6 * * *",  # Every 6 hours - Bitcoin price updates
   "0 12 * * 1"    # Weekly Monday noon - Weather data refresh

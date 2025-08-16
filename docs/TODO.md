@@ -142,6 +142,8 @@
 - [ ] **Weather API integration** - OpenWeatherMap for environmental data
 - [ ] **Solar irradiance data** - NREL API or similar for solar resource data
 - [ ] **Manual equipment updates** - User-triggered equipment price/spec updates (replaces daily cron trigger)
+- [ ] **Manual Bitcoin data updates** - User-triggered Bitcoin price/network data updates (complements 6h cron)
+- [ ] **Manual weather data updates** - User-triggered weather/solar data updates (complements weekly cron)
 - [ ] **API rate limiting** - Implement proper rate limiting and caching
 
 #### 14. Data Management & Caching

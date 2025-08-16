@@ -5,6 +5,11 @@
 The Solar Bitcoin Mining Calculator provides a REST API built on Cloudflare Workers for managing equipment, configurations, and basic projections. The API follows RESTful principles and returns JSON responses.
 
 > **Note**: Equipment database updates (miner prices, solar panel specs, etc.) are handled via manual user-triggered API calls rather than automated cron jobs to stay within Cloudflare's 5 cron trigger limit. Users can update equipment data on-demand through the UI.
+>
+> **Cron Trigger Strategy**: 
+> - **Staging**: No cron triggers (for development/testing)
+> - **Production**: 2 cron triggers (Bitcoin updates every 6h, Weather updates weekly)
+> - **Future**: Manual update buttons for on-demand data refresh (Bitcoin, Weather, Equipment)
 
 ## Base Configuration
 
