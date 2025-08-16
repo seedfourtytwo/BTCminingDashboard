@@ -41,10 +41,10 @@ try {
         systemId: systemId,
         calculatedGeneration: solarGeneration,
         maxCapacity: maxCapacity,
-        params: params
+        params: params,
       },
       severityLevel: 'error',
-      userAction: 'Running solar generation calculation'
+      userAction: 'Running solar generation calculation',
     });
   }
 } catch (error) {
@@ -56,7 +56,7 @@ try {
     errorContext: { params: params },
     severityLevel: 'critical',
     stackTrace: error.stack,
-    userAction: 'Solar generation calculation'
+    userAction: 'Solar generation calculation',
   });
 }
 ```
@@ -75,10 +75,10 @@ if (hashrate < 0) {
       field: 'hashrate_th',
       value: hashrate,
       table: 'miner_models',
-      formData: formData
+      formData: formData,
     },
     severityLevel: 'warning',
-    userAction: 'Adding new miner to inventory'
+    userAction: 'Adding new miner to inventory',
   });
   throw new ValidationError('Invalid hashrate value');
 }
@@ -101,10 +101,10 @@ try {
         table: 'system_configs',
         constraint: 'fk_location_id',
         data: configData,
-        errorCode: error.code
+        errorCode: error.code,
       },
       severityLevel: 'error',
-      userAction: 'Creating new system configuration'
+      userAction: 'Creating new system configuration',
     });
   }
 }
@@ -125,10 +125,10 @@ try {
     errorContext: {
       apiEndpoint: 'https://api.coingecko.com/v3/simple/price',
       errorCode: error.status,
-      responseText: error.responseText
+      responseText: error.responseText,
     },
     severityLevel: 'error',
-    userAction: 'Fetching current Bitcoin price'
+    userAction: 'Fetching current Bitcoin price',
   });
 }
 ```
@@ -136,24 +136,28 @@ try {
 ## Error Categories Reference
 
 ### Calculation Errors
+
 - `solar_calc` - Solar generation calculations
 - `mining_calc` - Mining performance calculations
 - `economic_calc` - Financial and ROI calculations
 - `weather_calc` - Weather impact calculations
 
 ### Validation Errors
+
 - `user_input` - User data validation
 - `equipment_specs` - Equipment specification validation
 - `system_config` - System configuration validation
 - `scenario_params` - Scenario parameter validation
 
 ### System Errors
+
 - `database` - Database connection and constraint errors
 - `memory` - Memory usage and performance errors
 - `timeout` - Request timeout errors
 - `file_system` - File system errors
 
 ### API Errors
+
 - `external_api` - External API integration errors
 - `rate_limit` - API rate limiting errors
 - `network` - Network connectivity errors
@@ -162,21 +166,25 @@ try {
 ## Severity Levels
 
 ### `info`
+
 - Informational messages
 - Normal operation notes
 - Debug information
 
 ### `warning`
+
 - Non-critical issues
 - Potential problems
 - Deprecated feature usage
 
 ### `error`
+
 - Standard errors
 - Issues that need attention
 - Failed operations
 
 ### `critical`
+
 - Severe errors
 - System failures
 - Data corruption issues
@@ -184,36 +192,40 @@ try {
 ## Querying Error Logs
 
 ### Recent Errors by User
+
 ```sql
-SELECT * FROM application_errors 
-WHERE user_id = ? 
-ORDER BY created_at DESC 
+SELECT * FROM application_errors
+WHERE user_id = ?
+ORDER BY created_at DESC
 LIMIT 50;
 ```
 
 ### Errors by Category
+
 ```sql
-SELECT error_category, COUNT(*) as error_count 
-FROM application_errors 
+SELECT error_category, COUNT(*) as error_count
+FROM application_errors
 WHERE created_at > datetime('now', '-7 days')
-GROUP BY error_category 
+GROUP BY error_category
 ORDER BY error_count DESC;
 ```
 
 ### Critical Errors
+
 ```sql
-SELECT * FROM application_errors 
-WHERE severity_level = 'critical' 
+SELECT * FROM application_errors
+WHERE severity_level = 'critical'
 ORDER BY created_at DESC;
 ```
 
 ### Error Trends
+
 ```sql
-SELECT 
+SELECT
     DATE(created_at) as error_date,
     error_type,
     COUNT(*) as error_count
-FROM application_errors 
+FROM application_errors
 WHERE created_at > datetime('now', '-30 days')
 GROUP BY DATE(created_at), error_type
 ORDER BY error_date DESC;
@@ -222,6 +234,7 @@ ORDER BY error_date DESC;
 ## Cleanup and Maintenance
 
 ### Automatic Cleanup
+
 The system includes a cleanup function to remove old error logs:
 
 ```sql
@@ -230,20 +243,22 @@ SELECT cleanup_old_errors();
 ```
 
 ### Manual Cleanup
+
 ```sql
 -- Remove errors older than 7 days
-DELETE FROM application_errors 
+DELETE FROM application_errors
 WHERE created_at < datetime('now', '-7 days');
 
 -- Remove specific error types
-DELETE FROM application_errors 
-WHERE error_type = 'info' 
+DELETE FROM application_errors
+WHERE error_type = 'info'
 AND created_at < datetime('now', '-1 day');
 ```
 
 ## Best Practices
 
 ### 1. Log Meaningful Context
+
 ```typescript
 // Good: Include relevant data
 errorContext: {
@@ -258,30 +273,33 @@ errorContext: { error: 'something went wrong' }
 ```
 
 ### 2. Use Appropriate Severity Levels
+
 ```typescript
 // Critical: System failure
-severityLevel: 'critical'
+severityLevel: 'critical';
 
 // Error: Operation failed
-severityLevel: 'error'
+severityLevel: 'error';
 
 // Warning: Potential issue
-severityLevel: 'warning'
+severityLevel: 'warning';
 
 // Info: Normal operation
-severityLevel: 'info'
+severityLevel: 'info';
 ```
 
 ### 3. Include User Action Context
+
 ```typescript
 // Good: Specific user action
-userAction: 'Creating new system configuration with 2 miners'
+userAction: 'Creating new system configuration with 2 miners';
 
 // Bad: Too generic
-userAction: 'User action'
+userAction: 'User action';
 ```
 
 ### 4. Handle Sensitive Data
+
 ```typescript
 // Don't log sensitive information
 errorContext: {
@@ -295,6 +313,7 @@ errorContext: {
 ## Integration with Application
 
 ### Error Logging Service
+
 ```typescript
 class ErrorLoggingService {
   async logError(params: {
@@ -315,15 +334,16 @@ class ErrorLoggingService {
 ```
 
 ### Global Error Handler
+
 ```typescript
 // Global error handler for uncaught exceptions
-process.on('uncaughtException', async (error) => {
+process.on('uncaughtException', async error => {
   await logError({
     errorType: 'system',
     errorCategory: 'uncaught_exception',
     errorMessage: error.message,
     severityLevel: 'critical',
-    stackTrace: error.stack
+    stackTrace: error.stack,
   });
 });
 ```

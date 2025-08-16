@@ -7,9 +7,11 @@ The database schema has been split into 5 logical migrations for better deployme
 ## Migration Files
 
 ### 0001_core_foundation.sql (238 lines)
+
 **Purpose**: Core foundation tables and user management
 **Dependencies**: None
 **Tables**:
+
 - `users` - User accounts and authentication
 - `locations` - Geographic locations for solar calculations
 - `miner_models` - ASIC miner specifications
@@ -18,27 +20,33 @@ The database schema has been split into 5 logical migrations for better deployme
 - `inverter_models` - Solar inverter specifications
 
 **Features**:
+
 - User management system (multi-user ready)
 - Equipment inventory tables with user fields
 - Core performance indexes
 - User data isolation indexes
 
 ### 0002_system_configuration.sql (147 lines)
+
 **Purpose**: System configurations and JSON validation
 **Dependencies**: 0001_core_foundation.sql
 **Tables**:
+
 - `system_configs` - User system configurations
 
 **Features**:
+
 - JSON-based equipment configuration
 - JSON validation constraints
 - Helper functions for capacity calculations
 - System configuration indexes
 
 ### 0003_external_data.sql (271 lines)
+
 **Purpose**: External data integration and API management
 **Dependencies**: 0001_core_foundation.sql
 **Tables**:
+
 - `bitcoin_network_data` - Bitcoin network statistics
 - `bitcoin_price_data` - Bitcoin price data
 - `monthly_solar_data` - Monthly solar resource data
@@ -48,6 +56,7 @@ The database schema has been split into 5 logical migrations for better deployme
 - `api_errors` - API error logging
 
 **Features**:
+
 - External API data tables
 - API management and monitoring
 - Data freshness tracking
@@ -55,13 +64,16 @@ The database schema has been split into 5 logical migrations for better deployme
 - Performance indexes for all data types
 
 ### 0004_projections_scenarios.sql (191 lines)
+
 **Purpose**: Projection scenarios and results
 **Dependencies**: 0001_core_foundation.sql, 0002_system_configuration.sql
 **Tables**:
+
 - `projection_scenarios` - Custom scenario parameters
 - `projection_results` - Calculated projection results
 
 **Features**:
+
 - Scenario-based "what-if" analysis
 - JSON parameter overrides
 - Comprehensive financial metrics
@@ -69,23 +81,29 @@ The database schema has been split into 5 logical migrations for better deployme
 - Projection performance indexes
 
 ### 0005_historical_data.sql (35 lines)
+
 **Purpose**: Historical data tracking
 **Dependencies**: 0001_core_foundation.sql
 **Tables**:
+
 - `miner_price_history` - Equipment value tracking
 
 **Features**:
+
 - Historical price tracking
 - Depreciation monitoring
 - Market demand analysis
 
 ### 0006_error_handling.sql (75 lines)
+
 **Purpose**: Application error logging and debugging
 **Dependencies**: 0001_core_foundation.sql
 **Tables**:
+
 - `application_errors` - Error logging and monitoring
 
 **Features**:
+
 - Comprehensive error tracking
 - Error categorization and severity levels
 - Context and stack trace logging
@@ -95,11 +113,13 @@ The database schema has been split into 5 logical migrations for better deployme
 ## Deployment Strategy
 
 ### Development Environment
+
 - Run migrations in order: 0001 → 0002 → 0003 → 0004 → 0005 → 0006
 - Each migration is self-contained and can be tested independently
 - Rollback is easier with smaller migrations
 
 ### Production Deployment
+
 1. **Test each migration individually** in staging
 2. **Deploy in sequence** to ensure dependencies are met
 3. **Monitor each migration** for any issues
@@ -108,16 +128,19 @@ The database schema has been split into 5 logical migrations for better deployme
 ### Migration Benefits
 
 **Safety**:
+
 - Smaller migrations reduce timeout risk
 - Easier to identify which migration failed
 - Safer rollback process
 
 **Maintainability**:
+
 - Logical separation of concerns
 - Easier to understand and modify
 - Better team collaboration
 
 **Testing**:
+
 - Can test each migration independently
 - Easier to debug issues
 - Better development workflow
@@ -136,6 +159,7 @@ The database schema has been split into 5 logical migrations for better deployme
 ## Rollback Strategy
 
 If a migration fails:
+
 1. **Identify the failing migration**
 2. **Rollback the specific migration** (if possible)
 3. **Fix the issue** in the migration file
