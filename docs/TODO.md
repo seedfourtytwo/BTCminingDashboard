@@ -5,7 +5,8 @@
 ### Infrastructure & Setup
 - [x] **Project initialization** - React + TypeScript + Vite setup
 - [x] **Cloudflare Workers configuration** - API, Calculations, and Data workers
-- [x] **Database setup** - Cloudflare D1 with simplified schema
+- [x] **Database setup** - Cloudflare D1 with consolidated schema
+- [x] **Database consolidation** - Merged 7 migrations into comprehensive schema
 - [x] **CI/CD pipeline** - GitHub Actions for automated deployment
 - [x] **Environment configuration** - Development and production environments
 - [x] **GitHub secrets** - API keys and deployment credentials

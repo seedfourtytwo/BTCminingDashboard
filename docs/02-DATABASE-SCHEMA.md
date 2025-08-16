@@ -1,245 +1,327 @@
-# Database Schema - Solar Bitcoin Mining Calculator (Simplified)
+# Database Schema - Solar Bitcoin Mining Calculator (Final)
 
 ## Schema Overview
 
-The database is organized into four main categories of tables, each serving a specific purpose in the solar mining calculation system:
+The database is organized into six logical migrations, each serving a specific purpose in the solar mining calculation system:
 
-1. **Reference Data Tables**: Essential equipment specifications
-2. **Time-Series Data Tables**: Current Bitcoin and environmental data
-3. **Configuration Tables**: User-defined system setups
-4. **Results Tables**: Calculated projections
+1. **Core Foundation**: User management and equipment specifications
+2. **System Configuration**: User-defined system setups with JSON flexibility
+3. **External Data**: Bitcoin and environmental data with API management
+4. **Projections & Scenarios**: Scenario-based analysis and results
+5. **Historical Data**: Equipment value tracking over time
+6. **Error Handling**: Application error logging and debugging
 
-## Table Categories and Relationships
+## Migration Structure
 
 ```
-REFERENCE DATA (Essential Specifications)
-├── locations
-├── miner_models
-├── solar_panel_models
-└── storage_models
+MIGRATION 0001: Core Foundation
+├── users (user management)
+├── locations (geographic data)
+├── miner_models (ASIC specifications)
+├── solar_panel_models (solar panel specs)
+├── storage_models (battery storage specs)
+└── inverter_models (inverter specifications)
 
-TIME-SERIES DATA (Current Data)
-├── bitcoin_network_data
-├── bitcoin_price_data
-└── environmental_data
+MIGRATION 0002: System Configuration
+├── system_configs (user system setups)
+├── JSON validation constraints
+└── Helper functions (capacity calculations)
 
-CONFIGURATION DATA (User-Defined)
-└── system_configs
+MIGRATION 0003: External Data
+├── bitcoin_network_data (network statistics)
+├── bitcoin_price_data (price information)
+├── monthly_solar_data (NREL API data)
+├── daily_forecast_data (weather forecasts)
+├── hourly_forecast_data (detailed forecasts)
+├── api_data_sources (API management)
+├── api_errors (API error tracking)
+└── Data validation constraints
 
-RESULTS DATA (Calculated)
-└── projection_results
+MIGRATION 0004: Projections & Scenarios
+├── projection_scenarios (what-if parameters)
+├── projection_results (calculated outcomes)
+└── Business analysis fields
+
+MIGRATION 0005: Historical Data
+└── miner_price_history (equipment value tracking)
+
+MIGRATION 0006: Error Handling
+├── application_errors (error logging)
+└── Error cleanup functions
 ```
+
+## Key Features
+
+- **Multi-User Ready**: User management system with data isolation
+- **Battery-Free Mining Support**: Grid-free, solar-only mining scenarios
+- **JSON-Based Flexibility**: Equipment configurations and scenario parameters
+- **Comprehensive Error Handling**: Application error logging and debugging
+- **API Data Management**: External data source tracking and monitoring
+- **Business Analysis**: ROI, payback, NPV, IRR, break-even analysis
+- **Equipment Value Tracking**: Depreciation models and resale value estimation
+- **Data Validation**: Comprehensive CHECK constraints and JSON validation
+- **Performance Optimization**: Extensive indexing for all query patterns
+- **Scenario-Based Projections**: Flexible "what-if" analysis with customizable parameters
 
 ## Detailed Table Specifications
 
-### 1. REFERENCE DATA TABLES
+### MIGRATION 0001: Core Foundation
 
-#### 1.1 locations
+#### users
+**Purpose**: User accounts for data isolation (multi-user ready)
+
+```sql
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    is_active BOOLEAN DEFAULT true,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### locations
 **Purpose**: Geographic locations for solar resource calculations
 
 ```sql
 CREATE TABLE locations (
     id INTEGER PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,              -- "San Francisco, CA"
-    latitude REAL NOT NULL,                  -- 37.7749 (decimal degrees)
-    longitude REAL NOT NULL,                 -- -122.4194 (decimal degrees)
-    elevation REAL NOT NULL,                 -- 16 (meters above sea level)
-    timezone VARCHAR(50) NOT NULL,           -- "America/Los_Angeles"
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    user_id INTEGER NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL,
+    elevation REAL NOT NULL,
+    timezone VARCHAR(50) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
 );
 ```
 
-#### 1.2 miner_models
+#### miner_models
 **Purpose**: Essential Bitcoin ASIC miner specifications
 
 ```sql
 CREATE TABLE miner_models (
     id INTEGER PRIMARY KEY,
-    manufacturer VARCHAR(50) NOT NULL,       -- "Bitmain", "MicroBT", "Canaan"
-    model_name VARCHAR(100) NOT NULL,        -- "Antminer S19 Pro", "WhatsMiner M30S++"
+    user_id INTEGER NOT NULL,
+    manufacturer VARCHAR(50) NOT NULL,
+    model_name VARCHAR(100) NOT NULL,
     
     -- Core Performance Specifications
-    hashrate_th REAL NOT NULL,              -- 110 (TH/s at optimal conditions)
-    power_consumption_w INTEGER NOT NULL,    -- 3250 (Watts at optimal conditions)
-    efficiency_j_th REAL NOT NULL,          -- 29.5 (J/TH at optimal conditions)
+    hashrate_th REAL NOT NULL,
+    power_consumption_w INTEGER NOT NULL,
+    efficiency_j_th REAL NOT NULL,
     
     -- Performance Degradation Model
-    hashrate_degradation_annual REAL DEFAULT 0.05,     -- 5% per year
-    efficiency_degradation_annual REAL DEFAULT 0.03,   -- 3% per year  
-    failure_rate_annual REAL DEFAULT 0.10,             -- 10% per year
+    hashrate_degradation_annual REAL DEFAULT 0.05,
+    efficiency_degradation_annual REAL DEFAULT 0.03,
+    failure_rate_annual REAL DEFAULT 0.10,
     
     -- Environmental Operating Limits
-    operating_temp_min INTEGER,             -- 5 (Celsius)
-    operating_temp_max INTEGER,             -- 40 (Celsius)
-    humidity_max INTEGER,                   -- 85 (percentage)
+    operating_temp_min INTEGER,
+    operating_temp_max INTEGER,
+    humidity_max INTEGER,
     
     -- Economic Data
-    current_price_usd REAL,                -- 3500 (Current Bitcoin price)
-    expected_lifespan_years REAL,          -- 5
+    current_price_usd REAL,
+    expected_lifespan_years REAL,
     
     -- Power Requirements
-    voltage_v INTEGER,                     -- 220
-    power_connection_type VARCHAR(20),     -- "C19", "C13", "Hardwired"
+    voltage_v INTEGER,
+    power_connection_type VARCHAR(20),
+    
+    -- User-Friendly Fields
+    user_nickname VARCHAR(100),
+    purchase_date DATE,
+    purchase_price_usd REAL,
+    warranty_expiry DATE,
+    notes TEXT,
+    
+    -- Price Depreciation Fields
+    estimated_resale_value_usd REAL,
+    depreciation_rate_annual REAL DEFAULT 0.25,
+    market_demand_factor REAL DEFAULT 1.0,
+    technology_obsolescence_factor REAL DEFAULT 1.0,
+    last_price_update_date DATE,
+    manual_price_override BOOLEAN DEFAULT false,
+    manual_current_price_usd REAL,
+    manual_price_notes TEXT,
     
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_manufacturer_model (manufacturer, model_name),
-    INDEX idx_efficiency (efficiency_j_th),
-    INDEX idx_hashrate (hashrate_th)
+    FOREIGN KEY(user_id) REFERENCES users(id)
 );
 ```
 
-#### 1.3 solar_panel_models
+#### solar_panel_models
 **Purpose**: Essential solar panel specifications
 
 ```sql
 CREATE TABLE solar_panel_models (
     id INTEGER PRIMARY KEY,
-    manufacturer VARCHAR(50) NOT NULL,       -- "Canadian Solar", "SunPower", "Panasonic"
-    model_name VARCHAR(100) NOT NULL,        -- "CS3W-400MS", "Maxeon 3 400W"
+    user_id INTEGER NOT NULL,
+    manufacturer VARCHAR(50) NOT NULL,
+    model_name VARCHAR(100) NOT NULL,
     
     -- Core Performance Specifications
-    rated_power_w INTEGER NOT NULL,         -- 400 (Watts at STC)
-    efficiency_percent REAL NOT NULL,       -- 20.5 (Efficiency percentage)
-    temperature_coefficient REAL NOT NULL,  -- -0.35 (%/°C)
+    rated_power_w INTEGER NOT NULL,
+    efficiency_percent REAL NOT NULL,
+    temperature_coefficient REAL NOT NULL,
     
     -- Degradation Model
-    degradation_rate_annual REAL DEFAULT 0.5, -- 0.5% per year
+    degradation_rate_annual REAL DEFAULT 0.5,
     
     -- Economic Data
-    cost_per_watt REAL,                     -- 0.45 (USD per watt)
-    expected_lifespan_years REAL,           -- 25
+    cost_per_watt REAL,
+    expected_lifespan_years REAL,
+    
+    -- User-Friendly Fields
+    user_nickname VARCHAR(100),
+    purchase_date DATE,
+    purchase_price_usd REAL,
+    installation_date DATE,
+    warranty_expiry DATE,
+    notes TEXT,
     
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_manufacturer_model (manufacturer, model_name),
-    INDEX idx_efficiency (efficiency_percent)
+    FOREIGN KEY(user_id) REFERENCES users(id)
 );
 ```
 
-#### 1.4 storage_models
+#### storage_models
 **Purpose**: Essential battery storage specifications
 
 ```sql
 CREATE TABLE storage_models (
     id INTEGER PRIMARY KEY,
-    manufacturer VARCHAR(50) NOT NULL,       -- "Tesla", "LG Chem", "BYD"
-    model_name VARCHAR(100) NOT NULL,        -- "Powerwall 2", "RESU 10H"
-    technology VARCHAR(20) NOT NULL,         -- "LiFePO4", "Li-ion"
+    user_id INTEGER NOT NULL,
+    manufacturer VARCHAR(50) NOT NULL,
+    model_name VARCHAR(100) NOT NULL,
+    technology VARCHAR(20) NOT NULL,
     
     -- Capacity & Performance
-    capacity_kwh REAL NOT NULL,             -- 13.5 (Total capacity)
-    usable_capacity_kwh REAL NOT NULL,      -- 13.5 (Usable capacity)
-    max_charge_rate_kw REAL NOT NULL,       -- 5 (Maximum charge rate)
-    max_discharge_rate_kw REAL NOT NULL,    -- 5 (Maximum discharge rate)
-    round_trip_efficiency REAL NOT NULL,    -- 0.90 (90% round-trip efficiency)
+    capacity_kwh REAL NOT NULL,
+    usable_capacity_kwh REAL NOT NULL,
+    max_charge_rate_kw REAL NOT NULL,
+    max_discharge_rate_kw REAL NOT NULL,
+    round_trip_efficiency REAL NOT NULL,
     
     -- Degradation Model
-    cycle_life INTEGER NOT NULL,            -- 6000 (Expected cycle life)
-    calendar_degradation_annual REAL DEFAULT 0.02, -- 2% per year
+    cycle_life INTEGER NOT NULL,
+    calendar_degradation_annual REAL DEFAULT 0.02,
     
     -- Economic Data
-    cost_per_kwh REAL,                      -- 500 (USD per kWh of capacity)
+    cost_per_kwh REAL,
+    
+    -- User-Friendly Fields
+    user_nickname VARCHAR(100),
+    purchase_date DATE,
+    purchase_price_usd REAL,
+    installation_date DATE,
+    warranty_expiry DATE,
+    notes TEXT,
     
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_manufacturer_model (manufacturer, model_name),
-    INDEX idx_capacity (capacity_kwh)
+    FOREIGN KEY(user_id) REFERENCES users(id)
 );
 ```
 
-### 2. TIME-SERIES DATA TABLES
-
-#### 2.1 bitcoin_network_data
-**Purpose**: Current Bitcoin network statistics
+#### inverter_models
+**Purpose**: Inverter specifications for solar system
 
 ```sql
-CREATE TABLE bitcoin_network_data (
+CREATE TABLE inverter_models (
     id INTEGER PRIMARY KEY,
-    recorded_date DATE NOT NULL,            -- 2024-08-11
-    difficulty BIGINT NOT NULL,             -- 90666502495565 (Current network difficulty)
-    network_hashrate REAL NOT NULL,        -- 650.5 (EH/s - Exahashes per second)
-    block_reward REAL NOT NULL,            -- 6.25 (BTC per block, includes halvings)
-    avg_block_time REAL NOT NULL,          -- 605 (seconds - average over 2016 blocks)
-    avg_transaction_fee REAL NOT NULL,     -- 0.0025 (BTC - average fee per transaction)
-    data_source VARCHAR(50) NOT NULL,      -- "blockchain.info", "blockstream.info"
+    user_id INTEGER NOT NULL,
+    manufacturer VARCHAR(50) NOT NULL,
+    model_name VARCHAR(100) NOT NULL,
+    
+    -- Core Specifications
+    rated_power_w INTEGER NOT NULL,
+    efficiency_percent REAL NOT NULL,
+    input_voltage_range VARCHAR(50) NOT NULL,
+    output_voltage_v INTEGER NOT NULL,
+    mppt_trackers INTEGER NOT NULL,
+    
+    -- Performance Characteristics
+    max_input_current_a REAL,
+    max_output_current_a REAL,
+    power_factor REAL DEFAULT 0.99,
+    
+    -- Environmental Specifications
+    operating_temp_min INTEGER,
+    operating_temp_max INTEGER,
+    humidity_max INTEGER,
+    
+    -- Economic Data
+    cost_usd REAL,
+    expected_lifespan_years REAL DEFAULT 15,
+    
+    -- User-Friendly Fields
+    user_nickname VARCHAR(100),
+    purchase_date DATE,
+    purchase_price_usd REAL,
+    installation_date DATE,
+    warranty_expiry DATE,
+    notes TEXT,
+    
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_date (recorded_date)
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
 );
 ```
 
-#### 2.2 bitcoin_price_data
-**Purpose**: Current Bitcoin price data
+### MIGRATION 0002: System Configuration
 
-```sql
-CREATE TABLE bitcoin_price_data (
-    id INTEGER PRIMARY KEY,
-    recorded_date DATE NOT NULL,            -- 2024-08-11
-    price_usd REAL NOT NULL,               -- 45250.50 (Closing price)
-    volume_24h REAL,                       -- 28500000000 (24h trading volume in USD)
-    data_source VARCHAR(50) NOT NULL,      -- "coingecko", "coinmarketcap"
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_date (recorded_date)
-);
-```
-
-#### 2.3 environmental_data
-**Purpose**: Current environmental data for power generation
-
-```sql
-CREATE TABLE environmental_data (
-    id INTEGER PRIMARY KEY,
-    location_id INTEGER NOT NULL,           -- References locations.id
-    recorded_date DATE NOT NULL,            -- 2024-08-11
-    
-    -- Solar Data
-    ghi_daily REAL,                        -- 6.2 (kWh/m²/day - Global Horizontal Irradiance)
-    dni_daily REAL,                        -- 7.8 (kWh/m²/day - Direct Normal Irradiance)
-    sun_hours REAL,                        -- 8.5 (hours of direct sunlight)
-    
-    -- Weather Conditions
-    temperature_avg REAL,                  -- 22.5 (Celsius - average temperature)
-    temperature_min REAL,                  -- 18.0 (Celsius - minimum temperature)
-    temperature_max REAL,                  -- 28.0 (Celsius - maximum temperature)
-    humidity_avg REAL,                     -- 65 (percentage - average humidity)
-    
-    data_source VARCHAR(50) NOT NULL,      -- "openweathermap", "nrel"
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(location_id) REFERENCES locations(id),
-    INDEX idx_location_date (location_id, recorded_date)
-);
-```
-
-### 3. CONFIGURATION DATA TABLES
-
-#### 3.1 system_configs
+#### system_configs
 **Purpose**: User-defined mining system configurations
 
 ```sql
 CREATE TABLE system_configs (
     id INTEGER PRIMARY KEY,
-    config_name VARCHAR(100) NOT NULL,      -- "My Solar Mining Rig"
-    description TEXT,                       -- User description of the configuration
-    location_id INTEGER NOT NULL,           -- References locations.id
+    user_id INTEGER NOT NULL,
+    config_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    location_id INTEGER NOT NULL,
     
     -- Power Generation Configuration
-    solar_panels JSON NOT NULL,             -- Array of solar panel configurations
-    storage_systems JSON,                   -- Array of battery system configurations
+    solar_panels JSON NOT NULL,
+    storage_systems JSON,
     
     -- Mining Equipment Configuration
-    miners JSON NOT NULL,                   -- Array of miner configurations
+    miners JSON NOT NULL,
     
     -- Economic Parameters
-    electricity_rate_usd_kwh REAL NOT NULL, -- 0.12 (Grid electricity rate)
-    net_metering_rate_usd_kwh REAL,         -- 0.08 (Grid export rate)
+    electricity_rate_usd_kwh REAL NOT NULL,
+    net_metering_rate_usd_kwh REAL,
+    
+    -- Battery-Free Mining Support
+    grid_connection_type VARCHAR(20) DEFAULT 'none',
+    mining_mode VARCHAR(20) DEFAULT 'solar_only',
+    max_grid_power_kw REAL DEFAULT 0,
+    mining_schedule JSON,
+    auto_calculate_hours BOOLEAN DEFAULT true,
+    manual_mining_hours_per_day REAL DEFAULT 0,
+    
+    -- Inverter Configuration
+    inverter_id INTEGER,
+    inverter_quantity INTEGER DEFAULT 1,
     
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(location_id) REFERENCES locations(id),
-    INDEX idx_config_name (config_name)
+    FOREIGN KEY(inverter_id) REFERENCES inverter_models(id)
 );
 ```
 
-**Example solar_panels JSON**:
+**JSON Schema Examples**:
+
+**solar_panels**:
 ```json
 [
   {
@@ -251,7 +333,7 @@ CREATE TABLE system_configs (
 ]
 ```
 
-**Example miners JSON**:
+**miners**:
 ```json
 [
   {
@@ -262,86 +344,566 @@ CREATE TABLE system_configs (
 ]
 ```
 
-### 4. RESULTS DATA TABLES
+**storage_systems**:
+```json
+[
+  {
+    "model_id": 3,
+    "quantity": 2
+  }
+]
+```
 
-#### 4.1 projection_results
+#### Helper Functions
+```sql
+-- Get total solar capacity for a system
+CREATE FUNCTION get_system_solar_capacity_w(system_id INTEGER) RETURNS REAL;
+
+-- Get total hashrate for a system
+CREATE FUNCTION get_system_total_hashrate_th(system_id INTEGER) RETURNS REAL;
+
+-- Get total mining power consumption
+CREATE FUNCTION get_system_mining_power_w(system_id INTEGER) RETURNS REAL;
+```
+
+### MIGRATION 0003: External Data
+
+#### bitcoin_network_data
+**Purpose**: Current Bitcoin network statistics
+
+```sql
+CREATE TABLE bitcoin_network_data (
+    id INTEGER PRIMARY KEY,
+    recorded_date DATE NOT NULL,
+    difficulty BIGINT NOT NULL,
+    network_hashrate REAL NOT NULL,
+    block_reward REAL NOT NULL,
+    avg_block_time REAL NOT NULL,
+    avg_transaction_fee REAL NOT NULL,
+    data_source VARCHAR(50) NOT NULL,
+    
+    -- Enhanced Network Data
+    avg_transaction_fee_sat_vb REAL,
+    mempool_size_mb REAL,
+    blocks_until_halving INTEGER,
+    next_difficulty_estimate BIGINT,
+    hashprice_usd_per_th REAL,
+    revenue_per_th_usd REAL,
+    profit_per_th_usd REAL,
+    
+    data_freshness_minutes INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### bitcoin_price_data
+**Purpose**: Current Bitcoin price data
+
+```sql
+CREATE TABLE bitcoin_price_data (
+    id INTEGER PRIMARY KEY,
+    recorded_date DATE NOT NULL,
+    price_usd REAL NOT NULL,
+    volume_24h REAL,
+    data_source VARCHAR(50) NOT NULL,
+    
+    -- Enhanced Price Data
+    market_cap_usd REAL,
+    volume_24h_usd REAL,
+    price_change_24h_percent REAL,
+    volatility_30d REAL,
+    price_change_7d_percent REAL,
+    price_change_30d_percent REAL,
+    
+    data_freshness_minutes INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### monthly_solar_data
+**Purpose**: Monthly solar resource data from NREL API
+
+```sql
+CREATE TABLE monthly_solar_data (
+    id INTEGER PRIMARY KEY,
+    location_id INTEGER NOT NULL,
+    year INTEGER NOT NULL,
+    month INTEGER NOT NULL,
+    
+    -- Monthly averages from NREL API
+    ghi_monthly_avg REAL,
+    dni_monthly_avg REAL,
+    sun_hours_monthly_avg REAL,
+    temperature_monthly_avg REAL,
+    
+    -- Enhanced environmental data
+    temperature_min_monthly_avg REAL,
+    temperature_max_monthly_avg REAL,
+    humidity_monthly_avg REAL,
+    atmospheric_pressure_monthly_avg REAL,
+    
+    -- Derived seasonal classification
+    season VARCHAR(10),
+    
+    data_source VARCHAR(50) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    UNIQUE(location_id, year, month),
+    FOREIGN KEY(location_id) REFERENCES locations(id)
+);
+```
+
+#### daily_forecast_data
+**Purpose**: Daily weather forecasts from OpenWeatherMap API
+
+```sql
+CREATE TABLE daily_forecast_data (
+    id INTEGER PRIMARY KEY,
+    location_id INTEGER NOT NULL,
+    forecast_date DATE NOT NULL,
+    
+    -- Daily forecast data from OpenWeatherMap
+    ghi_forecast REAL,
+    temperature_forecast REAL,
+    cloud_cover_forecast REAL,
+    humidity_forecast REAL,
+    wind_speed_forecast REAL,
+    
+    -- Enhanced environmental data
+    dni_forecast REAL,
+    sun_hours_forecast REAL,
+    temperature_min_forecast REAL,
+    temperature_max_forecast REAL,
+    weather_condition_forecast VARCHAR(20),
+    atmospheric_pressure_forecast REAL,
+    
+    -- Forecast metadata
+    forecast_horizon_days INTEGER,
+    confidence_level REAL,
+    
+    data_source VARCHAR(50) NOT NULL,
+    data_freshness_minutes INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY(location_id) REFERENCES locations(id)
+);
+```
+
+#### hourly_forecast_data
+**Purpose**: Hourly weather forecasts for detailed short-term planning
+
+```sql
+CREATE TABLE hourly_forecast_data (
+    id INTEGER PRIMARY KEY,
+    location_id INTEGER NOT NULL,
+    forecast_datetime DATETIME NOT NULL,
+    
+    -- Hourly forecast data
+    ghi_hourly_forecast REAL,
+    temperature_hourly_forecast REAL,
+    cloud_cover_hourly_forecast REAL,
+    
+    -- Enhanced environmental data
+    dni_hourly_forecast REAL,
+    temperature_min_hourly_forecast REAL,
+    temperature_max_hourly_forecast REAL,
+    humidity_hourly_forecast REAL,
+    weather_condition_hourly_forecast VARCHAR(20),
+    atmospheric_pressure_hourly_forecast REAL,
+    
+    -- Forecast metadata
+    forecast_horizon_hours INTEGER,
+    confidence_level REAL,
+    
+    data_source VARCHAR(50) NOT NULL,
+    data_freshness_minutes INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY(location_id) REFERENCES locations(id)
+);
+```
+
+#### api_data_sources
+**Purpose**: Track external API sources and their status
+
+```sql
+CREATE TABLE api_data_sources (
+    id INTEGER PRIMARY KEY,
+    source_name VARCHAR(50) NOT NULL UNIQUE,
+    endpoint_url TEXT NOT NULL,
+    last_fetch_time DATETIME,
+    is_active BOOLEAN DEFAULT true,
+    error_count INTEGER DEFAULT 0,
+    last_error_message TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### api_errors
+**Purpose**: Track API errors for debugging and monitoring
+
+```sql
+CREATE TABLE api_errors (
+    id INTEGER PRIMARY KEY,
+    source_name VARCHAR(50) NOT NULL,
+    error_message TEXT NOT NULL,
+    error_data JSON,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### MIGRATION 0004: Projections & Scenarios
+
+#### projection_scenarios
+**Purpose**: User-customizable projection parameters for "what-if" analysis
+
+```sql
+CREATE TABLE projection_scenarios (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    system_config_id INTEGER NOT NULL,
+    scenario_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    
+    -- Bitcoin Market Parameters (JSON for flexibility)
+    bitcoin_parameters JSON,
+    
+    -- Economic Parameters
+    economic_parameters JSON,
+    
+    -- Environmental Parameters
+    environmental_parameters JSON,
+    
+    -- Equipment Performance Parameters
+    equipment_parameters JSON,
+    
+    -- Scenario metadata
+    is_baseline BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT false,
+    is_user_created BOOLEAN DEFAULT true,
+    
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(system_config_id) REFERENCES system_configs(id),
+    UNIQUE(system_config_id, scenario_name)
+);
+```
+
+#### projection_results
 **Purpose**: Calculated projection results
 
 ```sql
 CREATE TABLE projection_results (
     id INTEGER PRIMARY KEY,
-    system_config_id INTEGER NOT NULL,      -- References system_configs.id
-    projection_date DATE NOT NULL,          -- 2024-08-11
+    user_id INTEGER NOT NULL,
+    system_config_id INTEGER NOT NULL,
+    scenario_id INTEGER NOT NULL,
+    projection_date DATE NOT NULL,
     
     -- Power Generation Results
-    total_generation_kwh REAL NOT NULL,     -- 145.5 (Total daily generation)
-    solar_generation_kwh REAL NOT NULL,     -- 125.0 (Solar contribution)
+    total_generation_kwh REAL NOT NULL,
+    solar_generation_kwh REAL NOT NULL,
     
     -- Energy Flow Analysis
-    mining_consumption_kwh REAL NOT NULL,   -- 780.0 (Total mining consumption)
-    grid_import_kwh REAL DEFAULT 0,         -- 655.0 (Grid electricity used)
-    grid_export_kwh REAL DEFAULT 0,         -- 15.0 (Excess solar exported)
+    mining_consumption_kwh REAL NOT NULL,
+    grid_import_kwh REAL DEFAULT 0,
+    grid_export_kwh REAL DEFAULT 0,
     
     -- Mining Performance
-    total_hashrate_th REAL NOT NULL,        -- 1100.0 (Total hashrate)
-    effective_hashrate_th REAL NOT NULL,    -- 1045.0 (After degradation)
-    btc_mined REAL NOT NULL,               -- 0.0125 (BTC earned this period)
-    btc_price_usd REAL NOT NULL,           -- 45250.0 (BTC price used)
+    total_hashrate_th REAL NOT NULL,
+    effective_hashrate_th REAL NOT NULL,
+    btc_mined REAL NOT NULL,
+    btc_price_usd REAL NOT NULL,
     
     -- Economic Results
-    mining_revenue_usd REAL NOT NULL,       -- 565.625 (Gross mining revenue)
-    electricity_cost_usd REAL NOT NULL,     -- 78.60 (Grid electricity cost)
-    net_profit_usd REAL NOT NULL,          -- 481.525 (Daily net profit)
+    mining_revenue_usd REAL NOT NULL,
+    electricity_cost_usd REAL NOT NULL,
+    net_profit_usd REAL NOT NULL,
     
     -- System Performance Metrics
-    solar_capacity_factor REAL,            -- 0.21 (Solar capacity factor)
-    system_efficiency REAL,                -- 0.875 (Overall system efficiency)
+    solar_capacity_factor REAL,
+    system_efficiency REAL,
+    
+    -- Battery-Free Mining Results
+    solar_direct_to_mining_kwh REAL DEFAULT 0,
+    solar_wasted_kwh REAL DEFAULT 0,
+    mining_hours_solar_only REAL DEFAULT 0,
+    mining_hours_grid_assisted REAL DEFAULT 0,
+    effective_mining_hours REAL DEFAULT 0,
+    solar_availability_hours REAL DEFAULT 0,
+    mining_availability_percent REAL DEFAULT 0,
+    
+    -- Seasonal Performance Tracking
+    season VARCHAR(10),
+    cloud_cover_avg_percent REAL,
+    weather_impact_factor REAL DEFAULT 1.0,
+    
+    -- Business Analysis Fields
+    roi_percent REAL,
+    payback_period_months REAL,
+    net_present_value_usd REAL,
+    internal_rate_return_percent REAL,
+    break_even_btc_price_usd REAL,
+    break_even_electricity_rate_usd_kwh REAL,
+    equipment_depreciation_usd REAL,
+    maintenance_cost_usd REAL,
+    insurance_cost_usd REAL,
+    property_tax_usd REAL,
+    total_operating_cost_usd REAL,
+    gross_profit_margin_percent REAL,
+    net_profit_margin_percent REAL,
+    total_investment_usd REAL,
+    total_revenue_usd REAL,
+    total_costs_usd REAL,
+    cumulative_profit_usd REAL,
+    monthly_cash_flow_usd REAL,
+    annual_cash_flow_usd REAL,
+    
+    -- Equipment Resale Value Tracking
+    equipment_resale_value_usd REAL,
+    total_investment_with_resale_usd REAL,
+    adjusted_roi_percent REAL,
+    net_equipment_value_usd REAL,
     
     calculated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(system_config_id) REFERENCES system_configs(id),
-    INDEX idx_config_date (system_config_id, projection_date)
+    FOREIGN KEY(scenario_id) REFERENCES projection_scenarios(id)
 );
 ```
 
+### MIGRATION 0005: Historical Data
+
+#### miner_price_history
+**Purpose**: Historical price tracking for miners
+
+```sql
+CREATE TABLE miner_price_history (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    miner_model_id INTEGER NOT NULL,
+    recorded_date DATE NOT NULL,
+    market_price_usd REAL NOT NULL,
+    resale_price_usd REAL,
+    market_demand_level VARCHAR(20),
+    depreciation_rate_used REAL,
+    calculation_method VARCHAR(20),
+    data_source VARCHAR(50),
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(miner_model_id) REFERENCES miner_models(id)
+);
+```
+
+### MIGRATION 0006: Error Handling
+
+#### application_errors
+**Purpose**: Track application errors for debugging and monitoring
+
+```sql
+CREATE TABLE application_errors (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER,
+    error_type VARCHAR(50) NOT NULL, -- 'calculation', 'validation', 'system', 'api'
+    error_category VARCHAR(50) NOT NULL, -- 'solar_calc', 'mining_calc', 'user_input', 'database'
+    error_message TEXT NOT NULL,
+    error_context JSON, -- Additional error details and context
+    severity_level VARCHAR(20) DEFAULT 'error', -- 'info', 'warning', 'error', 'critical'
+    stack_trace TEXT,
+    user_action TEXT, -- What user was doing when error occurred
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+```
+
+## Data Validation Constraints
+
+### Equipment Performance Constraints
+- Positive hashrate, power consumption, efficiency values
+- Valid degradation and failure rate ranges
+- Solar efficiency and degradation rate validation
+- Storage capacity and efficiency validation
+- Inverter power and efficiency validation
+
+### Geographic Constraints
+- Valid latitude (-90 to 90) and longitude (-180 to 180) ranges
+- Reasonable elevation range (-1000 to 10000 meters)
+
+### Economic Constraints
+- Positive electricity rates
+- Valid net metering rates
+- Reasonable ROI and payback period ranges
+
+### Bitcoin Data Constraints
+- Positive difficulty, hashrate, and block reward values
+- Valid Bitcoin price values
+
+### Environmental Data Constraints
+- Non-negative solar irradiance values
+- Reasonable temperature ranges (-50 to 80°C)
+- Valid cloud cover percentages (0-100%)
+
+### JSON Validation
+- Valid JSON structure for equipment configurations
+- Required fields present in JSON arrays
+- Proper data types for JSON fields
+
 ## Database Indexes
 
-### Essential Indexes
+### User Data Isolation Indexes
 ```sql
--- Time-series query optimization
-CREATE INDEX idx_projection_config_date ON projection_results(system_config_id, projection_date);
-CREATE INDEX idx_environmental_location_date ON environmental_data(location_id, recorded_date);
-CREATE INDEX idx_bitcoin_network_date ON bitcoin_network_data(recorded_date);
-
--- Equipment lookup optimization  
-CREATE INDEX idx_miner_efficiency ON miner_models(efficiency_j_th);
-CREATE INDEX idx_solar_efficiency ON solar_panel_models(efficiency_percent);
-
--- Search optimization
-CREATE INDEX idx_config_name ON system_configs(config_name);
+CREATE INDEX idx_locations_user ON locations(user_id);
+CREATE INDEX idx_miner_models_user ON miner_models(user_id);
+CREATE INDEX idx_solar_panel_models_user ON solar_panel_models(user_id);
+CREATE INDEX idx_storage_models_user ON storage_models(user_id);
+CREATE INDEX idx_inverter_models_user ON inverter_models(user_id);
+CREATE INDEX idx_system_configs_user ON system_configs(user_id);
+CREATE INDEX idx_projection_scenarios_user ON projection_scenarios(user_id);
+CREATE INDEX idx_projection_results_user ON projection_results(user_id);
+CREATE INDEX idx_miner_price_history_user ON miner_price_history(user_id);
 ```
+
+### Equipment Search Indexes
+```sql
+CREATE INDEX idx_miner_manufacturer_model ON miner_models(manufacturer, model_name);
+CREATE INDEX idx_miner_efficiency ON miner_models(efficiency_j_th);
+CREATE INDEX idx_miner_hashrate ON miner_models(hashrate_th);
+CREATE INDEX idx_miner_user_nickname ON miner_models(user_nickname);
+
+CREATE INDEX idx_solar_manufacturer_model ON solar_panel_models(manufacturer, model_name);
+CREATE INDEX idx_solar_efficiency ON solar_panel_models(efficiency_percent);
+CREATE INDEX idx_solar_user_nickname ON solar_panel_models(user_nickname);
+
+CREATE INDEX idx_storage_manufacturer_model ON storage_models(manufacturer, model_name);
+CREATE INDEX idx_storage_capacity ON storage_models(capacity_kwh);
+CREATE INDEX idx_storage_user_nickname ON storage_models(user_nickname);
+
+CREATE INDEX idx_inverter_manufacturer_model ON inverter_models(manufacturer, model_name);
+CREATE INDEX idx_inverter_power_rating ON inverter_models(rated_power_w);
+CREATE INDEX idx_inverter_efficiency ON inverter_models(efficiency_percent);
+CREATE INDEX idx_inverter_user_nickname ON inverter_models(user_nickname);
+```
+
+### System Configuration Indexes
+```sql
+CREATE INDEX idx_system_config_name ON system_configs(config_name);
+CREATE INDEX idx_system_config_mining_mode ON system_configs(mining_mode);
+CREATE INDEX idx_system_config_grid_type ON system_configs(grid_connection_type);
+CREATE INDEX idx_system_config_inverter ON system_configs(inverter_id);
+```
+
+### External Data Indexes
+```sql
+CREATE INDEX idx_bitcoin_network_date ON bitcoin_network_data(recorded_date);
+CREATE INDEX idx_bitcoin_network_hashprice ON bitcoin_network_data(hashprice_usd_per_th);
+CREATE INDEX idx_bitcoin_network_revenue_per_th ON bitcoin_network_data(revenue_per_th_usd);
+
+CREATE INDEX idx_bitcoin_price_date ON bitcoin_price_data(recorded_date);
+CREATE INDEX idx_bitcoin_price_volatility ON bitcoin_price_data(volatility_30d);
+CREATE INDEX idx_bitcoin_price_change_24h ON bitcoin_price_data(price_change_24h_percent);
+
+CREATE INDEX idx_monthly_solar_location_year_month ON monthly_solar_data(location_id, year, month);
+CREATE INDEX idx_monthly_solar_season ON monthly_solar_data(season);
+CREATE INDEX idx_monthly_solar_data_source ON monthly_solar_data(data_source);
+CREATE INDEX idx_monthly_solar_dni ON monthly_solar_data(dni_monthly_avg);
+CREATE INDEX idx_monthly_solar_sun_hours ON monthly_solar_data(sun_hours_monthly_avg);
+CREATE INDEX idx_monthly_solar_temp_range ON monthly_solar_data(temperature_min_monthly_avg, temperature_max_monthly_avg);
+
+CREATE INDEX idx_daily_forecast_location_date ON daily_forecast_data(location_id, forecast_date);
+CREATE INDEX idx_daily_forecast_horizon ON daily_forecast_data(forecast_horizon_days);
+CREATE INDEX idx_daily_forecast_data_source ON daily_forecast_data(data_source);
+CREATE INDEX idx_daily_forecast_dni ON daily_forecast_data(dni_forecast);
+CREATE INDEX idx_daily_forecast_sun_hours ON daily_forecast_data(sun_hours_forecast);
+CREATE INDEX idx_daily_forecast_temp_range ON daily_forecast_data(temperature_min_forecast, temperature_max_forecast);
+CREATE INDEX idx_daily_forecast_weather ON daily_forecast_data(weather_condition_forecast);
+
+CREATE INDEX idx_hourly_forecast_location_datetime ON hourly_forecast_data(location_id, forecast_datetime);
+CREATE INDEX idx_hourly_forecast_horizon ON hourly_forecast_data(forecast_horizon_hours);
+CREATE INDEX idx_hourly_forecast_data_source ON hourly_forecast_data(data_source);
+CREATE INDEX idx_hourly_forecast_dni ON hourly_forecast_data(dni_hourly_forecast);
+CREATE INDEX idx_hourly_forecast_temp_range ON hourly_forecast_data(temperature_min_hourly_forecast, temperature_max_hourly_forecast);
+CREATE INDEX idx_hourly_forecast_weather ON hourly_forecast_data(weather_condition_hourly_forecast);
+```
+
+### API Management Indexes
+```sql
+CREATE INDEX idx_api_data_sources_active ON api_data_sources(is_active, last_fetch_time);
+CREATE INDEX idx_api_errors_source_time ON api_errors(source_name, created_at);
+CREATE INDEX idx_bitcoin_price_freshness ON bitcoin_price_data(data_freshness_minutes);
+CREATE INDEX idx_bitcoin_network_freshness ON bitcoin_network_data(data_freshness_minutes);
+CREATE INDEX idx_daily_forecast_freshness ON daily_forecast_data(data_freshness_minutes);
+CREATE INDEX idx_hourly_forecast_freshness ON hourly_forecast_data(data_freshness_minutes);
+```
+
+### Projection Indexes
+```sql
+CREATE INDEX idx_projection_scenarios_config ON projection_scenarios(system_config_id);
+CREATE INDEX idx_projection_scenarios_baseline ON projection_scenarios(is_baseline);
+CREATE INDEX idx_projection_scenarios_active ON projection_scenarios(is_active);
+CREATE INDEX idx_projection_scenarios_user_created ON projection_scenarios(is_user_created);
+
+CREATE INDEX idx_projection_config_date ON projection_results(system_config_id, projection_date);
+CREATE INDEX idx_projection_scenario ON projection_results(scenario_id);
+CREATE INDEX idx_projection_mining_hours ON projection_results(effective_mining_hours);
+CREATE INDEX idx_projection_season ON projection_results(season);
+CREATE INDEX idx_projection_roi ON projection_results(roi_percent);
+CREATE INDEX idx_projection_payback ON projection_results(payback_period_months);
+CREATE INDEX idx_projection_irr ON projection_results(internal_rate_return_percent);
+CREATE INDEX idx_projection_break_even_price ON projection_results(break_even_btc_price_usd);
+CREATE INDEX idx_projection_total_investment ON projection_results(total_investment_usd);
+CREATE INDEX idx_projection_cumulative_profit ON projection_results(cumulative_profit_usd);
+```
+
+### Historical Data Indexes
+```sql
+CREATE INDEX idx_miner_price_history_model_date ON miner_price_history(miner_model_id, recorded_date);
+CREATE INDEX idx_miner_price_history_demand ON miner_price_history(market_demand_level);
+CREATE INDEX idx_miner_price_history_calculation ON miner_price_history(calculation_method);
+```
+
+### Error Handling Indexes
+```sql
+CREATE INDEX idx_app_errors_user_time ON application_errors(user_id, created_at);
+CREATE INDEX idx_app_errors_type_category ON application_errors(error_type, error_category);
+CREATE INDEX idx_app_errors_severity ON application_errors(severity_level);
+CREATE INDEX idx_app_errors_created_at ON application_errors(created_at);
+```
+
+## Migration Strategy
+
+### Deployment Order
+1. **0001_core_foundation.sql** - User management and equipment tables
+2. **0002_system_configuration.sql** - System configs and helper functions
+3. **0003_external_data.sql** - External data and API management
+4. **0004_projections_scenarios.sql** - Scenarios and results
+5. **0005_historical_data.sql** - Historical tracking
+6. **0006_error_handling.sql** - Error logging
+
+### Rollback Strategy
+Each migration can be rolled back independently if issues arise during deployment.
+
+### Testing Strategy
+- Test each migration individually
+- Verify foreign key relationships
+- Test helper functions with sample data
+- Validate JSON constraints
+- Test error logging functionality
 
 ## Data Retention Policy
 
 - **Current data**: Keep indefinitely for calculations
 - **Historical data**: Archive after 2 years, keep monthly summaries
 - **Projection results**: Keep for 1 year, then aggregate to summaries
-
-## Migration Strategy
-
-### Phase 1: Core Tables
-1. Reference data tables (locations, equipment catalogs)
-2. Current time-series tables (Bitcoin network, price data)
-
-### Phase 2: Configuration System
-1. System configuration tables
-2. Basic projection calculations
-
-### Phase 3: Results and Analytics
-1. Projection results tables
-2. Basic performance tracking
+- **Error logs**: Auto-cleanup after 30 days
 
 ---
 
-**Document Status**: Simplified v1.0  
+**Document Status**: Final v1.0  
 **Last Updated**: 2024-12-19  
-**Next Review**: After Phase 1 implementation
+**Migration Count**: 6 migrations (963 lines total)  
+**Tables**: 12 tables with comprehensive indexing and validation
