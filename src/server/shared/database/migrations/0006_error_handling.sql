@@ -38,39 +38,32 @@ CREATE INDEX idx_app_errors_created_at ON application_errors(created_at);
 -- ERROR CATEGORIES DOCUMENTATION
 -- =============================================================================
 
-COMMENT ON TABLE application_errors IS '
-Application error logging for debugging and monitoring.
-
-Error Types:
-- calculation: Mathematical or algorithmic errors
-- validation: User input or data validation errors  
-- system: Database, memory, or system-level errors
-- api: External API integration errors
-
-Error Categories:
-- solar_calc: Solar generation calculation errors
-- mining_calc: Mining performance calculation errors
-- economic_calc: Financial and ROI calculation errors
-- user_input: User data validation errors
-- database: Database connection or constraint errors
-- external_api: External API integration errors
-- system_performance: Memory, timeout, or performance errors
-
-Severity Levels:
-- info: Informational messages
-- warning: Non-critical issues
-- error: Standard errors that need attention
-- critical: Severe errors requiring immediate action
-';
+-- Application error logging for debugging and monitoring.
+--
+-- Error Types:
+-- - calculation: Mathematical or algorithmic errors
+-- - validation: User input or data validation errors  
+-- - system: Database, memory, or system-level errors
+-- - api: External API integration errors
+--
+-- Error Categories:
+-- - solar_calc: Solar generation calculation errors
+-- - mining_calc: Mining performance calculation errors
+-- - economic_calc: Financial and ROI calculation errors
+-- - user_input: User data validation errors
+-- - database: Database connection or constraint errors
+-- - external_api: External API integration errors
+-- - system_performance: Memory, timeout, or performance errors
+--
+-- Severity Levels:
+-- - info: Informational messages
+-- - warning: Non-critical issues
+-- - error: Standard errors that need attention
+-- - critical: Severe errors requiring immediate action
 
 -- =============================================================================
--- ERROR CLEANUP FUNCTION (Optional)
+-- ERROR CLEANUP FUNCTION (Application Level)
 -- =============================================================================
 
--- Function to clean up old error logs (keep last 30 days)
-CREATE FUNCTION cleanup_old_errors() RETURNS INTEGER AS $$
-  SELECT COUNT(*) FROM (
-    DELETE FROM application_errors 
-    WHERE created_at < datetime('now', '-30 days')
-  );
-$$;
+-- Note: Error cleanup function will be implemented in application code
+-- Function: cleanup_old_errors() - removes errors older than 30 days

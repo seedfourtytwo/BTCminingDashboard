@@ -32,9 +32,9 @@ CREATE TABLE locations (
     id INTEGER PRIMARY KEY,
     user_id INTEGER NOT NULL,
     name VARCHAR(100) NOT NULL,
-    latitude REAL NOT NULL,
-    longitude REAL NOT NULL,
-    elevation REAL NOT NULL,
+    latitude REAL NOT NULL CHECK (latitude BETWEEN -90 AND 90),
+    longitude REAL NOT NULL CHECK (longitude BETWEEN -180 AND 180),
+    elevation REAL NOT NULL CHECK (elevation BETWEEN -1000 AND 10000),
     timezone VARCHAR(50) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id)
@@ -53,14 +53,14 @@ CREATE TABLE miner_models (
     model_name VARCHAR(100) NOT NULL,
     
     -- Core Performance Specifications
-    hashrate_th REAL NOT NULL,
-    power_consumption_w INTEGER NOT NULL,
-    efficiency_j_th REAL NOT NULL,
+    hashrate_th REAL NOT NULL CHECK (hashrate_th > 0),
+    power_consumption_w INTEGER NOT NULL CHECK (power_consumption_w > 0),
+    efficiency_j_th REAL NOT NULL CHECK (efficiency_j_th > 0),
     
     -- Performance Degradation Model
-    hashrate_degradation_annual REAL DEFAULT 0.05,
-    efficiency_degradation_annual REAL DEFAULT 0.03,
-    failure_rate_annual REAL DEFAULT 0.10,
+    hashrate_degradation_annual REAL DEFAULT 0.05 CHECK (hashrate_degradation_annual BETWEEN 0 AND 1),
+    efficiency_degradation_annual REAL DEFAULT 0.03 CHECK (efficiency_degradation_annual BETWEEN 0 AND 1),
+    failure_rate_annual REAL DEFAULT 0.10 CHECK (failure_rate_annual BETWEEN 0 AND 1),
     
     -- Environmental Operating Limits
     operating_temp_min INTEGER,
@@ -106,12 +106,12 @@ CREATE TABLE solar_panel_models (
     model_name VARCHAR(100) NOT NULL,
     
     -- Core Performance Specifications
-    rated_power_w INTEGER NOT NULL,
-    efficiency_percent REAL NOT NULL,
+    rated_power_w INTEGER NOT NULL CHECK (rated_power_w > 0),
+    efficiency_percent REAL NOT NULL CHECK (efficiency_percent BETWEEN 0 AND 100),
     temperature_coefficient REAL NOT NULL,
     
     -- Degradation Model
-    degradation_rate_annual REAL DEFAULT 0.5,
+    degradation_rate_annual REAL DEFAULT 0.5 CHECK (degradation_rate_annual BETWEEN 0 AND 10),
     
     -- Economic Data
     cost_per_watt REAL,
@@ -140,14 +140,14 @@ CREATE TABLE storage_models (
     technology VARCHAR(20) NOT NULL,
     
     -- Capacity & Performance
-    capacity_kwh REAL NOT NULL,
-    usable_capacity_kwh REAL NOT NULL,
+    capacity_kwh REAL NOT NULL CHECK (capacity_kwh > 0),
+    usable_capacity_kwh REAL NOT NULL CHECK (usable_capacity_kwh > 0),
     max_charge_rate_kw REAL NOT NULL,
     max_discharge_rate_kw REAL NOT NULL,
-    round_trip_efficiency REAL NOT NULL,
+    round_trip_efficiency REAL NOT NULL CHECK (round_trip_efficiency BETWEEN 0 AND 1),
     
     -- Degradation Model
-    cycle_life INTEGER NOT NULL,
+    cycle_life INTEGER NOT NULL CHECK (cycle_life > 0),
     calendar_degradation_annual REAL DEFAULT 0.02,
     
     -- Economic Data
@@ -174,8 +174,8 @@ CREATE TABLE inverter_models (
     model_name VARCHAR(100) NOT NULL,
     
     -- Core Specifications
-    rated_power_w INTEGER NOT NULL,
-    efficiency_percent REAL NOT NULL,
+    rated_power_w INTEGER NOT NULL CHECK (rated_power_w > 0),
+    efficiency_percent REAL NOT NULL CHECK (efficiency_percent BETWEEN 0 AND 100),
     input_voltage_range VARCHAR(50) NOT NULL,
     output_voltage_v INTEGER NOT NULL,
     mppt_trackers INTEGER NOT NULL,

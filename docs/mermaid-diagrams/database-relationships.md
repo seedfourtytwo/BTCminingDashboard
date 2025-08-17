@@ -1,10 +1,4 @@
-# Database Relationships Diagram
-
-## Complete Database Schema
-
-```mermaid
 erDiagram
-    %% Core Foundation (Migration 0001)
     users {
         integer id PK
         varchar email UK
@@ -134,7 +128,6 @@ erDiagram
         datetime updated_at
     }
 
-    %% System Configuration (Migration 0002)
     system_configs {
         integer id PK
         integer user_id FK
@@ -158,7 +151,6 @@ erDiagram
         datetime updated_at
     }
 
-    %% External Data (Migration 0003)
     bitcoin_network_data {
         integer id PK
         date recorded_date
@@ -274,7 +266,6 @@ erDiagram
         datetime created_at
     }
 
-    %% Projections & Scenarios (Migration 0004)
     projection_scenarios {
         integer id PK
         integer user_id FK
@@ -348,7 +339,6 @@ erDiagram
         datetime calculated_at
     }
 
-    %% Historical Data (Migration 0005)
     miner_price_history {
         integer id PK
         integer user_id FK
@@ -364,7 +354,6 @@ erDiagram
         datetime created_at
     }
 
-    %% Error Handling (Migration 0006)
     application_errors {
         integer id PK
         integer user_id FK
@@ -380,7 +369,6 @@ erDiagram
         datetime created_at
     }
 
-    %% Relationships
     users ||--o{ locations : "has"
     users ||--o{ miner_models : "owns"
     users ||--o{ solar_panel_models : "owns"
@@ -405,72 +393,4 @@ erDiagram
 
     miner_models ||--o{ miner_price_history : "tracked_in"
 
-    %% External data tables (no direct relationships to user data)
     api_data_sources ||--o{ api_errors : "generates"
-```
-
-## Key Features Highlighted
-
-### User Data Isolation
-- All user-related tables have `user_id` foreign keys
-- Complete data isolation for multi-user support
-- User-specific indexes for performance
-
-### Equipment Management
-- Comprehensive equipment specifications
-- User-friendly fields (nicknames, notes, purchase info)
-- Depreciation and value tracking
-- Flexible JSON-based system configurations
-
-### External Data Integration
-- Bitcoin network and price data
-- Environmental data (solar, weather, forecasts)
-- API management and error tracking
-- Data freshness monitoring
-
-### Scenario-Based Analysis
-- Baseline and custom scenarios
-- JSON parameter overrides
-- Comprehensive financial metrics
-- Business analysis fields
-
-### Error Handling
-- Application error logging
-- Error categorization and severity levels
-- Context tracking and debugging support
-
-### Performance Optimization
-- Extensive indexing strategy
-- Optimized for common query patterns
-- User data isolation indexes
-- Time-series data indexes
-
-## Migration Dependencies
-
-```mermaid
-graph TD
-    A[0001_core_foundation.sql] --> B[0002_system_configuration.sql]
-    A --> C[0003_external_data.sql]
-    A --> D[0004_projections_scenarios.sql]
-    A --> E[0005_historical_data.sql]
-    A --> F[0006_error_handling.sql]
-    B --> D
-```
-
-## Data Flow
-
-```mermaid
-flowchart LR
-    A[User Input] --> B[Equipment Inventory]
-    B --> C[System Configuration]
-    C --> D[External APIs]
-    D --> E[Projection Scenarios]
-    E --> F[Calculation Engine]
-    F --> G[Projection Results]
-    G --> H[Business Analysis]
-    
-    I[Error Handling] --> J[Debugging & Monitoring]
-    K[Historical Data] --> L[Equipment Value Tracking]
-```
-
-This database schema provides a complete foundation for the Solar Bitcoin Mining Calculator with comprehensive user management, equipment tracking, external data integration, scenario-based analysis, and robust error handling.

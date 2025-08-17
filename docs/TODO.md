@@ -33,18 +33,13 @@
 - [x] **Data worker setup** - Framework for external data collection
 - [x] **Frontend landing page** - Professional UI with feature overview
 
-## 📋 Next Steps (In Logical Order)
+## 📋 Development Tasks (In Logical Order)
 
-### Phase 1: Foundation & Core Infrastructure (Priority: Critical)
-**Goal**: Establish solid foundation with basic UI and error handling
-
-#### 1. Database Seeding & Static Data
-- [ ] **Seed equipment data** - Populate miner_models with current ASIC specifications
-- [ ] **Seed solar panel data** - Add popular solar panel models with specifications
-- [ ] **Seed storage data** - Add battery storage system specifications
-- [ ] **Seed location data** - Add major cities with geographic coordinates
-- [ ] **Data validation** - Ensure all seeded data meets schema requirements
-- [ ] **Static market data** - Add sample Bitcoin prices and network data
+#### 1. Database Deployment & Testing
+- [ ] **Deploy database to staging** - Run migrations and seed data on staging environment
+- [ ] **Test database connectivity** - Verify API can connect to staging database
+- [ ] **Test seed data** - Verify all equipment, locations, and sample data are accessible
+- [ ] **Test basic CRUD operations** - Ensure API endpoints can read/write to database
 
 #### 2. Basic React Component Foundation
 - [ ] **Core UI components** - Button, Input, Card, Modal, Toast components
@@ -75,6 +70,8 @@
 - [ ] **Integration tests** - Test frontend-backend communication
 
 **Phase 1 Success Criteria**: Basic UI working, APIs returning static data, error handling functional
+
+### 🔄 FUTURE DEVELOPMENT PHASES
 
 ### Phase 2: Core Calculations & Basic UI (Priority: High)
 **Goal**: Implement basic calculations with simple UI validation

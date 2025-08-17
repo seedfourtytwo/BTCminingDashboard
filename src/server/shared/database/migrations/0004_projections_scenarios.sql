@@ -16,16 +16,16 @@ CREATE TABLE projection_scenarios (
     description TEXT,
     
     -- Bitcoin Market Parameters (JSON for flexibility)
-    bitcoin_parameters JSON,
+    bitcoin_parameters JSON CHECK (json_valid(bitcoin_parameters)),
     
     -- Economic Parameters
-    economic_parameters JSON,
+    economic_parameters JSON CHECK (json_valid(economic_parameters)),
     
     -- Environmental Parameters
-    environmental_parameters JSON,
+    environmental_parameters JSON CHECK (json_valid(environmental_parameters)),
     
     -- Equipment Performance Parameters
-    equipment_parameters JSON,
+    equipment_parameters JSON CHECK (json_valid(equipment_parameters)),
     
     -- Scenario metadata
     is_baseline BOOLEAN DEFAULT false,
@@ -69,9 +69,9 @@ CREATE TABLE projection_results (
     btc_price_usd REAL NOT NULL,
     
     -- Economic Results
-    mining_revenue_usd REAL NOT NULL,
-    electricity_cost_usd REAL NOT NULL,
-    net_profit_usd REAL NOT NULL,
+    mining_revenue_usd REAL NOT NULL CHECK (mining_revenue_usd >= 0),
+    electricity_cost_usd REAL NOT NULL CHECK (electricity_cost_usd >= 0),
+    net_profit_usd REAL NOT NULL CHECK (net_profit_usd >= -1000000),
     
     -- System Performance Metrics
     solar_capacity_factor REAL,
@@ -92,8 +92,8 @@ CREATE TABLE projection_results (
     weather_impact_factor REAL DEFAULT 1.0,
     
     -- Business Analysis Fields
-    roi_percent REAL,
-    payback_period_months REAL,
+    roi_percent REAL CHECK (roi_percent BETWEEN -100 AND 10000),
+    payback_period_months REAL CHECK (payback_period_months BETWEEN 0 AND 600),
     net_present_value_usd REAL,
     internal_rate_return_percent REAL,
     break_even_btc_price_usd REAL,
@@ -128,43 +128,18 @@ CREATE TABLE projection_results (
 -- SCENARIO JSON VALIDATION
 -- =============================================================================
 
--- JSON Validation for projection_scenarios
-ALTER TABLE projection_scenarios ADD CONSTRAINT chk_bitcoin_params_json_valid
-CHECK (bitcoin_parameters IS NULL OR (json_valid(bitcoin_parameters) AND json_type(bitcoin_parameters) = 'object'));
-
-ALTER TABLE projection_scenarios ADD CONSTRAINT chk_economic_params_json_valid
-CHECK (economic_parameters IS NULL OR (json_valid(economic_parameters) AND json_type(economic_parameters) = 'object'));
-
-ALTER TABLE projection_scenarios ADD CONSTRAINT chk_environmental_params_json_valid
-CHECK (environmental_parameters IS NULL OR (json_valid(environmental_parameters) AND json_type(environmental_parameters) = 'object'));
-
-ALTER TABLE projection_scenarios ADD CONSTRAINT chk_equipment_params_json_valid
-CHECK (equipment_parameters IS NULL OR (json_valid(equipment_parameters) AND json_type(equipment_parameters) = 'object'));
-
--- =============================================================================
--- PROJECTION RESULTS VALIDATION
--- =============================================================================
-
--- Projection Results Constraints
-ALTER TABLE projection_results ADD CONSTRAINT chk_revenue_positive CHECK (mining_revenue_usd >= 0);
-ALTER TABLE projection_results ADD CONSTRAINT chk_cost_positive CHECK (electricity_cost_usd >= 0);
-ALTER TABLE projection_results ADD CONSTRAINT chk_profit_reasonable CHECK (net_profit_usd >= -1000000);
-ALTER TABLE projection_results ADD CONSTRAINT chk_roi_reasonable CHECK (roi_percent BETWEEN -100 AND 10000);
-ALTER TABLE projection_results ADD CONSTRAINT chk_payback_reasonable CHECK (payback_period_months BETWEEN 0 AND 600);
+-- Note: All constraints have been moved to their respective CREATE TABLE statements
+-- for SQLite compatibility. Constraints are now defined at table creation time.
 
 -- =============================================================================
 -- SCENARIO DOCUMENTATION
 -- =============================================================================
 
-COMMENT ON COLUMN projection_scenarios.bitcoin_parameters IS '
-Bitcoin market params: {"price_usd": 30000, "difficulty_multiplier": 1.2}
-All fields optional - null = use current API data
-';
-
-COMMENT ON COLUMN projection_scenarios.economic_parameters IS '
-Economic params: {"electricity_rate_usd_kwh": 0.15, "maintenance_cost_multiplier": 1.2}
-All fields optional - null = use system config values
-';
+-- bitcoin_parameters: Bitcoin market params: {"price_usd": 30000, "difficulty_multiplier": 1.2}
+-- All fields optional - null = use current API data
+--
+-- economic_parameters: Economic params: {"electricity_rate_usd_kwh": 0.15, "maintenance_cost_multiplier": 1.2}
+-- All fields optional - null = use system config values
 
 -- =============================================================================
 -- PROJECTION INDEXES

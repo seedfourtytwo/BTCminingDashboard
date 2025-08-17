@@ -1,0 +1,54 @@
+# ==============================================================================
+# SOLAR MINING CALCULATOR - DATABASE CONFIGURATION
+# ==============================================================================
+# 
+# Dedicated configuration for database operations (migrations, seeding, etc.)
+# This file is separate from worker configurations for cleaner separation of concerns.
+#
+# Usage:
+# - Database migrations: wrangler d1 execute [db-name] --file=migration.sql
+# - Database seeding: wrangler d1 execute [db-name] --file=seed.sql
+# - Database management: wrangler d1 [command] [db-name]
+# ==============================================================================
+
+name = "solar-mining-database"
+
+# =============================================================================
+# DATABASE BINDINGS - Root level for direct access
+# =============================================================================
+
+# Development Database
+[[d1_databases]]
+binding = "DB_DEV"
+database_name = "solar-mining-db-dev"
+database_id = "435d8973-cd30-4d83-bb9f-a37c09190695"
+
+# Production Database  
+[[d1_databases]]
+binding = "DB_PROD"
+database_name = "solar-mining-db"
+database_id = "6967c156-01e7-4469-b331-69a33240c796"
+
+# =============================================================================
+# ENVIRONMENT CONFIGURATION
+# =============================================================================
+
+# Development environment
+[env.development]
+name = "solar-mining-database-dev"
+
+# Production environment
+[env.production]
+name = "solar-mining-database"
+
+# =============================================================================
+# NOTES
+# =============================================================================
+#
+# This configuration allows direct database access without environment complexity:
+# - wrangler d1 execute solar-mining-db-dev --file=migration.sql
+# - wrangler d1 execute solar-mining-db --file=migration.sql
+#
+# Worker configurations (wrangler.api.toml, etc.) handle worker-specific bindings
+# This file handles database-specific operations
+#

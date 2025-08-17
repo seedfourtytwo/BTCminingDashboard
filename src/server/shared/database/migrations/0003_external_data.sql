@@ -11,9 +11,9 @@
 CREATE TABLE bitcoin_network_data (
     id INTEGER PRIMARY KEY,
     recorded_date DATE NOT NULL,
-    difficulty BIGINT NOT NULL,
-    network_hashrate REAL NOT NULL,
-    block_reward REAL NOT NULL,
+    difficulty BIGINT NOT NULL CHECK (difficulty > 0),
+    network_hashrate REAL NOT NULL CHECK (network_hashrate > 0),
+    block_reward REAL NOT NULL CHECK (block_reward > 0),
     avg_block_time REAL NOT NULL,
     avg_transaction_fee REAL NOT NULL,
     data_source VARCHAR(50) NOT NULL,
@@ -27,6 +27,9 @@ CREATE TABLE bitcoin_network_data (
     revenue_per_th_usd REAL,
     profit_per_th_usd REAL,
     
+    -- Data freshness tracking
+    data_freshness_minutes INTEGER,
+    
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -35,7 +38,7 @@ CREATE TABLE bitcoin_network_data (
 CREATE TABLE bitcoin_price_data (
     id INTEGER PRIMARY KEY,
     recorded_date DATE NOT NULL,
-    price_usd REAL NOT NULL,
+    price_usd REAL NOT NULL CHECK (price_usd > 0),
     volume_24h REAL,
     data_source VARCHAR(50) NOT NULL,
     
@@ -46,6 +49,9 @@ CREATE TABLE bitcoin_price_data (
     volatility_30d REAL,
     price_change_7d_percent REAL,
     price_change_30d_percent REAL,
+    
+    -- Data freshness tracking
+    data_freshness_minutes INTEGER,
     
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -63,9 +69,9 @@ CREATE TABLE monthly_solar_data (
     month INTEGER NOT NULL,
     
     -- Monthly averages from NREL API
-    ghi_monthly_avg REAL,
-    dni_monthly_avg REAL,
-    sun_hours_monthly_avg REAL,
+    ghi_monthly_avg REAL CHECK (ghi_monthly_avg >= 0),
+    dni_monthly_avg REAL CHECK (dni_monthly_avg >= 0),
+    sun_hours_monthly_avg REAL CHECK (sun_hours_monthly_avg BETWEEN 0 AND 24),
     temperature_monthly_avg REAL,
     
     -- Enhanced environmental data
@@ -92,9 +98,9 @@ CREATE TABLE daily_forecast_data (
     forecast_date DATE NOT NULL,
     
     -- Daily forecast data from OpenWeatherMap
-    ghi_forecast REAL,
-    temperature_forecast REAL,
-    cloud_cover_forecast REAL,
+    ghi_forecast REAL CHECK (ghi_forecast >= 0),
+    temperature_forecast REAL CHECK (temperature_forecast BETWEEN -50 AND 80),
+    cloud_cover_forecast REAL CHECK (cloud_cover_forecast BETWEEN 0 AND 100),
     humidity_forecast REAL,
     wind_speed_forecast REAL,
     
@@ -110,6 +116,9 @@ CREATE TABLE daily_forecast_data (
     forecast_horizon_days INTEGER,
     confidence_level REAL,
     
+    -- Data freshness tracking
+    data_freshness_minutes INTEGER,
+    
     data_source VARCHAR(50) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     
@@ -124,9 +133,9 @@ CREATE TABLE hourly_forecast_data (
     forecast_datetime DATETIME NOT NULL,
     
     -- Hourly forecast data
-    ghi_hourly_forecast REAL,
-    temperature_hourly_forecast REAL,
-    cloud_cover_hourly_forecast REAL,
+    ghi_hourly_forecast REAL CHECK (ghi_hourly_forecast >= 0),
+    temperature_hourly_forecast REAL CHECK (temperature_hourly_forecast BETWEEN -50 AND 80),
+    cloud_cover_hourly_forecast REAL CHECK (cloud_cover_hourly_forecast BETWEEN 0 AND 100),
     
     -- Enhanced environmental data
     dni_hourly_forecast REAL,
@@ -139,6 +148,9 @@ CREATE TABLE hourly_forecast_data (
     -- Forecast metadata
     forecast_horizon_hours INTEGER,
     confidence_level REAL,
+    
+    -- Data freshness tracking
+    data_freshness_minutes INTEGER,
     
     data_source VARCHAR(50) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -173,58 +185,15 @@ CREATE TABLE api_errors (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Add data freshness tracking to existing tables
-ALTER TABLE bitcoin_price_data ADD COLUMN data_freshness_minutes INTEGER;
-ALTER TABLE bitcoin_network_data ADD COLUMN data_freshness_minutes INTEGER;
-ALTER TABLE daily_forecast_data ADD COLUMN data_freshness_minutes INTEGER;
-ALTER TABLE hourly_forecast_data ADD COLUMN data_freshness_minutes INTEGER;
+-- Note: Data freshness tracking columns have been added to CREATE TABLE statements
+-- for SQLite compatibility. All columns are now defined at table creation time.
 
 -- =============================================================================
 -- DATA VALIDATION CONSTRAINTS
 -- =============================================================================
 
--- Equipment Performance Constraints
-ALTER TABLE miner_models ADD CONSTRAINT chk_hashrate_positive CHECK (hashrate_th > 0);
-ALTER TABLE miner_models ADD CONSTRAINT chk_power_positive CHECK (power_consumption_w > 0);
-ALTER TABLE miner_models ADD CONSTRAINT chk_efficiency_positive CHECK (efficiency_j_th > 0);
-ALTER TABLE miner_models ADD CONSTRAINT chk_degradation_range CHECK (hashrate_degradation_annual BETWEEN 0 AND 1);
-ALTER TABLE miner_models ADD CONSTRAINT chk_failure_rate_range CHECK (failure_rate_annual BETWEEN 0 AND 1);
-
-ALTER TABLE solar_panel_models ADD CONSTRAINT chk_solar_power_positive CHECK (rated_power_w > 0);
-ALTER TABLE solar_panel_models ADD CONSTRAINT chk_solar_efficiency_range CHECK (efficiency_percent BETWEEN 0 AND 100);
-ALTER TABLE solar_panel_models ADD CONSTRAINT chk_solar_degradation_range CHECK (degradation_rate_annual BETWEEN 0 AND 10);
-
-ALTER TABLE storage_models ADD CONSTRAINT chk_storage_capacity_positive CHECK (capacity_kwh > 0);
-ALTER TABLE storage_models ADD CONSTRAINT chk_storage_efficiency_range CHECK (round_trip_efficiency BETWEEN 0 AND 1);
-ALTER TABLE storage_models ADD CONSTRAINT chk_storage_cycle_life_positive CHECK (cycle_life > 0);
-
-ALTER TABLE inverter_models ADD CONSTRAINT chk_inverter_power_positive CHECK (rated_power_w > 0);
-ALTER TABLE inverter_models ADD CONSTRAINT chk_inverter_efficiency_range CHECK (efficiency_percent BETWEEN 0 AND 100);
-
--- Geographic Constraints
-ALTER TABLE locations ADD CONSTRAINT chk_latitude_range CHECK (latitude BETWEEN -90 AND 90);
-ALTER TABLE locations ADD CONSTRAINT chk_longitude_range CHECK (longitude BETWEEN -180 AND 180);
-ALTER TABLE locations ADD CONSTRAINT chk_elevation_range CHECK (elevation BETWEEN -1000 AND 10000);
-
--- Economic Constraints
-ALTER TABLE system_configs ADD CONSTRAINT chk_electricity_rate_positive CHECK (electricity_rate_usd_kwh > 0);
-ALTER TABLE system_configs ADD CONSTRAINT chk_net_metering_rate_positive CHECK (net_metering_rate_usd_kwh IS NULL OR net_metering_rate_usd_kwh >= 0);
-
--- Bitcoin Data Constraints
-ALTER TABLE bitcoin_network_data ADD CONSTRAINT chk_difficulty_positive CHECK (difficulty > 0);
-ALTER TABLE bitcoin_network_data ADD CONSTRAINT chk_hashrate_positive CHECK (network_hashrate > 0);
-ALTER TABLE bitcoin_network_data ADD CONSTRAINT chk_block_reward_positive CHECK (block_reward > 0);
-
-ALTER TABLE bitcoin_price_data ADD CONSTRAINT chk_price_positive CHECK (price_usd > 0);
-
--- Environmental Data Constraints
-ALTER TABLE monthly_solar_data ADD CONSTRAINT chk_ghi_positive CHECK (ghi_monthly_avg >= 0);
-ALTER TABLE monthly_solar_data ADD CONSTRAINT chk_dni_positive CHECK (dni_monthly_avg >= 0);
-ALTER TABLE monthly_solar_data ADD CONSTRAINT chk_sun_hours_reasonable CHECK (sun_hours_monthly_avg BETWEEN 0 AND 24);
-
-ALTER TABLE daily_forecast_data ADD CONSTRAINT chk_forecast_ghi_positive CHECK (ghi_forecast >= 0);
-ALTER TABLE daily_forecast_data ADD CONSTRAINT chk_forecast_temp_reasonable CHECK (temperature_forecast BETWEEN -50 AND 80);
-ALTER TABLE daily_forecast_data ADD CONSTRAINT chk_cloud_cover_range CHECK (cloud_cover_forecast BETWEEN 0 AND 100);
+-- Note: All constraints have been moved to their respective CREATE TABLE statements
+-- for SQLite compatibility. Constraints are now defined at table creation time.
 
 -- =============================================================================
 -- EXTERNAL DATA INDEXES
