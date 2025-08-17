@@ -1,7 +1,7 @@
 {
   "name": "solar-mining-calculator",
   "version": "1.0.0",
-  "description": "A comprehensive planning and projection tool for solar-powered Bitcoin mining operations",
+  "description": "A planning and projection tool for solar-powered Bitcoin mining operations",
   "private": true,
   "type": "module",
   "scripts": {
@@ -125,14 +125,14 @@
     "react",
     "typescript"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "seed42",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/solar-mining-calculator.git"
+    "url": "https://github.com/seedfourtytwo/BTCminingDashboard"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/solar-mining-calculator/issues"
+    "url": "https://github.com/seedfourtytwo/BTCminingDashboard/issues"
   },
-  "homepage": "https://github.com/yourusername/solar-mining-calculator#readme"
+  "homepage": "https://github.com/seedfourtytwo/BTCminingDashboardr#readme"
 }

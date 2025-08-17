@@ -1,8 +1,25 @@
 # Error Handling Strategy - Solar Bitcoin Mining Calculator
 
+## Table of Contents
+- [Overview](#overview)
+- [Error Handling Philosophy](#error-handling-philosophy)
+- [Error Categories](#error-categories)
+  - [User Input Errors](#user-input-errors)
+  - [System Errors](#system-errors)
+  - [External API Errors](#external-api-errors)
+  - [Database Errors](#database-errors)
+  - [Calculation Errors](#calculation-errors)
+- [Error Response Format](#error-response-format)
+- [Error Logging](#error-logging)
+- [Error Recovery Strategies](#error-recovery-strategies)
+- [User Experience](#user-experience)
+- [Implementation Guidelines](#implementation-guidelines)
+- [Testing Error Scenarios](#testing-error-scenarios)
+- [Monitoring and Alerting](#monitoring-and-alerting)
+
 ## Overview
 
-This document defines a comprehensive error handling strategy for the Solar Bitcoin Mining Calculator, focusing on robustness, user experience, and debugging capabilities for a personal project environment.
+This document defines an error handling strategy for the Solar Bitcoin Mining Calculator, focusing on robustness, user experience, and debugging capabilities for a personal project environment.
 
 ## Error Classification System
 
@@ -930,7 +947,7 @@ describe('Error Handling', () => {
     });
     
     it('should provide helpful error message for invalid dates', () => {
-      const error = () => validateDateRange('2024-12-01', '2024-01-01');
+      const error = () => validateDateRange('2025-12-01', '2025-01-01');
       expect(error).toThrow('End date must be after start date');
     });
   });
@@ -960,5 +977,5 @@ describe('Error Handling', () => {
 ---
 
 **Document Status**: Draft v1.0  
-**Last Updated**: 2024-08-11  
+**Last Updated**: 2025-08-17  
 **Implementation Priority**: High - Implement during initial development phase

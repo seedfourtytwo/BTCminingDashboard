@@ -1,13 +1,19 @@
 # CI/CD Guide: From Zero to Deployment
 
 ## Table of Contents
-1. [CI/CD Fundamentals](#cicd-fundamentals)
-2. [GitHub Actions Setup](#github-actions-setup)
-3. [Cloudflare Integration](#cloudflare-integration)
-4. [Environment Management](#environment-management)
-5. [Best Practices](#best-practices)
-6. [Troubleshooting](#troubleshooting)
-7. [Complete Example](#complete-example)
+- [CI/CD Fundamentals](#cicd-fundamentals)
+  - [What is CI/CD?](#what-is-cicd)
+  - [Why CI/CD Matters](#why-cicd-matters)
+  - [The Basic Flow](#the-basic-flow)
+- [GitHub Actions Setup](#github-actions-setup)
+  - [Core Concepts](#core-concepts)
+  - [Basic Workflow Structure](#basic-workflow-structure)
+  - [Key GitHub Actions Concepts](#key-github-actions-concepts)
+- [Cloudflare Integration](#cloudflare-integration)
+- [Environment Management](#environment-management)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Complete Example](#complete-example)
 
 ---
 
@@ -287,7 +293,7 @@ wip
 database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
 
 # ✅ Real ID from Cloudflare
-database_id = "6967c156-01e7-4469-b331-69a33240c796"
+database_id = "your-actual-database-id"
 ```
 
 **2. "CPU limits are not supported for the Free plan"**
@@ -320,7 +326,7 @@ queue = "my-queue"
 id = "my-kv-namespace-id"
 
 # ✅ Comment out until real namespace is created
-# id = "real-kv-namespace-id"
+# id = "your-actual-kv-namespace-id"
 ```
 
 ### Debugging Workflows
@@ -547,86 +553,27 @@ jobs:
 
 ### Package.json Scripts
 
-```json
-{
-  "scripts": {
-    "dev": "concurrently \"npm run dev:client\" \"npm run dev:api\"",
-    "dev:client": "vite",
-    "dev:api": "wrangler dev --config wrangler.api.toml --port 8787",
-    
-    "build": "npm run build:client && npm run build:workers",
-    "build:client": "vite build",
-    "build:workers": "npm run build:api && npm run build:data",
-    "build:api": "wrangler deploy --config wrangler.api.toml --dry-run",
-    "build:data": "wrangler deploy --config wrangler.data.toml --dry-run",
-    
-    "test": "vitest",
-    "test:ci": "vitest run --coverage",
-    "test:smoke": "vitest run tests/smoke/**/*.test.ts",
-    
-    "lint": "eslint src --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
-    "lint:ci": "eslint src --ext .ts,.tsx --format=junit --output-file=eslint-report.xml --max-warnings 100",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    
-    "type-check": "tsc --noEmit",
-    
-    "deploy": "npm run deploy:api && npm run deploy:data",
-    "deploy:api": "wrangler deploy --config wrangler.api.toml --env production",
-    "deploy:data": "wrangler deploy --config wrangler.data.toml --env production",
-    "deploy:api:dev": "wrangler deploy --config wrangler.api.toml --env development",
-    "deploy:data:dev": "wrangler deploy --config wrangler.data.toml --env development",
-    
-    "pages:deploy": "wrangler pages deploy dist",
-    "pages:deploy:production": "wrangler pages deploy dist --branch main"
-  }
-}
-```
+**Source**: See [`package.json`](../package.json) for complete script definitions
 
-### Wrangler Configuration (Simplified)
+**Key Scripts**:
+- `dev` - Start development servers
+- `build` - Build for production
+- `test` - Run test suite
+- `deploy` - Deploy to production
+- `lint` - Code quality checks
 
-```toml
-# wrangler.api.toml
-name = "my-api"
-main = "src/server/api/index.ts"
-compatibility_date = "2024-01-01"
-compatibility_flags = ["nodejs_compat"]
+### Wrangler Configuration
 
-# Development environment
-[env.development]
-name = "my-api-dev"
+**Source**: See configuration files in project root:
+- [`wrangler.api.toml`](../wrangler.api.toml)
+- [`wrangler.calculations.toml`](../wrangler.calculations.toml)
+- [`wrangler.data.toml`](../wrangler.data.toml)
 
-# Production environment
-[env.production]
-name = "my-api"
-
-# Database bindings
-[[env.development.d1_databases]]
-binding = "DB"
-database_name = "my-db-dev"
-database_id = "your-dev-database-id"
-
-[[env.production.d1_databases]]
-binding = "DB"
-database_name = "my-db"
-database_id = "your-prod-database-id"
-
-# Environment variables
-[env.development.vars]
-CORS_ORIGIN = "http://localhost:3000"
-API_VERSION = "v1"
-
-[env.production.vars]
-CORS_ORIGIN = "https://your-app.pages.dev"
-API_VERSION = "v1"
-
-# Disable advanced features for initial deployment
-# [limits]
-# cpu_ms = 50
-
-# [[env.production.analytics_engine_datasets]]
-# binding = "ANALYTICS"
-# dataset = "my_api_analytics"
-```
+**Key Configuration Elements**:
+- **Worker Names**: API, calculations, and data workers
+- **Database Bindings**: D1 database connections
+- **Environment Variables**: CORS origins, API versions
+- **Service Bindings**: Inter-worker communication
 
 ---
 

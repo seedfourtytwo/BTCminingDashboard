@@ -1,8 +1,31 @@
 # Deployment Guide - Solar Bitcoin Mining Calculator
 
+## Table of Contents
+- [Overview](#overview)
+- [Architecture Overview](#architecture-overview)
+- [Prerequisites](#prerequisites)
+  - [Required Tools](#required-tools)
+  - [Required Accounts](#required-accounts)
+- [Initial Setup](#initial-setup)
+  - [Install Dependencies](#1-install-dependencies)
+  - [Cloudflare Account Setup](#2-cloudflare-account-setup)
+  - [Environment Configuration](#3-environment-configuration)
+  - [Database Setup](#4-database-setup)
+- [Worker Configuration](#worker-configuration)
+  - [API Worker Configuration](#1-api-worker-configuration)
+  - [Calculation Worker Configuration](#2-calculation-worker-configuration)
+  - [Data Worker Configuration](#3-data-worker-configuration)
+- [Database Deployment](#database-deployment)
+- [Frontend Deployment](#frontend-deployment)
+- [Environment Management](#environment-management)
+- [Monitoring and Maintenance](#monitoring-and-maintenance)
+- [Troubleshooting](#troubleshooting)
+
 ## Overview
 
 This guide covers the deployment of the Solar Bitcoin Mining Calculator on Cloudflare Workers. The application uses a serverless architecture with separate workers for API, calculations, and data management.
+
+**CI/CD Pipeline**: See [`docs/13-CI-CD-GUIDE.md`](13-CI-CD-GUIDE.md) for automated deployment and continuous integration setup.
 
 ## Architecture Overview
 
@@ -102,7 +125,7 @@ wrangler d1 execute solar-mining-calculator --file=src/server/shared/database/mi
 ```toml
 name = "solar-mining-calculator-api"
 main = "src/server/api/index.ts"
-compatibility_date = "2024-01-15"
+compatibility_date = "2025-01-15"
 
 [env.production]
 name = "solar-mining-calculator-api"
@@ -146,7 +169,7 @@ bucket_name = "solar-mining-calculator-assets-staging"
 ```toml
 name = "solar-mining-calculator-calculations"
 main = "src/server/calculations/index.ts"
-compatibility_date = "2024-01-15"
+compatibility_date = "2025-01-15"
 
 [env.production]
 name = "solar-mining-calculator-calculations"
@@ -182,7 +205,7 @@ CALCULATION_TIMEOUT = "30000"
 ```toml
 name = "solar-mining-calculator-data"
 main = "src/server/data/index.ts"
-compatibility_date = "2024-01-15"
+compatibility_date = "2025-01-15"
 
 [env.production]
 name = "solar-mining-calculator-data"
@@ -538,5 +561,5 @@ wrangler d1 execute solar-mining-calculator --command="SELECT COUNT(*) FROM equi
 ---
 
 **Document Status**: Current Plan v1.0  
-**Last Updated**: 2024-12-19  
+**Last Updated**: 2025-08-17  
 **Next Review**: After Phase 1 implementation

@@ -1,5 +1,20 @@
 # API Specification - Solar Bitcoin Mining Calculator
 
+## Table of Contents
+- [API Overview](#api-overview)
+- [Base Configuration](#base-configuration)
+- [Response Format](#response-format)
+- [Core API Endpoints](#core-api-endpoints)
+  - [Equipment Management](#1-equipment-management)
+  - [Location Management](#2-location-management)
+  - [System Configuration](#3-system-configuration)
+  - [Projection Calculations](#4-projection-calculations)
+  - [Bitcoin Data](#5-bitcoin-data)
+  - [Environmental Data](#6-environmental-data)
+- [Error Codes](#error-codes)
+- [Rate Limiting](#rate-limiting)
+- [Future Implementation](#future-implementation)
+
 ## API Overview
 
 The Solar Bitcoin Mining Calculator provides a REST API built on Cloudflare Workers for managing equipment, configurations, and basic projections. The API follows RESTful principles and returns JSON responses.
@@ -14,7 +29,7 @@ The Solar Bitcoin Mining Calculator provides a REST API built on Cloudflare Work
 ## Base Configuration
 
 ```
-Base URL: https://solar-mining-calculator.your-worker.workers.dev
+Base URL: https://solar-mining-api.christopher-k.workers.dev
 API Version: v1
 Content-Type: application/json
 ```
@@ -29,7 +44,7 @@ All API responses follow a consistent format:
   "success": true,
   "data": { ... },
   "meta": {
-    "timestamp": "2024-08-11T10:30:00Z",
+    "timestamp": "2025-08-17T10:30:00Z",
     "version": "1.0"
   }
 }
@@ -44,11 +59,13 @@ All API responses follow a consistent format:
     "message": "Invalid equipment configuration"
   },
   "meta": {
-    "timestamp": "2024-08-11T10:30:00Z",
+    "timestamp": "2025-08-17T10:30:00Z",
     "version": "1.0"
   }
 }
 ```
+
+**Note**: Full response schemas are defined in the API implementation files.
 
 ## Core API Endpoints
 
@@ -228,7 +245,7 @@ GET /api/v1/system-configs
         }
       ],
       "electricity_rate_usd_kwh": 0.12,
-      "created_at": "2024-08-11T10:30:00Z"
+      "created_at": "2025-08-17T10:30:00Z"
     }
   ]
 }
@@ -299,7 +316,7 @@ Content-Type: application/json
     "payback_period_months": 18.5,
     "monthly_results": [
       {
-        "month": "2024-09",
+        "month": "2025-09",
         "solar_generation_kwh": 3750,
         "mining_consumption_kwh": 23400,
         "btc_mined": 0.375,
@@ -352,7 +369,7 @@ GET /api/v1/bitcoin/current
 Get historical Bitcoin price data.
 
 ```http
-GET /api/v1/bitcoin/history?start_date=2024-01-01&end_date=2024-08-11
+GET /api/v1/bitcoin/history?start_date=2025-01-01&end_date=2025-08-17
 ```
 
 ### 6. ENVIRONMENTAL DATA
@@ -382,7 +399,7 @@ GET /api/v1/environmental/1
       "ghi_daily_estimated": 7.2,
       "temperature_max": 35
     },
-    "last_updated": "2024-08-11T15:30:00Z"
+    "last_updated": "2025-08-17T15:30:00Z"
   }
 }
 ```
@@ -451,5 +468,5 @@ X-RateLimit-Reset: 1628700000
 ---
 
 **Document Status**: Current Plan v1.0  
-**Last Updated**: 2024-12-19  
+**Last Updated**: 2025-08-17  
 **Next Review**: After Phase 1 implementation

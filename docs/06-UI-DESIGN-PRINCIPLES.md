@@ -1,8 +1,26 @@
 # User-Friendly UI Design Principles - 2024 Best Practices
 
+## Table of Contents
+- [Overview](#overview)
+- [Core Design Philosophy](#core-design-philosophy)
+  - [User-Centered Design Principles](#user-centered-design-principles)
+- [Visual Hierarchy](#1-visual-hierarchy)
+  - [Importance and Implementation](#importance-and-implementation)
+  - [Typography Hierarchy Structure](#typography-hierarchy-structure)
+  - [Hierarchy Creation Techniques](#hierarchy-creation-techniques)
+  - [Application to Mining Calculator](#application-to-mining-calculator)
+- [Typography Principles](#2-typography-principles)
+- [Color Theory and Application](#3-color-theory-and-application)
+- [Layout and Spacing](#4-layout-and-spacing)
+- [Component Design](#5-component-design)
+- [Accessibility Standards](#6-accessibility-standards)
+- [Responsive Design](#7-responsive-design)
+- [Performance Optimization](#8-performance-optimization)
+- [Implementation Guidelines](#9-implementation-guidelines)
+
 ## Overview
 
-This document serves as a comprehensive reference for designing modern, user-friendly interfaces for the Solar Bitcoin Mining Calculator. These principles are based on current industry best practices, accessibility standards, and user experience research from 2024.
+This document serves as a reference for designing modern, user-friendly interfaces for the Solar Bitcoin Mining Calculator. These principles are based on current industry best practices, accessibility standards, and user experience research from 2024.
 
 ## Core Design Philosophy
 
@@ -720,6 +738,6 @@ Follow the POUR principles: Perceivable, Operable, Understandable, Robust.
 ---
 
 **Document Status**: Final v1.0  
-**Last Updated**: 2024-08-11  
+**Last Updated**: 2025-08-17  
 **Compliance**: WCAG 2.2 AA, 2024 Best Practices  
 **Review Schedule**: Quarterly updates for accessibility standards

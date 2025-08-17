@@ -28,5 +28,12 @@
 - [Important note 2]
 - [Important note 3]
 
+## 🌿 Git Workflow
+- **Create dedicated branch**: `git checkout -b feature/[session-name]` (if not already on appropriate branch)
+- **Commit frequently**: Small, focused commits with clear messages
+- **Push regularly**: `gitß push -u origin feature/[session-name]` to backup work and trigger CI/CD
+- **Direct merge**: Since CI/CD runs on push and this is solo development, direct merging is efficient
+- **Note**: PRs are valuable for team projects but add overhead for solo development
+
 ---
 **Branch**: `feature/[branch-name]`
